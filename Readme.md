@@ -1,7 +1,7 @@
 # Личный проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Олег Новицкий](https://up.htmlacademy.ru/ecmascript/10/user/480757).
-* Наставник: `Неизвестно`.
+* Наставник: `Without mentor`.
 
 ---
 
