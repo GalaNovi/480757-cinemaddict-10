@@ -276,6 +276,7 @@ const filmListElement = renderTemplate(createFilmListTemplate(), filmsElement).q
 new Array(FILMS_COUNT)
   .fill(``)
   .forEach(() => renderTemplate(createCardTemplate(), filmListElement));
+renderTemplate(createMoreButtonTemplate(), filmsElement.querySelector(`.films-list`));
 const extraTopListElement = renderTemplate(createExtraTopListTemplate(), filmsElement).querySelector(`.films-list__container`);
 const extraCommentedListElement = renderTemplate(createExtraCommentedListTemplate(), filmsElement).querySelector(`.films-list__container`);
 new Array(EXTRA_FILMS_COUNT)
