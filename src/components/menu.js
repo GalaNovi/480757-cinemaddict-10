@@ -14,12 +14,13 @@ const createFilterMarkup = (filter, index) => {
   );
 };
 
-export const createFilterTemplate = () => {
+export const createMenuTemplate = () => {
   const filtersMarkup = Filters.map((filter, index) => createFilterMarkup(filter, index)).join(``);
 
   return (
     `<nav class="main-navigation">
       ${filtersMarkup}
+      <a href="#stats" class="main-navigation__item main-navigation__item--additional">Stats</a>
     </nav>`
   );
 };

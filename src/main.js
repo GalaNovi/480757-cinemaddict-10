@@ -1,5 +1,5 @@
 import {createProfileTemplate} from './components/profile';
-import {createFilterTemplate} from './components/filter';
+import {createMenuTemplate} from './components/menu';
 import {createSortTemplate} from './components/sort';
 import {createFilmsContainerTemplate} from './components/films-container';
 import {createFilmListTemplate} from './components/film-list';
@@ -7,6 +7,7 @@ import {createCardTemplate} from './components/card';
 import {createMoreButtonTemplate} from './components/more-button';
 import {createExtraFilmListTemplate} from './components/extra-film-list';
 import {createFilmModalTemplate} from './components/film-modal';
+import {generateMovies} from './mock/movie';
 
 const createElement = (templateString) => {
   const template = document.createElement(`template`);
@@ -21,20 +22,25 @@ const renderTemplate = (template, element) => {
 
 const FILMS_COUNT = 5;
 const EXTRA_FILMS_COUNT = 2;
-const EXTRA_FILM_HEADINGS = [`Top rated`, `Most commented`];
+const ExtraFilmHeadings = [`Top rated`, `Most commented`];
 
 const bodyElement = document.querySelector(`body`);
 const headerElement = bodyElement.querySelector(`.header`);
 const mainElement = bodyElement.querySelector(`.main`);
+const movies = generateMovies(FILMS_COUNT);
+const topRatedMovies = generateMovies(EXTRA_FILMS_COUNT);
+const mostCommentedMovies = generateMovies(EXTRA_FILMS_COUNT);
 
 renderTemplate(createProfileTemplate(), headerElement);
-renderTemplate(createFilterTemplate(), mainElement);
+renderTemplate(createMenuTemplate(), mainElement);
 renderTemplate(createSortTemplate(), mainElement);
 const filmsContainerElement = renderTemplate(createFilmsContainerTemplate(), mainElement);
 const filmListElement = renderTemplate(createFilmListTemplate(), filmsContainerElement).querySelector(`.films-list__container`);
-new Array(FILMS_COUNT)
-  .fill(``)
-  .forEach(() => renderTemplate(createCardTemplate(), filmListElement));
+movies.forEach((movie) => renderTemplate(createCardTemplate(movie), filmListElement));
 renderTemplate(createMoreButtonTemplate(), filmsContainerElement.querySelector(`.films-list`));
-EXTRA_FILM_HEADINGS.forEach((heading) => renderTemplate(createExtraFilmListTemplate(heading, EXTRA_FILMS_COUNT), filmsContainerElement));
+const topRatedListElement = renderTemplate(createExtraFilmListTemplate(ExtraFilmHeadings[0]), filmsContainerElement).querySelector(`.films-list__container`);
+const mostCommentedListElement = renderTemplate(createExtraFilmListTemplate(ExtraFilmHeadings[1]), filmsContainerElement).querySelector(`.films-list__container`);
+topRatedMovies.forEach((movie) => renderTemplate(createCardTemplate(movie), topRatedListElement));
+mostCommentedMovies.forEach((movie) => renderTemplate(createCardTemplate(movie), mostCommentedListElement));
+
 renderTemplate(createFilmModalTemplate(), bodyElement).style.display = `none`; // Что бы не мешал.
