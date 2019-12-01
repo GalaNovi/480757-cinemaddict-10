@@ -1,5 +1,5 @@
 import {createProfileTemplate} from './components/profile';
-import {createMenuTemplate} from './components/menu';
+import {createFilterTemplate} from './components/filter';
 import {createSortTemplate} from './components/sort';
 import {createFilmsContainerTemplate} from './components/films-container';
 import {createFilmListTemplate} from './components/film-list';
@@ -28,7 +28,7 @@ const headerElement = bodyElement.querySelector(`.header`);
 const mainElement = bodyElement.querySelector(`.main`);
 
 renderTemplate(createProfileTemplate(), headerElement);
-renderTemplate(createMenuTemplate(), mainElement);
+renderTemplate(createFilterTemplate(), mainElement);
 renderTemplate(createSortTemplate(), mainElement);
 const filmsContainerElement = renderTemplate(createFilmsContainerTemplate(), mainElement);
 const filmListElement = renderTemplate(createFilmListTemplate(), filmsContainerElement).querySelector(`.films-list__container`);
