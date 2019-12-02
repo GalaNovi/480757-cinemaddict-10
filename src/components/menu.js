@@ -1,21 +1,26 @@
 import {capitalize} from '../utils';
+import {filters} from '../const';
 
-const Filters = [`all`, `watchlist`, `history`, `favorites`];
+const filterParameters = {
+  'all': ``,
+  'watchlist': (movie) => movie.movieInfo.isOnTheWatchlist,
+  'history': (movie) => movie.movieInfo.isAlredyWatched,
+  'favorites': (movie) => movie.movieInfo.isFavorite,
+};
 
-const createFilterMarkup = (filter, index) => {
-  const activeClass = !index ? ` main-navigation__item--active` : ``;
+const createFilterMarkup = (filter, movies) => {
+  const activeClass = filter === `all` ? ` main-navigation__item--active` : ``;
+  const counterMarkup = filter === `all` ? `All movies` : `${capitalize(filter)} <span class="main-navigation__item-count">${movies.filter(filterParameters[filter]).length}</span>`;
 
   return (
     `<a href="#${filter}" class="main-navigation__item${activeClass}">
-      ${filter === `all` ?
-      `All movies` :
-      `${capitalize(filter)} <span class="main-navigation__item-count">13</span>`}
+      ${counterMarkup}
     </a>`
   );
 };
 
-export const createMenuTemplate = () => {
-  const filtersMarkup = Filters.map((filter, index) => createFilterMarkup(filter, index)).join(``);
+export const createMenuTemplate = (movies) => {
+  const filtersMarkup = filters.map((filter) => createFilterMarkup(filter, movies)).join(``);
 
   return (
     `<nav class="main-navigation">
