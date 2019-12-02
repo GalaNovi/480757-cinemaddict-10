@@ -1,7 +1,9 @@
 import {shuffleArray} from '../utils';
 import {emotions} from '../const';
 
-const MAX_GENRES_COUNT = 3;
+const MAX_DESCRIPTION_SENTENSES = 6;
+const MAX_GENRES = 3;
+const MIN_ACTORS = 2;
 const MAX_ACTORS = 4;
 const MAX_WRITERS = 3;
 const getRandomBetween = (min, max, demicalPlacesCount = 0) => (parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(demicalPlacesCount));
@@ -64,44 +66,44 @@ const genres = [
 const comments = [
   {
     'author': `Tim Macoveev`,
-    'comment': `Very good film! Not sorry for the time spent.`,
-    'date': new Date(`${getRandomBetween(2016, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}, ${getRandomBetween(0, 23)}, ${getRandomBetween(0, 59)}`).getTime(),
+    'text': `Very good film! Not sorry for the time spent.`,
+    'date': Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     'emotion': getRandomArrayItem(emotions),
   },
   {
     'author': `Mike Chakman`,
-    'comment': `Which movie is good? Yes, this is nonsense! The acting is terrible. Blooper on a blooper. Graphics sucks.`,
-    'date': new Date(`${getRandomBetween(2016, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}, ${getRandomBetween(0, 23)}, ${getRandomBetween(0, 59)}`).getTime(),
+    'text': `Which movie is good? Yes, this is nonsense! The acting is terrible. Blooper on a blooper. Graphics sucks.`,
+    'date': Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     'emotion': getRandomArrayItem(emotions),
   },
   {
     'author': `ChinWag`,
-    'comment': `The book was like that))) Cool like))) I can’t remember the name)))`,
-    'date': new Date(`${getRandomBetween(2016, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}, ${getRandomBetween(0, 23)}, ${getRandomBetween(0, 59)}`).getTime(),
+    'text': `The book was like that))) Cool like))) I can’t remember the name)))`,
+    'date': Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     'emotion': getRandomArrayItem(emotions),
   },
   {
     'author': `derroys`,
-    'comment': `Awesome movie, one of the favorite in our family, great actors. Adore. I recommend.`,
-    'date': new Date(`${getRandomBetween(2016, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}, ${getRandomBetween(0, 23)}, ${getRandomBetween(0, 59)}`).getTime(),
+    'text': `Awesome movie, one of the favorite in our family, great actors. Adore. I recommend.`,
+    'date': Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     'emotion': getRandomArrayItem(emotions),
   },
   {
     'author': `Darkmus`,
-    'comment': `Good, funny film, why do sofa critics give such low ratings? :(`,
-    'date': new Date(`${getRandomBetween(2016, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}, ${getRandomBetween(0, 23)}, ${getRandomBetween(0, 59)}`).getTime(),
+    'text': `Good, funny film, why do sofa critics give such low ratings? :(`,
+    'date': Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     'emotion': getRandomArrayItem(emotions),
   },
   {
     'author': `DarGi`,
-    'comment': `Surprisingly enjoyed watching this movie)`,
-    'date': new Date(`${getRandomBetween(2016, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}, ${getRandomBetween(0, 23)}, ${getRandomBetween(0, 59)}`).getTime(),
+    'text': `Surprisingly enjoyed watching this movie)`,
+    'date': Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     'emotion': getRandomArrayItem(emotions),
   },
   {
     'author': `Barathrum`,
-    'comment': `A very pleasant psychological-ironic film, it looks in one breath. Cool story, a logical and interesting plot, a wonderful selection of actors. I looked with pleasure.`,
-    'date': new Date(`${getRandomBetween(2016, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}, ${getRandomBetween(0, 23)}, ${getRandomBetween(0, 59)}`).getTime(),
+    'text': `A very pleasant psychological-ironic film, it looks in one breath. Cool story, a logical and interesting plot, a wonderful selection of actors. I looked with pleasure.`,
+    'date': Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     'emotion': getRandomArrayItem(emotions),
   },
 ];
@@ -148,20 +150,20 @@ const countries = [
 const generateAgeLimit = () => getRandomArrayItem(ageLimits);
 const generateTitle = () => getRandomArrayItem(titles);
 const generatePoster = () => getRandomArrayItem(posters);
-const generateGenres = () => shuffleArray(genres).slice(0, getRandomBetween(1, MAX_GENRES_COUNT));
+const generateGenres = () => shuffleArray(genres).slice(0, getRandomBetween(1, MAX_GENRES));
 const generateComments = () => shuffleArray(comments).slice(0, getRandomBetween(0, comments.length));
 const generateDirector = () => getRandomArrayItem(directors);
 const generateWriters = () => shuffleArray(writers).slice(0, getRandomBetween(1, MAX_WRITERS));
-const generateActors = () => shuffleArray(actors).slice(0, getRandomBetween(1, MAX_ACTORS));
+const generateActors = () => shuffleArray(actors).slice(0, getRandomBetween(MIN_ACTORS, MAX_ACTORS));
 const generateCountry = () => getRandomArrayItem(countries);
 const generateReleaseDate = () => new Date(`${getRandomBetween(1960, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}`).getTime();
 
 const generateDescription = () => {
   const sentenses = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`
-  .split(`.`)
-  .map((sentense) => sentense.trim());
+  .split(`. `)
+  .map((sentense, i, array) => i !== array.length - 1 ? `${sentense}.` : sentense);
 
-  return sentenses.slice(0, getRandomBetween(1, 3)).join(`. `).trim();
+  return sentenses.slice(0, getRandomBetween(1, MAX_DESCRIPTION_SENTENSES)).join(` `).trim();
 };
 
 const generateCard = (index) => {
