@@ -47,7 +47,6 @@ const renderLoadButton = (container) => {
 
     loadButtonElement.addEventListener(`click`, (evt) => {
       evt.preventDefault();
-      console.log(shownMoviesCounter, MoviesCount.ADD);
       renderMainMovies(movies.slice(shownMoviesCounter, shownMoviesCounter + MoviesCount.ADD), filmListElement);
       if (movies.length === shownMoviesCounter) {
         loadButtonElement.remove();

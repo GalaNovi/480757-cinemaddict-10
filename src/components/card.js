@@ -15,7 +15,7 @@ const createCardTemplate = (movie) => {
   const year = new Date(movie.movieInfo.release.date).getFullYear();
   const commentsNumber = comments.length;
   const duration = formatTime(movie.movieInfo.duration);
-  const genres = movie.movieInfo.genres.map((name) => capitalize(name)).join(` `);
+  const genres = movie.movieInfo.genres.map((genre) => capitalize(genre)).join(` `);
   const ratingMarkup = createRatingMarkup(rating);
 
   return (
@@ -39,4 +39,4 @@ const createCardTemplate = (movie) => {
   );
 };
 
-export {createCardTemplate, formatTime}
+export {createCardTemplate, formatTime};
