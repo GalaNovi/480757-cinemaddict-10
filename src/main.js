@@ -55,7 +55,14 @@ const renderLoadButton = (container) => {
   }
 };
 
-const renderExtraMovies = (topRatedMovies, mostCommentedMovies) => {
+const renderExtraMovies = (topRatedMovies, mostCommentedMovies, container) => {
+  let topRatedListElement;
+  let mostCommentedListElement;
+
+  if (topRatedMovies || mostCommentedMovies) {
+    topRatedListElement = renderTemplate(createExtraMovieListTemplate(extraFilmHeadings[0]), container).querySelector(`.films-list__container`);
+    mostCommentedListElement = renderTemplate(createExtraMovieListTemplate(extraFilmHeadings[1]), container).querySelector(`.films-list__container`);
+  }
   if (topRatedMovies) {
     topRatedMovies.forEach((movie) => renderTemplate(createCardTemplate(movie), topRatedListElement));
   }
@@ -82,9 +89,7 @@ const filmsContainerElement = renderTemplate(createMoviesContainerTemplate(), ma
 const filmListElement = renderTemplate(createMovieListTemplate(), filmsContainerElement).querySelector(`.films-list__container`);
 renderMainMovies(movies.slice(shownMoviesCounter, MoviesCount.START), filmListElement);
 renderLoadButton(filmsContainerElement);
-const topRatedListElement = renderTemplate(createExtraMovieListTemplate(extraFilmHeadings[0]), filmsContainerElement).querySelector(`.films-list__container`);
-const mostCommentedListElement = renderTemplate(createExtraMovieListTemplate(extraFilmHeadings[1]), filmsContainerElement).querySelector(`.films-list__container`);
-renderExtraMovies(topRatedMovies, mostCommentedMovies);
+renderExtraMovies(topRatedMovies, mostCommentedMovies, filmsContainerElement);
 document.querySelector(`.footer__statistics p`).textContent = `${movies.length} movies inside`;
 
 renderTemplate(createBigCardTemplate(movies[0]), bodyElement).style.display = `none`; // Что бы не мешал.
