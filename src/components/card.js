@@ -7,6 +7,8 @@ const formatTime = (duration) => {
   return `${hours}h ${minutes}m`;
 };
 
+const createRatingMarkup = (rating) => rating >= 1 ? `<p class="film-card__rating">${rating}</p>` : ``;
+
 const createCardTemplate = (movie) => {
   const {comments} = movie;
   const {name, poster, rating, description, isOnTheWatchlist, isAlredyWatched, isFavorite} = movie.movieInfo;
@@ -14,11 +16,12 @@ const createCardTemplate = (movie) => {
   const commentsNumber = comments.length;
   const duration = formatTime(movie.movieInfo.duration);
   const genres = movie.movieInfo.genres.map((name) => capitalize(name)).join(` `);
+  const ratingMarkup = createRatingMarkup(rating);
 
   return (
     `<article class="film-card">
       <h3 class="film-card__title">${name}</h3>
-      <p class="film-card__rating">${rating}</p>
+      ${ratingMarkup}
       <p class="film-card__info">
         <span class="film-card__year">${year}</span>
         <span class="film-card__duration">${duration}</span>

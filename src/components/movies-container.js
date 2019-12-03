@@ -1,4 +1,4 @@
-export const createFilmsContainerTemplate = () => {
+export const createMoviesContainerTemplate = () => {
   return (
     `<section class="films"></div>`
   );

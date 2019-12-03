@@ -48,7 +48,7 @@ const createCommentsMarkup = (comment) => {
   );
 };
 
-export const createFilmModalTemplate = (movie) => {
+export const createBigCardTemplate = (movie) => {
   const {
     poster,
     ageLimit,

@@ -182,7 +182,7 @@ const generateCard = (index) => {
         'country': generateCountry(),
       },
       'poster': generatePoster(),
-      'rating': getRandomBetween(2, 9, 1),
+      'rating': getRandomBetween(0, 9, 1),
       'duration': getRandomBetween(75, 180),
       'genres': generateGenres(),
       'description': generateDescription(),

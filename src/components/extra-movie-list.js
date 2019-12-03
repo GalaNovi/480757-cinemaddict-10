@@ -1,4 +1,4 @@
-export const createExtraFilmListTemplate = (heading) => {
+export const createExtraMovieListTemplate = (heading) => {
   return (
     `<section class="films-list--extra">
       <h2 class="films-list__title">${heading}</h2>
