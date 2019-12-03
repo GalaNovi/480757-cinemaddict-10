@@ -55,21 +55,27 @@ const renderLoadButton = (container) => {
   }
 };
 
-const renderExtraMovies = (topRatedMovies, mostCommentedMovies, container) => {
-  let topRatedListElement;
-  let mostCommentedListElement;
+const renderExtraMovies = (container, ...movieGroups) => {
+  const doesHasMovies = movieGroups.some((element) => Boolean(element) === true);
+  const extraMovieLists = new Map([
+    [`topRatedListElement`, null],
+    [`mostCommentedListElement`, null],
+  ]);
+  const extraMovieListsKeys = Array.from(extraMovieLists.keys());
 
-  if (topRatedMovies || mostCommentedMovies) {
-    topRatedListElement = renderTemplate(createExtraMovieListTemplate(extraFilmHeadings[0]), container).querySelector(`.films-list__container`);
-    mostCommentedListElement = renderTemplate(createExtraMovieListTemplate(extraFilmHeadings[1]), container).querySelector(`.films-list__container`);
-  }
-  if (topRatedMovies) {
-    topRatedMovies.forEach((movie) => renderTemplate(createCardTemplate(movie), topRatedListElement));
+  if (doesHasMovies) {
+    extraFilmHeadings.forEach((heading, index) => {
+      extraMovieLists.set(extraMovieListsKeys[index], renderTemplate(createExtraMovieListTemplate(heading), container).querySelector(`.films-list__container`));
+    });
   }
 
-  if (mostCommentedMovies) {
-    mostCommentedMovies.forEach((movie) => renderTemplate(createCardTemplate(movie), mostCommentedListElement));
-  }
+  movieGroups.forEach((moviesGroup, index) => {
+    if (moviesGroup) {
+      moviesGroup.forEach((movie) => renderTemplate(createCardTemplate(movie), extraMovieLists.get(extraMovieListsKeys[index])));
+    } else {
+      extraMovieLists.get(extraMovieListsKeys[index]).parentNode.innerHTML = ``;
+    }
+  });
 };
 
 const bodyElement = document.querySelector(`body`);
@@ -89,7 +95,7 @@ const filmsContainerElement = renderTemplate(createMoviesContainerTemplate(), ma
 const filmListElement = renderTemplate(createMovieListTemplate(), filmsContainerElement).querySelector(`.films-list__container`);
 renderMainMovies(movies.slice(shownMoviesCounter, MoviesCount.START), filmListElement);
 renderLoadButton(filmsContainerElement);
-renderExtraMovies(topRatedMovies, mostCommentedMovies, filmsContainerElement);
+renderExtraMovies(filmsContainerElement, mostCommentedMovies, topRatedMovies);
 document.querySelector(`.footer__statistics p`).textContent = `${movies.length} movies inside`;
 
 renderTemplate(createBigCardTemplate(movies[0]), bodyElement).style.display = `none`; // Что бы не мешал.
