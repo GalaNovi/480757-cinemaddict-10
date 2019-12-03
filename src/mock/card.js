@@ -10,9 +10,9 @@ const getRandomBetween = (min, max, demicalPlacesCount = 0) => (parseFloat((min 
 const getRandomArrayItem = (array) => array[getRandomBetween(0, array.length - 1)];
 const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 
-const ageLimits = [0, 6, 12, 16, 18];
+const ageLimits = new Set([0, 6, 12, 16, 18]);
 
-const titles = [
+const titles = new Set([
   `The Shawshank Redemption`,
   `The Godfather`,
   `The Dark Knight`,
@@ -28,9 +28,9 @@ const titles = [
   `Star Wars: Episode V - The Empire Strikes Back`,
   `The Lord of the Rings: The Two Towers`,
   `The Matrix`,
-];
+]);
 
-const posters = [
+const posters = new Set([
   `./images/posters/made-for-each-other.png`,
   `./images/posters/popeye-meets-sinbad.png`,
   `./images/posters/sagebrush-trail.jpg`,
@@ -38,9 +38,9 @@ const posters = [
   `./images/posters/the-dance-of-life.jpg`,
   `./images/posters/the-great-flamarion.jpg`,
   `./images/posters/the-man-with-the-golden-arm.jpg`,
-];
+]);
 
-const directors = [
+const directors = new Set([
   `Quentin Tarantino`,
   `Christopher Nolan`,
   `Joel Coen`,
@@ -52,18 +52,18 @@ const directors = [
   `Drew Goddard`,
   `Ridley Scott`,
   `James Ponsoldt`,
-];
+]);
 
-const genres = [
+const genres = new Set([
   `comedy`,
   `musicle`,
   `western`,
   `drama`,
   `cartoon`,
   `mystery`,
-];
+]);
 
-const comments = [
+const comments = new Set([
   {
     'author': `Tim Macoveev`,
     'text': `Very good film! Not sorry for the time spent.`,
@@ -106,9 +106,9 @@ const comments = [
     'date': Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     'emotion': getRandomArrayItem(emotions),
   },
-];
+]);
 
-const writers = [
+const writers = new Set([
   `Anthony Mann`,
   `Stanley Kubrick`,
   `Martin Scorsese`,
@@ -120,9 +120,9 @@ const writers = [
   `Christopher Nolan`,
   `Ridley Scott`,
   `James Ponsoldt`,
-];
+]);
 
-const actors = [
+const actors = new Set([
   `Jack Nicholson`,
   `Marlon Brando`,
   `Robert De Niro`,
@@ -135,9 +135,9 @@ const actors = [
   `Julia Ormond`,
   `Jennifer Aniston`,
   `Denzel Washington`,
-];
+]);
 
-const countries = [
+const countries = new Set([
   `USA`,
   `Italy`,
   `Russia`,
@@ -145,17 +145,17 @@ const countries = [
   `England`,
   `Belgium`,
   `India`,
-];
+]);
 
-const generateAgeLimit = () => getRandomArrayItem(ageLimits);
-const generateTitle = () => getRandomArrayItem(titles);
-const generatePoster = () => getRandomArrayItem(posters);
-const generateGenres = () => shuffleArray(genres).slice(0, getRandomBetween(1, MAX_GENRES));
-const generateComments = () => shuffleArray(comments).slice(0, getRandomBetween(0, comments.length));
-const generateDirector = () => getRandomArrayItem(directors);
-const generateWriters = () => shuffleArray(writers).slice(0, getRandomBetween(1, MAX_WRITERS));
-const generateActors = () => shuffleArray(actors).slice(0, getRandomBetween(MIN_ACTORS, MAX_ACTORS));
-const generateCountry = () => getRandomArrayItem(countries);
+const generateAgeLimit = () => getRandomArrayItem(Array.from(ageLimits));
+const generateTitle = () => getRandomArrayItem(Array.from(titles));
+const generatePoster = () => getRandomArrayItem(Array.from(posters));
+const generateGenres = () => shuffleArray(Array.from(genres)).slice(0, getRandomBetween(1, MAX_GENRES));
+const generateComments = () => shuffleArray(Array.from(comments)).slice(0, getRandomBetween(0, comments.size));
+const generateDirector = () => getRandomArrayItem(Array.from(directors));
+const generateWriters = () => shuffleArray(Array.from(writers)).slice(0, getRandomBetween(1, MAX_WRITERS));
+const generateActors = () => shuffleArray(Array.from(actors)).slice(0, getRandomBetween(MIN_ACTORS, MAX_ACTORS));
+const generateCountry = () => getRandomArrayItem(Array.from(countries));
 const generateReleaseDate = () => new Date(`${getRandomBetween(1960, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}`).getTime();
 
 const generateDescription = () => {
