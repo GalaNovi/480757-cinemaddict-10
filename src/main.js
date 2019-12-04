@@ -55,27 +55,15 @@ const renderLoadButton = (container) => {
   }
 };
 
-const renderExtraMovies = (container, ...movieGroups) => {
-  const doesHasMovies = movieGroups.some((element) => Boolean(element) === true);
-  const extraMovieLists = new Map([
-    [`topRatedListElement`, null],
-    [`mostCommentedListElement`, null],
-  ]);
-  const extraMovieListsKeys = Array.from(extraMovieLists.keys());
+const renderExtraMovies = (movies, heading, container) => {
+  const doesHasMovies = Boolean(movies.length);
+  const extraMovieList = renderTemplate(createExtraMovieListTemplate(heading), container).querySelector(`.films-list__container`);
 
   if (doesHasMovies) {
-    extraFilmHeadings.forEach((heading, index) => {
-      extraMovieLists.set(extraMovieListsKeys[index], renderTemplate(createExtraMovieListTemplate(heading), container).querySelector(`.films-list__container`));
-    });
+    movies.forEach((movie) => renderTemplate(createCardTemplate(movie), extraMovieList));
+  } else {
+    extraMovieList.parentNode.innerHTML = ``;
   }
-
-  movieGroups.forEach((moviesGroup, index) => {
-    if (moviesGroup) {
-      moviesGroup.forEach((movie) => renderTemplate(createCardTemplate(movie), extraMovieLists.get(extraMovieListsKeys[index])));
-    } else {
-      extraMovieLists.get(extraMovieListsKeys[index]).parentNode.innerHTML = ``;
-    }
-  });
 };
 
 const bodyElement = document.querySelector(`body`);
@@ -95,7 +83,8 @@ const filmsContainerElement = renderTemplate(createMoviesContainerTemplate(), ma
 const filmListElement = renderTemplate(createMovieListTemplate(), filmsContainerElement).querySelector(`.films-list__container`);
 renderMainMovies(movies.slice(shownMoviesCounter, MoviesCount.START), filmListElement);
 renderLoadButton(filmsContainerElement);
-renderExtraMovies(filmsContainerElement, mostCommentedMovies, topRatedMovies);
+renderExtraMovies(topRatedMovies, extraFilmHeadings[0], filmsContainerElement);
+renderExtraMovies(mostCommentedMovies, extraFilmHeadings[1], filmsContainerElement);
 document.querySelector(`.footer__statistics p`).textContent = `${movies.length} movies inside`;
 
 renderTemplate(createBigCardTemplate(movies[0]), bodyElement).style.display = `none`; // Что бы не мешал.
