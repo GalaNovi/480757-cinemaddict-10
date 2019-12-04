@@ -1,4 +1,4 @@
-import {renderTemplate} from './utils';
+import {render} from './utils';
 import {createProfileTemplate} from './components/profile';
 import {createMenuTemplate} from './components/menu';
 import {createSortTemplate} from './components/sort';
@@ -37,13 +37,13 @@ const getExtraMovies = (movies, parameter) => {
 };
 
 const renderMainMovies = (movies, container) => {
-  movies.forEach((movie) => renderTemplate(createCardTemplate(movie), container));
+  movies.forEach((movie) => render(createCardTemplate(movie), container));
   shownMoviesCounter = shownMoviesCounter + movies.length;
 };
 
 const renderLoadButton = (container) => {
   if (shownMoviesCounter !== movies.length) {
-    const loadButtonElement = renderTemplate(createMoreButtonTemplate(), container.querySelector(`.films-list`));
+    const loadButtonElement = render(createMoreButtonTemplate(), container.querySelector(`.films-list`));
 
     loadButtonElement.addEventListener(`click`, (evt) => {
       evt.preventDefault();
@@ -57,10 +57,10 @@ const renderLoadButton = (container) => {
 
 const renderExtraMovies = (movies, heading, container) => {
   const doesHasMovies = Boolean(movies.length);
-  const extraMovieList = renderTemplate(createExtraMovieListTemplate(heading), container).querySelector(`.films-list__container`);
+  const extraMovieList = render(createExtraMovieListTemplate(heading), container).querySelector(`.films-list__container`);
 
   if (doesHasMovies) {
-    movies.forEach((movie) => renderTemplate(createCardTemplate(movie), extraMovieList));
+    movies.forEach((movie) => render(createCardTemplate(movie), extraMovieList));
   } else {
     extraMovieList.parentNode.innerHTML = ``;
   }
@@ -74,17 +74,16 @@ const topRatedMovies = getExtraMovies(movies, `topRated`);
 const mostCommentedMovies = getExtraMovies(movies, `mostCommented`);
 const alredyWathedMoviesNumber = movies.filter((movie) => movie.movieInfo.isAlredyWatched).length;
 
-renderTemplate(createProfileTemplate(alredyWathedMoviesNumber), headerElement);
-renderTemplate(createMenuTemplate(movies), mainElement);
-renderTemplate(createSortTemplate(), mainElement);
+render(createProfileTemplate(alredyWathedMoviesNumber), headerElement);
+render(createMenuTemplate(movies), mainElement);
+render(createSortTemplate(), mainElement);
 
-
-const filmsContainerElement = renderTemplate(createMoviesContainerTemplate(), mainElement);
-const filmListElement = renderTemplate(createMovieListTemplate(), filmsContainerElement).querySelector(`.films-list__container`);
+const filmsContainerElement = render(createMoviesContainerTemplate(), mainElement);
+const filmListElement = render(createMovieListTemplate(), filmsContainerElement).querySelector(`.films-list__container`);
 renderMainMovies(movies.slice(shownMoviesCounter, MoviesCount.START), filmListElement);
 renderLoadButton(filmsContainerElement);
 renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0], filmsContainerElement);
 renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1], filmsContainerElement);
 document.querySelector(`.footer__statistics p`).textContent = `${movies.length} movies inside`;
 
-renderTemplate(createBigCardTemplate(movies[0]), bodyElement).style.display = `none`; // Что бы не мешал.
+render(createBigCardTemplate(movies[0]), bodyElement).style.display = `none`; // Что бы не мешал.

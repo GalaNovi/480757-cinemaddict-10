@@ -15,9 +15,15 @@ const createElement = (templateString) => {
   return template.content.firstElementChild;
 };
 
-const renderTemplate = (template, element) => {
-  const childElement = createElement(template);
-  return element.appendChild(childElement);
+const render = (container, element, place = Position.BEFOREEND) => {
+  switch (place) {
+    case Position.BEFOREEND:
+      container.append(element);
+      break;
+    case Position.AFTERBEGIN:
+      container.prepend(element);
+      break;
+  }
 };
 
-export {capitalize, shuffleArray, renderTemplate};
+export {capitalize, shuffleArray, createElement, render};
