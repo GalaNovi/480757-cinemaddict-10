@@ -1,5 +1,5 @@
 import {capitalize} from '../utils';
-import {filters} from '../const';
+import {FILTERS} from '../const';
 
 const filterParameters = {
   all: ``,
@@ -20,7 +20,7 @@ const createFilterMarkup = (filter, movies) => {
 };
 
 export const createMenuTemplate = (movies) => {
-  const filtersMarkup = filters.map((filter) => createFilterMarkup(filter, movies)).join(``);
+  const filtersMarkup = FILTERS.map((filter) => createFilterMarkup(filter, movies)).join(``);
 
   return (
     `<nav class="main-navigation">

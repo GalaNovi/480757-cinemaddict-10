@@ -1,5 +1,5 @@
 import {shuffleArray} from '../utils';
-import {emotions} from '../const';
+import {EMOTIONS} from '../const';
 
 const MAX_DESCRIPTION_SENTENSES = 6;
 const MAX_GENRES = 3;
@@ -68,43 +68,43 @@ const comments = new Set([
     author: `Tim Macoveev`,
     text: `Very good film! Not sorry for the time spent.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(emotions),
+    emotion: getRandomArrayItem(EMOTIONS),
   },
   {
     author: `Mike Chakman`,
     text: `Which movie is good? Yes, this is nonsense! The acting is terrible. Blooper on a blooper. Graphics sucks.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(emotions),
+    emotion: getRandomArrayItem(EMOTIONS),
   },
   {
     author: `ChinWag`,
     text: `The book was like that))) Cool like))) I can’t remember the name)))`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(emotions),
+    emotion: getRandomArrayItem(EMOTIONS),
   },
   {
     author: `derroys`,
     text: `Awesome movie, one of the favorite in our family, great actors. Adore. I recommend.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(emotions),
+    emotion: getRandomArrayItem(EMOTIONS),
   },
   {
     author: `Darkmus`,
     text: `Good, funny film, why do sofa critics give such low ratings? :(`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(emotions),
+    emotion: getRandomArrayItem(EMOTIONS),
   },
   {
     author: `DarGi`,
     text: `Surprisingly enjoyed watching this movie)`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(emotions),
+    emotion: getRandomArrayItem(EMOTIONS),
   },
   {
     author: `Barathrum`,
     text: `A very pleasant psychological-ironic film, it looks in one breath. Cool story, a logical and interesting plot, a wonderful selection of actors. I looked with pleasure.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(emotions),
+    emotion: getRandomArrayItem(EMOTIONS),
   },
 ]);
 

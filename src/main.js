@@ -9,7 +9,7 @@ import {createMoreButtonTemplate} from './components/more-button';
 import {createExtraMovieListTemplate} from './components/extra-movie-list';
 import {createBigCardTemplate} from './components/big-card';
 import {generateCards} from './mock/card';
-import {extraFilmHeadings} from './const';
+import {EXTRA_MOVIES_HEADINGS} from './const';
 
 const MoviesCount = {
   ALL: 22,
@@ -83,8 +83,8 @@ const filmsContainerElement = renderTemplate(createMoviesContainerTemplate(), ma
 const filmListElement = renderTemplate(createMovieListTemplate(), filmsContainerElement).querySelector(`.films-list__container`);
 renderMainMovies(movies.slice(shownMoviesCounter, MoviesCount.START), filmListElement);
 renderLoadButton(filmsContainerElement);
-renderExtraMovies(topRatedMovies, extraFilmHeadings[0], filmsContainerElement);
-renderExtraMovies(mostCommentedMovies, extraFilmHeadings[1], filmsContainerElement);
+renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0], filmsContainerElement);
+renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1], filmsContainerElement);
 document.querySelector(`.footer__statistics p`).textContent = `${movies.length} movies inside`;
 
 renderTemplate(createBigCardTemplate(movies[0]), bodyElement).style.display = `none`; // Что бы не мешал.

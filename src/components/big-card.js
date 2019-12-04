@@ -1,6 +1,6 @@
 import {capitalize} from '../utils';
 import {formatTime} from './card';
-import {months} from '../const';
+import {MONTHS} from '../const';
 
 const getCommentTimeAgoText = (dateTime) => {
   const secondsAgo = Math.floor((Date.now() - dateTime) / 1000);
@@ -69,7 +69,7 @@ export const createBigCardTemplate = (movie) => {
   const writers = movie.movieInfo.writers.join(`, `);
   const actors = movie.movieInfo.actors.join(`, `);
   const date = new Date(release.date);
-  const releaseDate = `${date.getDate()} ${months[date.getMonth() - 1]} ${date.getFullYear()}`;
+  const releaseDate = `${date.getDate()} ${MONTHS[date.getMonth() - 1]} ${date.getFullYear()}`;
   const country = release.country;
   const genresMarkup = genres.map((genre) => `<span class="film-details__genre">${capitalize(genre)}</span>`).join(``);
 

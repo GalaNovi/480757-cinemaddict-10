@@ -1,7 +1,7 @@
-const extraFilmHeadings = [`Top rated`, `Most commented`];
-const filters = [`all`, `watchlist`, `history`, `favorites`];
-const emotions = [`smile`, `sleeping`, `puke`, `angry`];
-const months = [
+const EXTRA_MOVIES_HEADINGS = [`Top rated`, `Most commented`];
+const FILTERS = [`all`, `watchlist`, `history`, `favorites`];
+const EMOTIONS = [`smile`, `sleeping`, `puke`, `angry`];
+const MONTHS = [
   `January`,
   `February`,
   `March`,
@@ -16,4 +16,4 @@ const months = [
   `December`,
 ];
 
-export {extraFilmHeadings, filters, emotions, months};
+export {EXTRA_MOVIES_HEADINGS, FILTERS, EMOTIONS, MONTHS};
