@@ -2,10 +2,10 @@ import {capitalize} from '../utils';
 import {filters} from '../const';
 
 const filterParameters = {
-  'all': ``,
-  'watchlist': (movie) => movie.movieInfo.isOnTheWatchlist,
-  'history': (movie) => movie.movieInfo.isAlredyWatched,
-  'favorites': (movie) => movie.movieInfo.isFavorite,
+  all: ``,
+  watchlist: (movie) => movie.movieInfo.isOnTheWatchlist,
+  history: (movie) => movie.movieInfo.isAlredyWatched,
+  favorites: (movie) => movie.movieInfo.isFavorite,
 };
 
 const createFilterMarkup = (filter, movies) => {

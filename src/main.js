@@ -21,13 +21,13 @@ const MoviesCount = {
 let shownMoviesCounter = 0;
 
 const extraMoviesParameters = {
-  'topRated': {
-    'filter': ({movieInfo}) => movieInfo.rating >= 1,
-    'sort': (a, b) => b.movieInfo.rating - a.movieInfo.rating,
+  topRated: {
+    filter: ({movieInfo}) => movieInfo.rating >= 1,
+    sort: (a, b) => b.movieInfo.rating - a.movieInfo.rating,
   },
-  'mostCommented': {
-    'filter': ({comments}) => comments.length >= 1,
-    'sort': (a, b) => b.comments.length - a.comments.length,
+  mostCommented: {
+    filter: ({comments}) => comments.length >= 1,
+    sort: (a, b) => b.comments.length - a.comments.length,
   },
 };
 
