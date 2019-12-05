@@ -1,6 +1,6 @@
 import {createElement} from '../utils';
 
-const createExtraMovieListMarkup = (heading) => {
+const createExtraMoviesMarkup = (heading) => {
   return (
     `<section class="films-list--extra">
       <h2 class="films-list__title">${heading}</h2>
@@ -9,14 +9,14 @@ const createExtraMovieListMarkup = (heading) => {
   );
 };
 
-export default class ExtraMovieList {
+export default class ExtraMovies {
   constructor(heading) {
     this._elment = null;
     this._heading = heading;
   }
 
   getTemplate() {
-    return createExtraMovieListMarkup(this._heading);
+    return createExtraMoviesMarkup(this._heading);
   }
 
   getElement() {

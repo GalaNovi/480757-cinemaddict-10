@@ -1,6 +1,6 @@
 import {createElement} from '../utils';
 
-const createSorttMarkup = () => {
+const createSortMarkup = () => {
   return (
     `<ul class="sort">
       <li><a href="#" class="sort__button sort__button--active">Sort by default</a></li>
@@ -10,13 +10,13 @@ const createSorttMarkup = () => {
   );
 };
 
-export default class ExtraMovieList {
+export default class Sort {
   constructor() {
     this._elment = null;
   }
 
   getTemplate() {
-    return createSorttMarkup();
+    return createSortMarkup();
   }
 
   getElement() {

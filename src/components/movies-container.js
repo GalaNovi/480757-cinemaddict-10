@@ -13,13 +13,12 @@ const createMoviesContainerMarkup = () => {
 };
 
 export default class MoviesContainer {
-  constructor(heading) {
+  constructor() {
     this._elment = null;
-    this._heading = heading;
   }
 
   getTemplate() {
-    return createMoviesContainerMarkup(this._heading);
+    return createMoviesContainerMarkup();
   }
 
   getElement() {
