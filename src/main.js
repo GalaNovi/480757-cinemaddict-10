@@ -6,24 +6,19 @@ import MoviesContainer from './components/movies-container';
 import Card from './components/card';
 import BigCard from './components/big-card';
 import ExtraMovies from './components/extra-movies';
-import {render} from './utils';
+import {render, getNextItemsIterator} from './utils';
 import {generateCards} from './mock/card';
 import {EXTRA_MOVIES_HEADINGS} from './const';
 
-const MoviesCount = {
-  ALL: 22,
-  START: 5,
-  ADD: 5,
-  EXTRA: 2,
-};
+const MOVIES_AMOUNT = 23;
+const EXTRA_MOVIES_AMOUNT = 2;
 const bodyElement = document.querySelector(`body`);
 const headerElement = bodyElement.querySelector(`.header`);
 const mainElement = bodyElement.querySelector(`.main`);
-const moviesData = generateCards(MoviesCount.ALL);
+const moviesData = generateCards(MOVIES_AMOUNT);
 const alredyWathedMoviesNumber = moviesData.filter((movie) => movie.movieInfo.isAlredyWatched).length;
 const moviesContainerComponent = new MoviesContainer();
 const moviesListElement = moviesContainerComponent.getElement().querySelector(`.films-list__container`);
-const loadButtonElement = moviesContainerComponent.getElement().querySelector(`.films-list__show-more`);
 const extraMoviesParameters = {
   topRated: {
     filter: ({movieInfo}) => movieInfo.rating >= 1,
@@ -34,19 +29,20 @@ const extraMoviesParameters = {
     sort: (a, b) => b.comments.length - a.comments.length,
   },
 };
-let shownMoviesCounter = 0;
+const iterator = getNextItemsIterator(moviesData);
+const {value: moviesForRender, done: hasNoMoviesForRender} = iterator.next();
 
 const getExtraMovies = (movies, parameter) => {
   const extraMovies = movies.filter(extraMoviesParameters[parameter].filter);
-  return extraMovies.length ? extraMovies.sort(extraMoviesParameters[parameter].sort).slice(0, MoviesCount.EXTRA) : false;
+  return extraMovies.length ? extraMovies.sort(extraMoviesParameters[parameter].sort).slice(0, EXTRA_MOVIES_AMOUNT) : false;
 };
 
 const topRatedMovies = getExtraMovies(moviesData, `topRated`);
 const mostCommentedMovies = getExtraMovies(moviesData, `mostCommented`);
 
-const renderMovieCard = (container, movieData) => {
-  const card = new Card(movieData);
-  const bigCard = new BigCard(movieData);
+const renderMovieCard = (container, movie) => {
+  const card = new Card(movie);
+  const bigCard = new BigCard(movie);
   const bigCardCloseElement = bigCard.getElement().querySelector(`.film-details__close-btn`);
   const openingBigCardElements = [
     card.getElement().querySelector(`.film-card__poster`),
@@ -81,34 +77,41 @@ const renderMovieCard = (container, movieData) => {
     });
   });
 
-  render(container, card.getElement())
+  render(container, card.getElement());
 };
 
-const renderMainMovies = (container, moviesForRender) => {
-  moviesForRender.forEach((movieForRender) => renderMovieCard(container, movieForRender));
-  shownMoviesCounter += moviesForRender.length;
+const renderMainMovies = (container, movies) => {
+  movies.forEach((movie) => renderMovieCard(container, movie));
 };
 
-const initLoadButton = (button, moviesForRender) => {
-  if (shownMoviesCounter !== moviesData.length) {
+const initLoadButton = () => {
+  const loadButtonElement = moviesContainerComponent.getElement().querySelector(`.films-list__show-more`);
 
-    button.addEventListener(`click`, (evt) => {
+  if (!hasNoMoviesForRender) {
+    loadButtonElement.addEventListener(`click`, (evt) => {
       evt.preventDefault();
-      renderMainMovies(moviesListElement, moviesForRender.slice(shownMoviesCounter, shownMoviesCounter + MoviesCount.ADD));
-      if (moviesForRender.length === shownMoviesCounter) {
-        button.remove();
+      const {value, done} = iterator.next();
+
+      if (value) {
+        renderMainMovies(moviesListElement, value);
+      }
+
+      if (done) {
+        loadButtonElement.remove();
       }
     });
+  } else {
+    loadButtonElement.remove();
   }
 };
 
-const renderExtraMovies = (moviesForRender, heading) => {
-  const doesHasMovies = Boolean(moviesForRender.length);
+const renderExtraMovies = (movies, heading) => {
+  const doesHasMovies = Boolean(movies.length);
   const extraMoviesComponent = new ExtraMovies(heading, moviesContainerComponent);
   const extraMoviesListElement = extraMoviesComponent.getElement().querySelector(`.films-list__container`);
 
   if (doesHasMovies) {
-    moviesForRender.forEach((movieForRender) => renderMovieCard(extraMoviesListElement, movieForRender));
+    movies.forEach((movie) => renderMovieCard(extraMoviesListElement, movie));
   } else {
     extraMoviesComponent.getElement().innerHTML = ``;
   }
@@ -120,8 +123,8 @@ render(headerElement, new Profile(alredyWathedMoviesNumber).getElement());
 render(mainElement, new Menu(moviesData).getElement());
 render(mainElement, new Sort().getElement());
 
-renderMainMovies(moviesListElement, moviesData.slice(shownMoviesCounter, MoviesCount.START));
-initLoadButton(loadButtonElement, moviesData, moviesListElement);
+renderMainMovies(moviesListElement, moviesForRender);
+initLoadButton();
 render(mainElement, moviesContainerComponent.getElement());
 renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
 renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);

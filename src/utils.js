@@ -34,4 +34,19 @@ const render = (container, element, place = Position.BEFOREEND) => {
   }
 };
 
-export {capitalize, shuffleArray, createElement, render};
+const getNextItemsIterator = (items) => {
+  const ITEMS_PART_AMOUNT = 5;
+  const itemsAmount = items.length;
+  let previousItemsAmount = 0;
+
+  return {
+    next() {
+      const value = items.slice(previousItemsAmount, previousItemsAmount + ITEMS_PART_AMOUNT);
+      previousItemsAmount += value.length;
+      const done = previousItemsAmount === itemsAmount;
+      return {value, done};
+    }
+  };
+};
+
+export {capitalize, shuffleArray, createElement, render, getNextItemsIterator};
