@@ -1,6 +1,6 @@
-import {capitalize} from '../utils';
+import {capitalize, createElement} from '../utils';
 
-const formatTime = (duration) => {
+export const formatTime = (duration) => {
   const hours = Math.floor(duration / 60);
   const minutes = duration % 60;
 
@@ -9,13 +9,22 @@ const formatTime = (duration) => {
 
 const createRatingMarkup = (rating) => rating >= 1 ? `<p class="film-card__rating">${rating}</p>` : ``;
 
-const createCardTemplate = (movie) => {
-  const {comments} = movie;
-  const {name, poster, rating, description, isOnTheWatchlist, isAlredyWatched, isFavorite} = movie.movieInfo;
-  const year = new Date(movie.movieInfo.release.date).getFullYear();
+const createCardMarkup = (movieData) => {
+  const {
+    name,
+    poster,
+    rating,
+    description,
+    isOnTheWatchlist,
+    isAlredyWatched,
+    isFavorite
+  } = movieData.movieInfo;
+
+  const {comments} = movieData;
+  const year = new Date(movieData.movieInfo.release.date).getFullYear();
   const commentsNumber = comments.length;
-  const duration = formatTime(movie.movieInfo.duration);
-  const genres = movie.movieInfo.genres.map((genre) => capitalize(genre)).join(` `);
+  const duration = formatTime(movieData.movieInfo.duration);
+  const genres = movieData.movieInfo.genres.map((genre) => capitalize(genre)).join(` `);
   const ratingMarkup = createRatingMarkup(rating);
 
   return (
@@ -39,4 +48,26 @@ const createCardTemplate = (movie) => {
   );
 };
 
-export {createCardTemplate, formatTime};
+export default class Card {
+  constructor(movieData) {
+    this._element = null;
+    this._movieData = movieData;
+  }
+
+  getTemplate() {
+    return createCardMarkup(this._movieData);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element.remove();
+    this._element = null;
+  }
+}

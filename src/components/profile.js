@@ -1,19 +1,21 @@
-const generateProfileRatingMarkup = (moviesNumber) => {
+import {createElement} from '../utils';
+
+const createProfileRatingMarkup = (moviesAmount) => {
   let markup = ``;
 
-  if (moviesNumber > 0 && moviesNumber <= 10) {
+  if (moviesAmount > 0 && moviesAmount <= 10) {
     markup = `<p class="profile__rating">Novice</p>`;
-  } else if (moviesNumber > 10 && moviesNumber <= 20) {
+  } else if (moviesAmount > 10 && moviesAmount <= 20) {
     markup = `<p class="profile__rating">Fan</p>`;
-  } else if (moviesNumber > 20) {
+  } else if (moviesAmount > 20) {
     markup = `<p class="profile__rating">Movie Buff</p>`;
   }
 
   return markup;
 };
 
-export const createProfileTemplate = (moviesNumber) => {
-  const profileRatingMarkup = generateProfileRatingMarkup(moviesNumber);
+const createProfileMarkup = (moviesAmount) => {
+  const profileRatingMarkup = createProfileRatingMarkup(moviesAmount);
 
   return (
     `<section class="header__profile profile">
@@ -22,3 +24,27 @@ export const createProfileTemplate = (moviesNumber) => {
     </section>`
   );
 };
+
+export default class Profile {
+  constructor(moviesAmount) {
+    this._elment = null;
+    this._moviesAmount = moviesAmount;
+  }
+
+  getTemplate() {
+    return createProfileMarkup(this._moviesAmount);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element.remove();
+    this._element = null;
+  }
+}

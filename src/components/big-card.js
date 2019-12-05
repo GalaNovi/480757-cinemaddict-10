@@ -1,4 +1,4 @@
-import {capitalize} from '../utils';
+import {capitalize, createElement} from '../utils';
 import {formatTime} from './card';
 import {MONTHS} from '../const';
 
@@ -48,7 +48,7 @@ const createCommentsMarkup = (comment) => {
   );
 };
 
-export const createBigCardTemplate = (movie) => {
+const createBigCardMarkup = (movieData) => {
   const {
     poster,
     ageLimit,
@@ -63,16 +63,15 @@ export const createBigCardTemplate = (movie) => {
     isOnTheWatchlist,
     isAlredyWatched,
     isFavorite
-  } = movie.movieInfo;
+  } = movieData.movieInfo;
 
-  const comments = movie.comments;
-  const writers = movie.movieInfo.writers.join(`, `);
-  const actors = movie.movieInfo.actors.join(`, `);
+  const {comments} = movieData;
+  const writers = movieData.movieInfo.writers.join(`, `);
+  const actors = movieData.movieInfo.actors.join(`, `);
   const date = new Date(release.date);
   const releaseDate = `${date.getDate()} ${MONTHS[date.getMonth() - 1]} ${date.getFullYear()}`;
   const country = release.country;
   const genresMarkup = genres.map((genre) => `<span class="film-details__genre">${capitalize(genre)}</span>`).join(``);
-
   const commentsMarkup = comments.map((comment) => createCommentsMarkup(comment)).join(``);
 
   return (
@@ -195,3 +194,27 @@ export const createBigCardTemplate = (movie) => {
     </section>`
   );
 };
+
+export default class BigCard {
+  constructor(movieData) {
+    this._element = null;
+    this._movieData = movieData;
+  }
+
+  getTemplate() {
+    return createBigCardMarkup(this._movieData);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element.remove();
+    this._element = null;
+  }
+}

@@ -1,4 +1,4 @@
-import {capitalize} from '../utils';
+import {capitalize, createElement} from '../utils';
 import {FILTERS} from '../const';
 
 const filterParameters = {
@@ -19,8 +19,8 @@ const createFilterMarkup = (filter, movies) => {
   );
 };
 
-export const createMenuTemplate = (movies) => {
-  const filtersMarkup = FILTERS.map((filter) => createFilterMarkup(filter, movies)).join(``);
+const createMenuMarkup = (moviesData) => {
+  const filtersMarkup = FILTERS.map((filter) => createFilterMarkup(filter, moviesData)).join(``);
 
   return (
     `<nav class="main-navigation">
@@ -29,3 +29,27 @@ export const createMenuTemplate = (movies) => {
     </nav>`
   );
 };
+
+export default class Menu {
+  constructor(moviesData) {
+    this._element = null;
+    this._moviesData = moviesData;
+  }
+
+  getTemplate() {
+    return createMenuMarkup(this._moviesData);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element.remove();
+    this._element = null;
+  }
+}

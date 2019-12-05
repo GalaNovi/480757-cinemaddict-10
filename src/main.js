@@ -1,15 +1,13 @@
 import {render} from './utils';
-import {createProfileTemplate} from './components/profile';
-import {createMenuTemplate} from './components/menu';
-import {createSortTemplate} from './components/sort';
-import {createMoviesContainerTemplate} from './components/movies-container';
-import {createMovieListTemplate} from './components/movie-list';
-import {createCardTemplate} from './components/card';
-import {createMoreButtonTemplate} from './components/more-button';
-import {createExtraMovieListTemplate} from './components/extra-movie-list';
-import {createBigCardTemplate} from './components/big-card';
+// import {createProfileTemplate} from './components/profile';
+// import {createMenuTemplate} from './components/menu';
+// import {createSortTemplate} from './components/sort';
+// import {createMoviesContainerTemplate} from './components/movies-container';
+// import {createCardTemplate} from './components/card';
+// import {createExtraMovieListTemplate} from './components/extra-movie-list';
+import BigCard from './components/big-card';
 import {generateCards} from './mock/card';
-import {EXTRA_MOVIES_HEADINGS} from './const';
+// import {EXTRA_MOVIES_HEADINGS} from './const';
 
 const MoviesCount = {
   ALL: 22,
@@ -70,20 +68,20 @@ const bodyElement = document.querySelector(`body`);
 const headerElement = bodyElement.querySelector(`.header`);
 const mainElement = bodyElement.querySelector(`.main`);
 const movies = generateCards(MoviesCount.ALL);
-const topRatedMovies = getExtraMovies(movies, `topRated`);
-const mostCommentedMovies = getExtraMovies(movies, `mostCommented`);
-const alredyWathedMoviesNumber = movies.filter((movie) => movie.movieInfo.isAlredyWatched).length;
+// const topRatedMovies = getExtraMovies(movies, `topRated`);
+// const mostCommentedMovies = getExtraMovies(movies, `mostCommented`);
+// const alredyWathedMoviesNumber = movies.filter((movie) => movie.movieInfo.isAlredyWatched).length;
 
-render(createProfileTemplate(alredyWathedMoviesNumber), headerElement);
-render(createMenuTemplate(movies), mainElement);
-render(createSortTemplate(), mainElement);
+// render(createProfileTemplate(alredyWathedMoviesNumber), headerElement);
+// render(createMenuTemplate(movies), mainElement);
+// render(createSortTemplate(), mainElement);
 
-const filmsContainerElement = render(createMoviesContainerTemplate(), mainElement);
-const filmListElement = render(createMovieListTemplate(), filmsContainerElement).querySelector(`.films-list__container`);
-renderMainMovies(movies.slice(shownMoviesCounter, MoviesCount.START), filmListElement);
-renderLoadButton(filmsContainerElement);
-renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0], filmsContainerElement);
-renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1], filmsContainerElement);
-document.querySelector(`.footer__statistics p`).textContent = `${movies.length} movies inside`;
+// const filmsContainerElement = render(createMoviesContainerTemplate(), mainElement);
+// const filmListElement = render(createMovieListTemplate(), filmsContainerElement).querySelector(`.films-list__container`);
+// renderMainMovies(movies.slice(shownMoviesCounter, MoviesCount.START), filmListElement);
+// renderLoadButton(filmsContainerElement);
+// renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0], filmsContainerElement);
+// renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1], filmsContainerElement);
+// document.querySelector(`.footer__statistics p`).textContent = `${movies.length} movies inside`;
 
-render(createBigCardTemplate(movies[0]), bodyElement).style.display = `none`; // Что бы не мешал.
+render(bodyElement, new BigCard(movies[0]).getElement()); // Что бы не мешал.

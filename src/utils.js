@@ -1,3 +1,5 @@
+import {Position} from './const';
+
 const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
 const shuffleArray = (array) => {
@@ -22,6 +24,12 @@ const render = (container, element, place = Position.BEFOREEND) => {
       break;
     case Position.AFTERBEGIN:
       container.prepend(element);
+      break;
+    case Position.BEFORE:
+      container.before(element);
+      break;
+    case Position.AFTER:
+      container.after(element);
       break;
   }
 };
