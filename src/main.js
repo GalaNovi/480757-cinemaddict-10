@@ -1,25 +1,24 @@
-import {renderTemplate} from './utils';
-import {createProfileTemplate} from './components/profile';
-import {createMenuTemplate} from './components/menu';
-import {createSortTemplate} from './components/sort';
-import {createMoviesContainerTemplate} from './components/movies-container';
-import {createMovieListTemplate} from './components/movie-list';
-import {createCardTemplate} from './components/card';
-import {createMoreButtonTemplate} from './components/more-button';
-import {createExtraMovieListTemplate} from './components/extra-movie-list';
-import {createBigCardTemplate} from './components/big-card';
+
+import Profile from './components/profile';
+import Menu from './components/menu';
+import Sort from './components/sort';
+import MoviesContainer from './components/movies-container';
+import Card from './components/card';
+import BigCard from './components/big-card';
+import ExtraMovies from './components/extra-movies';
+import {render, getNextItemsIterator} from './utils';
 import {generateCards} from './mock/card';
 import {EXTRA_MOVIES_HEADINGS} from './const';
 
-const MoviesCount = {
-  ALL: 22,
-  START: 5,
-  ADD: 5,
-  EXTRA: 2,
-};
-
-let shownMoviesCounter = 0;
-
+const MOVIES_AMOUNT = 23;
+const EXTRA_MOVIES_AMOUNT = 2;
+const bodyElement = document.querySelector(`body`);
+const headerElement = bodyElement.querySelector(`.header`);
+const mainElement = bodyElement.querySelector(`.main`);
+const moviesData = generateCards(MOVIES_AMOUNT);
+const alredyWathedMoviesNumber = moviesData.filter((movie) => movie.movieInfo.isAlredyWatched).length;
+const moviesContainerComponent = new MoviesContainer();
+const moviesListElement = moviesContainerComponent.getElement().querySelector(`.films-list__container`);
 const extraMoviesParameters = {
   topRated: {
     filter: ({movieInfo}) => movieInfo.rating >= 1,
@@ -30,61 +29,103 @@ const extraMoviesParameters = {
     sort: (a, b) => b.comments.length - a.comments.length,
   },
 };
+const iterator = getNextItemsIterator(moviesData);
+const {value: moviesForRender, done: hasNoMoviesForRender} = iterator.next();
 
 const getExtraMovies = (movies, parameter) => {
   const extraMovies = movies.filter(extraMoviesParameters[parameter].filter);
-  return extraMovies.length ? extraMovies.sort(extraMoviesParameters[parameter].sort).slice(0, MoviesCount.EXTRA) : false;
+  return extraMovies.length ? extraMovies.sort(extraMoviesParameters[parameter].sort).slice(0, EXTRA_MOVIES_AMOUNT) : false;
 };
 
-const renderMainMovies = (movies, container) => {
-  movies.forEach((movie) => renderTemplate(createCardTemplate(movie), container));
-  shownMoviesCounter = shownMoviesCounter + movies.length;
+const topRatedMovies = getExtraMovies(moviesData, `topRated`);
+const mostCommentedMovies = getExtraMovies(moviesData, `mostCommented`);
+
+const renderMovieCard = (container, movie) => {
+  const card = new Card(movie);
+  const bigCard = new BigCard(movie);
+  const bigCardCloseElement = bigCard.getElement().querySelector(`.film-details__close-btn`);
+  const openingBigCardElements = [
+    card.getElement().querySelector(`.film-card__poster`),
+    card.getElement().querySelector(`.film-card__title`),
+    card.getElement().querySelector(`.film-card__comments`),
+  ];
+
+  const onEsqKeyDown = (evt) => {
+    evt.preventDefault();
+    closeBigCard();
+  };
+
+  const openBigCard = () => {
+    render(bodyElement, bigCard.getElement());
+    document.addEventListener(`keydown`, onEsqKeyDown);
+  };
+
+  const closeBigCard = () => {
+    bigCard.getElement().remove();
+    document.removeEventListener(`keydown`, onEsqKeyDown);
+  };
+
+  const onCloseElementClick = () => {
+    closeBigCard();
+  };
+
+  openingBigCardElements.forEach((element) => {
+    element.addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+      openBigCard();
+      bigCardCloseElement.addEventListener(`click`, onCloseElementClick);
+    });
+  });
+
+  render(container, card.getElement());
 };
 
-const renderLoadButton = (container) => {
-  if (shownMoviesCounter !== movies.length) {
-    const loadButtonElement = renderTemplate(createMoreButtonTemplate(), container.querySelector(`.films-list`));
+const renderMainMovies = (container, movies) => {
+  movies.forEach((movie) => renderMovieCard(container, movie));
+};
 
+const initLoadButton = () => {
+  const loadButtonElement = moviesContainerComponent.getElement().querySelector(`.films-list__show-more`);
+
+  if (!hasNoMoviesForRender) {
     loadButtonElement.addEventListener(`click`, (evt) => {
       evt.preventDefault();
-      renderMainMovies(movies.slice(shownMoviesCounter, shownMoviesCounter + MoviesCount.ADD), filmListElement);
-      if (movies.length === shownMoviesCounter) {
+      const {value, done} = iterator.next();
+
+      if (value) {
+        renderMainMovies(moviesListElement, value);
+      }
+
+      if (done) {
         loadButtonElement.remove();
       }
     });
+  } else {
+    loadButtonElement.remove();
   }
 };
 
-const renderExtraMovies = (movies, heading, container) => {
+const renderExtraMovies = (movies, heading) => {
   const doesHasMovies = Boolean(movies.length);
-  const extraMovieList = renderTemplate(createExtraMovieListTemplate(heading), container).querySelector(`.films-list__container`);
+  const extraMoviesComponent = new ExtraMovies(heading, moviesContainerComponent);
+  const extraMoviesListElement = extraMoviesComponent.getElement().querySelector(`.films-list__container`);
 
   if (doesHasMovies) {
-    movies.forEach((movie) => renderTemplate(createCardTemplate(movie), extraMovieList));
+    movies.forEach((movie) => renderMovieCard(extraMoviesListElement, movie));
   } else {
-    extraMovieList.parentNode.innerHTML = ``;
+    extraMoviesComponent.getElement().innerHTML = ``;
   }
+
+  render(moviesContainerComponent.getElement(), extraMoviesComponent.getElement());
 };
 
-const bodyElement = document.querySelector(`body`);
-const headerElement = bodyElement.querySelector(`.header`);
-const mainElement = bodyElement.querySelector(`.main`);
-const movies = generateCards(MoviesCount.ALL);
-const topRatedMovies = getExtraMovies(movies, `topRated`);
-const mostCommentedMovies = getExtraMovies(movies, `mostCommented`);
-const alredyWathedMoviesNumber = movies.filter((movie) => movie.movieInfo.isAlredyWatched).length;
+render(headerElement, new Profile(alredyWathedMoviesNumber).getElement());
+render(mainElement, new Menu(moviesData).getElement());
+render(mainElement, new Sort().getElement());
 
-renderTemplate(createProfileTemplate(alredyWathedMoviesNumber), headerElement);
-renderTemplate(createMenuTemplate(movies), mainElement);
-renderTemplate(createSortTemplate(), mainElement);
-
-
-const filmsContainerElement = renderTemplate(createMoviesContainerTemplate(), mainElement);
-const filmListElement = renderTemplate(createMovieListTemplate(), filmsContainerElement).querySelector(`.films-list__container`);
-renderMainMovies(movies.slice(shownMoviesCounter, MoviesCount.START), filmListElement);
-renderLoadButton(filmsContainerElement);
-renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0], filmsContainerElement);
-renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1], filmsContainerElement);
-document.querySelector(`.footer__statistics p`).textContent = `${movies.length} movies inside`;
-
-renderTemplate(createBigCardTemplate(movies[0]), bodyElement).style.display = `none`; // Что бы не мешал.
+renderMainMovies(moviesListElement, moviesForRender);
+initLoadButton();
+render(mainElement, moviesContainerComponent.getElement());
+renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
+renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
+document.querySelector(`.footer__statistics p`).textContent = `${moviesData.length} movies inside`;

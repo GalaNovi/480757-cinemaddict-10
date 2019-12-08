@@ -16,4 +16,9 @@ const MONTHS = [
   `December`,
 ];
 
-export {EXTRA_MOVIES_HEADINGS, FILTERS, EMOTIONS, MONTHS};
+const Position = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+};
+
+export {EXTRA_MOVIES_HEADINGS, FILTERS, EMOTIONS, MONTHS, Position};

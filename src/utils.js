@@ -1,3 +1,5 @@
+import {Position} from './const';
+
 const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
 const shuffleArray = (array) => {
@@ -15,9 +17,36 @@ const createElement = (templateString) => {
   return template.content.firstElementChild;
 };
 
-const renderTemplate = (template, element) => {
-  const childElement = createElement(template);
-  return element.appendChild(childElement);
+const render = (container, element, place = Position.BEFOREEND) => {
+  switch (place) {
+    case Position.BEFOREEND:
+      container.append(element);
+      break;
+    case Position.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case Position.BEFORE:
+      container.before(element);
+      break;
+    case Position.AFTER:
+      container.after(element);
+      break;
+  }
 };
 
-export {capitalize, shuffleArray, renderTemplate};
+const getNextItemsIterator = (items) => {
+  const ITEMS_PART_AMOUNT = 5;
+  const itemsAmount = items.length;
+  let previousItemsAmount = 0;
+
+  return {
+    next() {
+      const value = items.slice(previousItemsAmount, previousItemsAmount + ITEMS_PART_AMOUNT);
+      previousItemsAmount += value.length;
+      const done = previousItemsAmount === itemsAmount;
+      return {value, done};
+    }
+  };
+};
+
+export {capitalize, shuffleArray, createElement, render, getNextItemsIterator};
