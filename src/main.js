@@ -3,6 +3,7 @@ import Profile from './components/profile';
 import Menu from './components/menu';
 import Sort from './components/sort';
 import MoviesContainer from './components/movies-container';
+import NoMoviesContainer from './components/no-movies-container';
 import Card from './components/card';
 import BigCard from './components/big-card';
 import ExtraMovies from './components/extra-movies';
@@ -51,8 +52,10 @@ const renderMovieCard = (container, movie) => {
   ];
 
   const onEsqKeyDown = (evt) => {
-    evt.preventDefault();
-    closeBigCard();
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      evt.preventDefault();
+      closeBigCard();
+    }
   };
 
   const openBigCard = () => {
@@ -123,9 +126,14 @@ render(headerElement, new Profile(alredyWathedMoviesNumber).getElement());
 render(mainElement, new Menu(moviesData).getElement());
 render(mainElement, new Sort().getElement());
 
-renderMainMovies(moviesListElement, moviesForRender);
-initLoadButton();
-render(mainElement, moviesContainerComponent.getElement());
-renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
-renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
+if (moviesData.length) {
+  renderMainMovies(moviesListElement, moviesForRender);
+  initLoadButton();
+  render(mainElement, moviesContainerComponent.getElement());
+  renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
+  renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
+} else {
+  render(mainElement, new NoMoviesContainer().getElement());
+}
+
 document.querySelector(`.footer__statistics p`).textContent = `${moviesData.length} movies inside`;
