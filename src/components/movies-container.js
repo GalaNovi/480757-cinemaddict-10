@@ -17,6 +17,10 @@ export default class MoviesContainer extends AbstractComponent {
     return createMoviesContainerMarkup();
   }
 
+  getMoviesListElement() {
+    return this.getElement().querySelector(`.films-list__container`);
+  }
+
   setLoadButtonHandler(handler) {
     this.getElement().querySelector(`.films-list__show-more`)
       .addEventListener(`click`, handler);

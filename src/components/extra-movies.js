@@ -18,4 +18,8 @@ export default class ExtraMovies extends AbstractComponent {
   getTemplate() {
     return createExtraMoviesMarkup(this._heading);
   }
+
+  getMoviesListElement() {
+    return this.getElement().querySelector(`.films-list__container`);
+  }
 }

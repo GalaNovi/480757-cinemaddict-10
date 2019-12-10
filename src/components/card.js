@@ -52,7 +52,7 @@ export default class Card extends AbstractComponent {
     return createCardMarkup(this._movieData);
   }
 
-  setOnOpeningBigCardElementsHandler(handler) {
+  setOpenHandler(handler) {
     const openingBigCardElements = [
       this.getElement().querySelector(`.film-card__poster`),
       this.getElement().querySelector(`.film-card__title`),

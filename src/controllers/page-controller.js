@@ -27,8 +27,6 @@ export class PageController {
     this._extraMoviesAmount = 2;
     this._headerElement = this._container.querySelector(`.header`);
     this._mainElement = this._container.querySelector(`.main`);
-    this._moviesContainerComponent = new MoviesContainer();
-    this._moviesListElement = this._moviesContainerComponent.getElement().querySelector(`.films-list__container`);
   }
 
   render(moviesData) {
@@ -37,13 +35,15 @@ export class PageController {
     const {value: moviesForRender, done: hasNoMoviesForRender} = iterator.next();
     const topRatedMovies = this._getExtraMovies(moviesData, `topRated`);
     const mostCommentedMovies = this._getExtraMovies(moviesData, `mostCommented`);
+    const moviesContainerComponent = new MoviesContainer();
+    const moviesListElement = moviesContainerComponent.getMoviesListElement();
 
     const onLoadButtonClick = (evt) => {
       evt.preventDefault();
       const {value, done} = iterator.next();
 
       if (value) {
-        this._renderMainMovies(this._moviesListElement, value);
+        this._renderMainMovies(moviesListElement, value);
       }
 
       if (done) {
@@ -53,10 +53,24 @@ export class PageController {
 
     const initLoadButton = () => {
       if (!hasNoMoviesForRender) {
-        this._moviesContainerComponent.setLoadButtonHandler(onLoadButtonClick);
+        moviesContainerComponent.setLoadButtonHandler(onLoadButtonClick);
       } else {
-        this._moviesContainerComponent.removeLoadButton();
+        moviesContainerComponent.removeLoadButton();
       }
+    };
+
+    const renderExtraMovies = (movies, heading) => {
+      const doesHasMovies = Boolean(movies.length);
+      const extraMoviesComponent = new ExtraMovies(heading, moviesContainerComponent);
+      const extraMoviesListElement = extraMoviesComponent.getMoviesListElement();
+
+      if (doesHasMovies) {
+        movies.forEach((movie) => this._renderMovieCard(extraMoviesListElement, movie));
+      } else {
+        extraMoviesComponent.getElement().innerHTML = ``;
+      }
+
+      render(moviesContainerComponent, extraMoviesComponent);
     };
 
     render(this._headerElement, new Profile(alredyWathedMoviesNumber));
@@ -64,11 +78,11 @@ export class PageController {
     render(this._mainElement, new Sort());
 
     if (moviesData.length) {
-      this._renderMainMovies(this._moviesListElement, moviesForRender);
+      this._renderMainMovies(moviesListElement, moviesForRender);
       initLoadButton(hasNoMoviesForRender);
-      render(this._mainElement, this._moviesContainerComponent);
-      this._renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
-      this._renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
+      render(this._mainElement, moviesContainerComponent);
+      renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
+      renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
     } else {
       render(this._mainElement, new NoMoviesContainer());
     }
@@ -102,36 +116,22 @@ export class PageController {
       document.removeEventListener(`keydown`, onEsqKeyDown);
     };
 
-    const onBigCardCloseButtonClick = () => {
+    const onCloseButtonClick = () => {
       closeBigCard();
     };
 
-    const onOpeningBigCardElementClick = (evt) => {
+    const onOpeningElementClick = (evt) => {
       evt.preventDefault();
       openBigCard();
-      bigCard.setCloseButtonHandler(onBigCardCloseButtonClick);
+      bigCard.setCloseButtonHandler(onCloseButtonClick);
     };
 
-    card.setOnOpeningBigCardElementsHandler(onOpeningBigCardElementClick);
+    card.setOpenHandler(onOpeningElementClick);
 
     render(container, card);
   }
 
   _renderMainMovies(container, movies) {
     movies.forEach((movie) => this._renderMovieCard(container, movie));
-  }
-
-  _renderExtraMovies(movies, heading) {
-    const doesHasMovies = Boolean(movies.length);
-    const extraMoviesComponent = new ExtraMovies(heading, this._moviesContainerComponent);
-    const extraMoviesListElement = extraMoviesComponent.getElement().querySelector(`.films-list__container`);
-
-    if (doesHasMovies) {
-      movies.forEach((movie) => this._renderMovieCard(extraMoviesListElement, movie));
-    } else {
-      extraMoviesComponent.getElement().innerHTML = ``;
-    }
-
-    render(this._moviesContainerComponent, extraMoviesComponent);
   }
 }
