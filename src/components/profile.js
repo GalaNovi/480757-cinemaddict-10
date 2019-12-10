@@ -1,4 +1,4 @@
-import {createElement} from '../utils';
+import AbstractComponent from './abstract-component';
 
 const createProfileRatingMarkup = (moviesAmount) => {
   let markup = ``;
@@ -25,26 +25,13 @@ const createProfileMarkup = (moviesAmount) => {
   );
 };
 
-export default class Profile {
+export default class Profile extends AbstractComponent {
   constructor(moviesAmount) {
-    this._elment = null;
+    super();
     this._moviesAmount = moviesAmount;
   }
 
   getTemplate() {
     return createProfileMarkup(this._moviesAmount);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element.remove();
-    this._element = null;
   }
 }

@@ -1,4 +1,4 @@
-import {createElement} from '../utils';
+import AbstractComponent from './abstract-component';
 
 const createNoMoviesContainerMarkup = () => {
   return (
@@ -10,25 +10,8 @@ const createNoMoviesContainerMarkup = () => {
   );
 };
 
-export default class NoMoviesContainer {
-  constructor() {
-    this._elment = null;
-  }
-
+export default class NoMoviesContainer extends AbstractComponent {
   getTemplate() {
     return createNoMoviesContainerMarkup();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element.remove();
-    this._element = null;
   }
 }

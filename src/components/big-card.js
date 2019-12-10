@@ -1,5 +1,5 @@
-import {capitalize, createElement} from '../utils';
-import {formatTime} from './card';
+import AbstractComponent from './abstract-component';
+import {capitalize, formatTime} from '../utils/common';
 import {MONTHS} from '../const';
 
 const getCommentTimeAgoText = (dateTime) => {
@@ -26,6 +26,8 @@ const getCommentTimeAgoText = (dateTime) => {
     return `more then two days ago`;
   }
 };
+
+const createRatingMarkup = (rating) => rating >= 1 ? `<p class="film-details__total-rating">${rating}</p>` : ``;
 
 const createCommentsMarkup = (comment) => {
   const {author, text, date, emotion} = comment;
@@ -66,6 +68,7 @@ const createBigCardMarkup = (movieData) => {
   } = movieData.movieInfo;
 
   const {comments} = movieData;
+  const ratingMarkup = createRatingMarkup(rating);
   const writers = movieData.movieInfo.writers.join(`, `);
   const actors = movieData.movieInfo.actors.join(`, `);
   const date = new Date(release.date);
@@ -96,7 +99,7 @@ const createBigCardMarkup = (movieData) => {
                 </div>
 
                 <div class="film-details__rating">
-                  <p class="film-details__total-rating">${rating}</p>
+                  ${ratingMarkup}
                 </div>
               </div>
 
@@ -195,9 +198,9 @@ const createBigCardMarkup = (movieData) => {
   );
 };
 
-export default class BigCard {
+export default class BigCard extends AbstractComponent {
   constructor(movieData) {
-    this._element = null;
+    super();
     this._movieData = movieData;
   }
 
@@ -205,16 +208,8 @@ export default class BigCard {
     return createBigCardMarkup(this._movieData);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element.remove();
-    this._element = null;
+  setCloseButtonHandler(handler) {
+    this.getElement().querySelector(`.film-details__close-btn`)
+      .addEventListener(`click`, handler);
   }
 }

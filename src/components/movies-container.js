@@ -1,4 +1,4 @@
-import {createElement} from '../utils';
+import AbstractComponent from './abstract-component';
 
 const createMoviesContainerMarkup = () => {
   return (
@@ -12,25 +12,17 @@ const createMoviesContainerMarkup = () => {
   );
 };
 
-export default class MoviesContainer {
-  constructor() {
-    this._elment = null;
-  }
-
+export default class MoviesContainer extends AbstractComponent {
   getTemplate() {
     return createMoviesContainerMarkup();
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  setLoadButtonHandler(handler) {
+    this.getElement().querySelector(`.films-list__show-more`)
+      .addEventListener(`click`, handler);
   }
 
-  removeElement() {
-    this._element.remove();
-    this._element = null;
+  removeLoadButton() {
+    this.getElement().querySelector(`.films-list__show-more`).remove();
   }
 }

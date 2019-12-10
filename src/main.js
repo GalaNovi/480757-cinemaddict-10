@@ -7,7 +7,8 @@ import NoMoviesContainer from './components/no-movies-container';
 import Card from './components/card';
 import BigCard from './components/big-card';
 import ExtraMovies from './components/extra-movies';
-import {render, getNextItemsIterator} from './utils';
+import {getNextItemsIterator} from './utils/common';
+import {render} from './utils/render';
 import {generateCards} from './mock/card';
 import {EXTRA_MOVIES_HEADINGS} from './const';
 
@@ -44,12 +45,6 @@ const mostCommentedMovies = getExtraMovies(moviesData, `mostCommented`);
 const renderMovieCard = (container, movie) => {
   const card = new Card(movie);
   const bigCard = new BigCard(movie);
-  const bigCardCloseElement = bigCard.getElement().querySelector(`.film-details__close-btn`);
-  const openingBigCardElements = [
-    card.getElement().querySelector(`.film-card__poster`),
-    card.getElement().querySelector(`.film-card__title`),
-    card.getElement().querySelector(`.film-card__comments`),
-  ];
 
   const onEsqKeyDown = (evt) => {
     if (evt.key === `Escape` || evt.key === `Esc`) {
@@ -59,7 +54,7 @@ const renderMovieCard = (container, movie) => {
   };
 
   const openBigCard = () => {
-    render(bodyElement, bigCard.getElement());
+    render(bodyElement, bigCard);
     document.addEventListener(`keydown`, onEsqKeyDown);
   };
 
@@ -68,43 +63,43 @@ const renderMovieCard = (container, movie) => {
     document.removeEventListener(`keydown`, onEsqKeyDown);
   };
 
-  const onCloseElementClick = () => {
+  const onBigCardCloseButtonClick = () => {
     closeBigCard();
   };
 
-  openingBigCardElements.forEach((element) => {
-    element.addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      openBigCard();
-      bigCardCloseElement.addEventListener(`click`, onCloseElementClick);
-    });
-  });
+  const onOpeningBigCardElementClick = (evt) => {
+    evt.preventDefault();
+    openBigCard();
+    bigCard.setCloseButtonHandler(onBigCardCloseButtonClick);
+  };
 
-  render(container, card.getElement());
+  card.setOnOpeningBigCardElementsHandler(onOpeningBigCardElementClick);
+
+  render(container, card);
 };
 
 const renderMainMovies = (container, movies) => {
   movies.forEach((movie) => renderMovieCard(container, movie));
 };
 
+const onLoadButtonClick = (evt) => {
+  evt.preventDefault();
+  const {value, done} = iterator.next();
+
+  if (value) {
+    renderMainMovies(moviesListElement, value);
+  }
+
+  if (done) {
+    evt.target.remove();
+  }
+};
+
 const initLoadButton = () => {
-  const loadButtonElement = moviesContainerComponent.getElement().querySelector(`.films-list__show-more`);
-
   if (!hasNoMoviesForRender) {
-    loadButtonElement.addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      const {value, done} = iterator.next();
-
-      if (value) {
-        renderMainMovies(moviesListElement, value);
-      }
-
-      if (done) {
-        loadButtonElement.remove();
-      }
-    });
+    moviesContainerComponent.setLoadButtonHandler(onLoadButtonClick);
   } else {
-    loadButtonElement.remove();
+    moviesContainerComponent.sremoveLoadButton();
   }
 };
 
@@ -119,21 +114,21 @@ const renderExtraMovies = (movies, heading) => {
     extraMoviesComponent.getElement().innerHTML = ``;
   }
 
-  render(moviesContainerComponent.getElement(), extraMoviesComponent.getElement());
+  render(moviesContainerComponent, extraMoviesComponent);
 };
 
-render(headerElement, new Profile(alredyWathedMoviesNumber).getElement());
-render(mainElement, new Menu(moviesData).getElement());
-render(mainElement, new Sort().getElement());
+render(headerElement, new Profile(alredyWathedMoviesNumber));
+render(mainElement, new Menu(moviesData));
+render(mainElement, new Sort());
 
 if (moviesData.length) {
   renderMainMovies(moviesListElement, moviesForRender);
   initLoadButton();
-  render(mainElement, moviesContainerComponent.getElement());
+  render(mainElement, moviesContainerComponent);
   renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
   renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
 } else {
-  render(mainElement, new NoMoviesContainer().getElement());
+  render(mainElement, new NoMoviesContainer());
 }
 
 document.querySelector(`.footer__statistics p`).textContent = `${moviesData.length} movies inside`;

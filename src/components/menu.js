@@ -1,4 +1,5 @@
-import {capitalize, createElement} from '../utils';
+import AbstractComponent from './abstract-component';
+import {capitalize} from '../utils/common';
 import {FILTERS} from '../const';
 
 const filterParameters = {
@@ -30,26 +31,13 @@ const createMenuMarkup = (moviesData) => {
   );
 };
 
-export default class Menu {
+export default class Menu extends AbstractComponent {
   constructor(moviesData) {
-    this._element = null;
+    super();
     this._moviesData = moviesData;
   }
 
   getTemplate() {
     return createMenuMarkup(this._moviesData);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element.remove();
-    this._element = null;
   }
 }
