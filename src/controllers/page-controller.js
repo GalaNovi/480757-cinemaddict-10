@@ -27,6 +27,7 @@ export class PageController {
     this._extraMoviesAmount = 2;
     this._headerElement = this._container.querySelector(`.header`);
     this._mainElement = this._container.querySelector(`.main`);
+    this._moviesContainerComponent = new MoviesContainer();
   }
 
   render(moviesData) {
@@ -35,8 +36,7 @@ export class PageController {
     const {value: moviesForRender, done: hasNoMoviesForRender} = iterator.next();
     const topRatedMovies = this._getExtraMovies(moviesData, `topRated`);
     const mostCommentedMovies = this._getExtraMovies(moviesData, `mostCommented`);
-    const moviesContainerComponent = new MoviesContainer();
-    const moviesListElement = moviesContainerComponent.getMoviesListElement();
+    const moviesListElement = this._moviesContainerComponent.getMoviesListElement();
 
     const onLoadButtonClick = (evt) => {
       evt.preventDefault();
@@ -53,24 +53,10 @@ export class PageController {
 
     const initLoadButton = () => {
       if (!hasNoMoviesForRender) {
-        moviesContainerComponent.setLoadButtonHandler(onLoadButtonClick);
+        this._moviesContainerComponent.setLoadButtonHandler(onLoadButtonClick);
       } else {
-        moviesContainerComponent.removeLoadButton();
+        this._moviesContainerComponent.removeLoadButton();
       }
-    };
-
-    const renderExtraMovies = (movies, heading) => {
-      const doesHasMovies = Boolean(movies.length);
-      const extraMoviesComponent = new ExtraMovies(heading, moviesContainerComponent);
-      const extraMoviesListElement = extraMoviesComponent.getMoviesListElement();
-
-      if (doesHasMovies) {
-        movies.forEach((movie) => this._renderMovieCard(extraMoviesListElement, movie));
-      } else {
-        extraMoviesComponent.getElement().innerHTML = ``;
-      }
-
-      render(moviesContainerComponent, extraMoviesComponent);
     };
 
     render(this._headerElement, new Profile(alredyWathedMoviesNumber));
@@ -80,9 +66,9 @@ export class PageController {
     if (moviesData.length) {
       this._renderMainMovies(moviesListElement, moviesForRender);
       initLoadButton(hasNoMoviesForRender);
-      render(this._mainElement, moviesContainerComponent);
-      renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
-      renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
+      render(this._mainElement, this._moviesContainerComponent);
+      this._renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
+      this._renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
     } else {
       render(this._mainElement, new NoMoviesContainer());
     }
@@ -93,6 +79,20 @@ export class PageController {
   _getExtraMovies(movies, parameter) {
     const extraMovies = movies.filter(extraMoviesParameters[parameter].filter);
     return extraMovies.length ? extraMovies.sort(extraMoviesParameters[parameter].sort).slice(0, this._extraMoviesAmount) : false;
+  }
+
+  _renderExtraMovies(movies, heading) {
+    const doesHasMovies = Boolean(movies.length);
+    const extraMoviesComponent = new ExtraMovies(heading);
+    const extraMoviesListElement = extraMoviesComponent.getMoviesListElement();
+
+    if (doesHasMovies) {
+      movies.forEach((movie) => this._renderMovieCard(extraMoviesListElement, movie));
+    } else {
+      extraMoviesComponent.getElement().innerHTML = ``;
+    }
+
+    render(this._moviesContainerComponent, extraMoviesComponent);
   }
 
   _renderMovieCard(container, movie) {
