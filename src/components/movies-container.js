@@ -21,12 +21,17 @@ export default class MoviesContainer extends AbstractComponent {
     return this.getElement().querySelector(`.films-list__container`);
   }
 
-  setLoadButtonHandler(handler) {
+  setLoadButtonCallback(callback) {
     this.getElement().querySelector(`.films-list__show-more`)
-      .addEventListener(`click`, handler);
+      .addEventListener(`click`, callback);
   }
 
-  removeLoadButton() {
-    this.getElement().querySelector(`.films-list__show-more`).remove();
+  toggleShowLoadButton(areAllMoviesShown) {
+    const loadMoreButton = this.getElement().querySelector(`.films-list__show-more`);
+    if (areAllMoviesShown) {
+      loadMoreButton.style.display = `none`;
+    } else {
+      loadMoreButton.style.display = ``;
+    }
   }
 }

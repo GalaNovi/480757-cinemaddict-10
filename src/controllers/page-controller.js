@@ -10,6 +10,10 @@ import {getNextItemsIterator} from '../utils/common';
 import {render} from '../utils/render';
 import {EXTRA_MOVIES_HEADINGS} from '../const';
 
+const START_MOVIES_AMOUNT = 5;
+const ADD_MOVIES_AMOUNT = 5;
+const EXTRA_MOVIES_AMOUNT = 2;
+
 const extraMoviesParameters = {
   topRated: {
     filter: ({movieInfo}) => movieInfo.rating >= 1,
@@ -24,53 +28,29 @@ const extraMoviesParameters = {
 export class PageController {
   constructor(container) {
     this._container = container;
-    this._extraMoviesAmount = 2;
-    this._headerElement = this._container.querySelector(`.header`);
-    this._mainElement = this._container.querySelector(`.main`);
+    this._extraMoviesAmount = EXTRA_MOVIES_AMOUNT;
+    this._renderedMoviesAmount = START_MOVIES_AMOUNT;
     this._moviesContainerComponent = new MoviesContainer();
   }
 
   render(moviesData) {
-    const alredyWathedMoviesNumber = moviesData.filter((movie) => movie.movieInfo.isAlredyWatched).length;
-    const iterator = getNextItemsIterator(moviesData);
-    const {value: moviesForRender, done: hasNoMoviesForRender} = iterator.next();
+    const headerElement = this._container.querySelector(`.header`);
+    const mainElement = this._container.querySelector(`.main`);
+    const alredyWatchedMoviesNumber = moviesData.filter((movie) => movie.movieInfo.isAlredyWatched).length;
     const topRatedMovies = this._getExtraMovies(moviesData, `topRated`);
     const mostCommentedMovies = this._getExtraMovies(moviesData, `mostCommented`);
-    const moviesListElement = this._moviesContainerComponent.getMoviesListElement();
 
-    const onLoadButtonClick = (evt) => {
-      evt.preventDefault();
-      const {value, done} = iterator.next();
-
-      if (value) {
-        this._renderMainMovies(moviesListElement, value);
-      }
-
-      if (done) {
-        evt.target.remove();
-      }
-    };
-
-    const initLoadButton = () => {
-      if (!hasNoMoviesForRender) {
-        this._moviesContainerComponent.setLoadButtonHandler(onLoadButtonClick);
-      } else {
-        this._moviesContainerComponent.removeLoadButton();
-      }
-    };
-
-    render(this._headerElement, new Profile(alredyWathedMoviesNumber));
-    render(this._mainElement, new Menu(moviesData));
-    render(this._mainElement, new Sort());
+    render(headerElement, new Profile(alredyWatchedMoviesNumber));
+    render(mainElement, new Menu(moviesData));
+    render(mainElement, new Sort());
 
     if (moviesData.length) {
-      this._renderMainMovies(moviesListElement, moviesForRender);
-      initLoadButton(hasNoMoviesForRender);
-      render(this._mainElement, this._moviesContainerComponent);
+      this._initMainMoviesList(moviesData);
+      render(mainElement, this._moviesContainerComponent);
       this._renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
       this._renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
     } else {
-      render(this._mainElement, new NoMoviesContainer());
+      render(mainElement, new NoMoviesContainer());
     }
 
     this._container.querySelector(`.footer__statistics p`).textContent = `${moviesData.length} movies inside`;
@@ -87,7 +67,7 @@ export class PageController {
     const extraMoviesListElement = extraMoviesComponent.getMoviesListElement();
 
     if (doesHasMovies) {
-      movies.forEach((movie) => this._renderMovieCard(extraMoviesListElement, movie));
+      movies.forEach((movie) => this._renderMovieCard(movie, extraMoviesListElement));
     } else {
       extraMoviesComponent.getElement().innerHTML = ``;
     }
@@ -95,7 +75,7 @@ export class PageController {
     render(this._moviesContainerComponent, extraMoviesComponent);
   }
 
-  _renderMovieCard(container, movie) {
+  _renderMovieCard(movie, container = this._moviesContainerComponent.getMoviesListElement()) {
     const card = new Card(movie);
     const bigCard = new BigCard(movie);
 
@@ -131,7 +111,23 @@ export class PageController {
     render(container, card);
   }
 
-  _renderMainMovies(container, movies) {
-    movies.forEach((movie) => this._renderMovieCard(container, movie));
+  _renderMainMovies(iterator) {
+    const {value: moviesForRender, done: hasNoMoviesForRender} = iterator.next();
+    moviesForRender.forEach((movie) => this._renderMovieCard(movie));
+    this._moviesContainerComponent.toggleShowLoadButton(hasNoMoviesForRender);
+  }
+
+  _initMainMoviesList(moviesData) {
+    const iterator = getNextItemsIterator(moviesData, ADD_MOVIES_AMOUNT, this._renderedMoviesAmount);
+
+    const initLoadButton = () => {
+      this._moviesContainerComponent.setLoadButtonCallback((evt) => {
+        evt.preventDefault();
+        this._renderMainMovies(iterator);
+      });
+    };
+
+    this._renderMainMovies(iterator);
+    initLoadButton();
   }
 }

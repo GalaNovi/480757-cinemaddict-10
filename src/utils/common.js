@@ -9,14 +9,14 @@ const shuffleArray = (array) => {
   return array;
 };
 
-const getNextItemsIterator = (items) => {
-  const ITEMS_PART_AMOUNT = 5;
+const getNextItemsIterator = (items, itemsPartAmount, startItemsAmount) => {
   const itemsAmount = items.length;
   let previousItemsAmount = 0;
 
   return {
     next() {
-      const value = items.slice(previousItemsAmount, previousItemsAmount + ITEMS_PART_AMOUNT);
+      const value = items.slice(previousItemsAmount, startItemsAmount);
+      startItemsAmount += itemsPartAmount;
       previousItemsAmount += value.length;
       const done = previousItemsAmount === itemsAmount;
       return {value, done};
