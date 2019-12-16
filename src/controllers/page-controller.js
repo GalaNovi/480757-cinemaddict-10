@@ -1,5 +1,6 @@
 import BigCard from '../components/big-card';
 import Card from '../components/card';
+import MainMovies from '../components/main-movies';
 import ExtraMovies from '../components/extra-movies';
 import Menu from '../components/menu';
 import MoviesContainer from '../components/movies-container';
@@ -31,6 +32,7 @@ export class PageController {
     this._extraMoviesAmount = EXTRA_MOVIES_AMOUNT;
     this._renderedMoviesAmount = START_MOVIES_AMOUNT;
     this._moviesContainerComponent = new MoviesContainer();
+    this._mainMoviesComponent = new MainMovies();
   }
 
   render(moviesData) {
@@ -63,19 +65,16 @@ export class PageController {
 
   _renderExtraMovies(movies, heading) {
     const doesHasMovies = Boolean(movies.length);
-    const extraMoviesComponent = new ExtraMovies(heading);
-    const extraMoviesListElement = extraMoviesComponent.getMoviesListElement();
 
     if (doesHasMovies) {
+      const extraMoviesComponent = new ExtraMovies(heading);
+      const extraMoviesListElement = extraMoviesComponent.getMoviesListElement();
       movies.forEach((movie) => this._renderMovieCard(movie, extraMoviesListElement));
-    } else {
-      extraMoviesComponent.getElement().innerHTML = ``;
+      render(this._moviesContainerComponent, extraMoviesComponent);
     }
-
-    render(this._moviesContainerComponent, extraMoviesComponent);
   }
 
-  _renderMovieCard(movie, container = this._moviesContainerComponent.getMoviesListElement()) {
+  _renderMovieCard(movie, container = this._mainMoviesComponent.getMoviesList()) {
     const card = new Card(movie);
     const bigCard = new BigCard(movie);
 
@@ -114,20 +113,20 @@ export class PageController {
   _renderMainMovies(iterator) {
     const {value: moviesForRender, done: hasNoMoviesForRender} = iterator.next();
     moviesForRender.forEach((movie) => this._renderMovieCard(movie));
-    this._moviesContainerComponent.toggleShowLoadButton(hasNoMoviesForRender);
+    this._mainMoviesComponent.toggleShowLoadButton(hasNoMoviesForRender);
   }
 
   _initMainMoviesList(moviesData) {
     const iterator = getNextItemsIterator(moviesData, ADD_MOVIES_AMOUNT, this._renderedMoviesAmount);
-
-    const initLoadButton = () => {
-      this._moviesContainerComponent.setLoadButtonCallback((evt) => {
-        evt.preventDefault();
-        this._renderMainMovies(iterator);
-      });
-    };
-
     this._renderMainMovies(iterator);
-    initLoadButton();
+    this._loadButtonInit(iterator);
+    render(this._moviesContainerComponent, this._mainMoviesComponent);
+  }
+
+  _loadButtonInit(iterator) {
+    this._mainMoviesComponent.setLoadButtonCallback((evt) => {
+      evt.preventDefault();
+      this._renderMainMovies(iterator);
+    });
   }
 }
