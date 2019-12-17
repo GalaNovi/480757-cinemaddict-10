@@ -40,11 +40,15 @@ export default class Sort extends AbstractComponent {
   }
 
   setCallback(callback) {
-    this._callback = callback;
-    this.getElement().addEventListener(`click`, this._callback);
+    this.getElement().addEventListener(`click`, (evt) => {
+      if (evt.target.tagName === `A`) {
+        this._setCurrentSortType(evt);
+        callback();
+      }
+    });
   }
 
-  setCurrentSortType(evt) {
+  _setCurrentSortType(evt) {
     evt.preventDefault();
     const newSortLink = evt.target;
     const newSortType = evt.target.getAttribute(`data-sort-type`);
