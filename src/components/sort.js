@@ -35,8 +35,9 @@ export default class Sort extends AbstractComponent {
     }
   }
 
-  setHandler(handler) {
-    this.getElement().addEventListener(`click`, handler);
+  setCallback(callback) {
+    this._callback = callback;
+    this.getElement().addEventListener(`click`, this._callback);
   }
 
   setCurrentSortType(sortLink, sortType) {

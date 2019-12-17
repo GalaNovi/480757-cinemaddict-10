@@ -52,7 +52,7 @@ export class PageController {
       render(this._moviesContainerComponent, this._mainMoviesComponent);
       this._mainMoviesListInit(moviesData);
       render(mainElement, this._moviesContainerComponent);
-      this._sortComponent.setHandler((evt) => {
+      this._sortComponent.setCallback((evt) => {
         if (evt.target.tagName === `A`) {
           evt.preventDefault();
           const sortType = evt.target.getAttribute(`data-sort-type`);
