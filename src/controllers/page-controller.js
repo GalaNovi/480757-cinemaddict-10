@@ -73,10 +73,12 @@ export class PageController {
     const cardComponent = new Card(movie);
     const bigCardComponent = new BigCard(movie);
 
-    this._subscriptions.push(() => {
-      cardComponent.removeElement();
-      bigCardComponent.removeElement();
-    });
+    if (container === this._mainMoviesComponent.getMoviesList()) {
+      this._subscriptions.push(() => {
+        cardComponent.removeElement();
+        bigCardComponent.removeElement();
+      });
+    }
 
     const onEsqKeyDown = (evt) => {
       if (evt.key === `Escape` || evt.key === `Esc`) {
