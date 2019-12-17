@@ -52,13 +52,8 @@ export class PageController {
       render(this._moviesContainerComponent, this._mainMoviesComponent);
       this._mainMoviesListInit(moviesData);
       render(mainElement, this._moviesContainerComponent);
-      this._sortComponent.setHandler((evt) => {
-        if (evt.target.tagName === `A`) {
-          evt.preventDefault();
-          const sortType = evt.target.getAttribute(`data-sort-type`);
-          this._sortComponent.setCurrentSortType(evt.target, sortType);
-          this._mainMoviesListInit(moviesData);
-        }
+      this._sortComponent.setCallback(() => {
+        this._mainMoviesListInit(moviesData);
       });
       this._renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
       this._renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
