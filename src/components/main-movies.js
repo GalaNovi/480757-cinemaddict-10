@@ -11,13 +11,24 @@ const createMainMoviesMarkup = () => {
 };
 
 export default class MainMovies extends AbstractComponent {
+  constructor() {
+    super();
+    this._isNeedSetHandler = true;
+  }
+
   getTemplate() {
     return createMainMoviesMarkup();
   }
 
-  setLoadButtonCallback(callback) {
-    this.getElement().querySelector(`.films-list__show-more`)
-      .addEventListener(`click`, callback);
+  setCallback(callback) {
+    this._callback = callback;
+
+    if (this._isNeedSetHandler) {
+      this.getElement().querySelector(`.films-list__show-more`)
+        .addEventListener(`click`, () => this._callback());
+    }
+
+    this._isNeedSetHandler = false;
   }
 
   toggleShowLoadButton(areAllMoviesShown) {

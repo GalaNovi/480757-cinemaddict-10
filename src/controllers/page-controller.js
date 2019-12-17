@@ -33,6 +33,8 @@ export class PageController {
     this._renderedMoviesAmount = START_MOVIES_AMOUNT;
     this._moviesContainerComponent = new MoviesContainer();
     this._mainMoviesComponent = new MainMovies();
+    this._sortComponent = new Sort();
+    this._subscriptions = [];
   }
 
   render(moviesData) {
@@ -44,11 +46,20 @@ export class PageController {
 
     render(headerElement, new Profile(alredyWatchedMoviesNumber));
     render(mainElement, new Menu(moviesData));
-    render(mainElement, new Sort());
+    render(mainElement, this._sortComponent);
 
     if (moviesData.length) {
-      this._initMainMoviesList(moviesData);
+      render(this._moviesContainerComponent, this._mainMoviesComponent);
+      this._mainMoviesListInit(moviesData);
       render(mainElement, this._moviesContainerComponent);
+      this._sortComponent.setHandler((evt) => {
+        if (evt.target.tagName === `A`) {
+          evt.preventDefault();
+          const sortType = evt.target.getAttribute(`data-sort-type`);
+          this._sortComponent.setCurrentSortType(evt.target, sortType);
+          this._mainMoviesListInit(moviesData);
+        }
+      });
       this._renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
       this._renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
     } else {
@@ -56,6 +67,53 @@ export class PageController {
     }
 
     this._container.querySelector(`.footer__statistics p`).textContent = `${moviesData.length} movies inside`;
+  }
+
+  _renderMovieCard(movie, container = this._mainMoviesComponent.getMoviesList()) {
+    const cardComponent = new Card(movie);
+    const bigCardComponent = new BigCard(movie);
+
+    this._subscriptions.push(() => {
+      cardComponent.removeElement();
+      bigCardComponent.removeElement();
+    });
+
+    const onEsqKeyDown = (evt) => {
+      if (evt.key === `Escape` || evt.key === `Esc`) {
+        evt.preventDefault();
+        closeBigCard();
+      }
+    };
+
+    const openBigCard = () => {
+      render(this._container, bigCardComponent);
+      document.addEventListener(`keydown`, onEsqKeyDown);
+    };
+
+    const closeBigCard = () => {
+      bigCardComponent.getElement().remove();
+      document.removeEventListener(`keydown`, onEsqKeyDown);
+    };
+
+    const onCloseButtonClick = () => {
+      closeBigCard();
+    };
+
+    const onOpeningElementClick = (evt) => {
+      evt.preventDefault();
+      openBigCard();
+      bigCardComponent.setCloseButtonHandler(onCloseButtonClick);
+    };
+
+    cardComponent.setOpenHandler(onOpeningElementClick);
+
+    render(container, cardComponent);
+  }
+
+  _renderMainMovies(iterator) {
+    const {value: moviesForRender, done: hasNoMoviesForRender} = iterator.next();
+    moviesForRender.forEach((movie) => this._renderMovieCard(movie));
+    this._mainMoviesComponent.toggleShowLoadButton(hasNoMoviesForRender);
   }
 
   _getExtraMovies(movies, parameter) {
@@ -74,59 +132,19 @@ export class PageController {
     }
   }
 
-  _renderMovieCard(movie, container = this._mainMoviesComponent.getMoviesList()) {
-    const card = new Card(movie);
-    const bigCard = new BigCard(movie);
-
-    const onEsqKeyDown = (evt) => {
-      if (evt.key === `Escape` || evt.key === `Esc`) {
-        evt.preventDefault();
-        closeBigCard();
-      }
-    };
-
-    const openBigCard = () => {
-      render(this._container, bigCard);
-      document.addEventListener(`keydown`, onEsqKeyDown);
-    };
-
-    const closeBigCard = () => {
-      bigCard.getElement().remove();
-      document.removeEventListener(`keydown`, onEsqKeyDown);
-    };
-
-    const onCloseButtonClick = () => {
-      closeBigCard();
-    };
-
-    const onOpeningElementClick = (evt) => {
-      evt.preventDefault();
-      openBigCard();
-      bigCard.setCloseButtonHandler(onCloseButtonClick);
-    };
-
-    card.setOpenHandler(onOpeningElementClick);
-
-    render(container, card);
-  }
-
-  _renderMainMovies(iterator) {
-    const {value: moviesForRender, done: hasNoMoviesForRender} = iterator.next();
-    moviesForRender.forEach((movie) => this._renderMovieCard(movie));
-    this._mainMoviesComponent.toggleShowLoadButton(hasNoMoviesForRender);
-  }
-
-  _initMainMoviesList(moviesData) {
-    const iterator = getNextItemsIterator(moviesData, ADD_MOVIES_AMOUNT, this._renderedMoviesAmount);
+  _mainMoviesListInit(moviesData) {
+    this._clearMainMovies();
+    const moviesForRender = this._sortComponent.sortData(moviesData);
+    const iterator = getNextItemsIterator(moviesForRender, ADD_MOVIES_AMOUNT, this._renderedMoviesAmount);
     this._renderMainMovies(iterator);
-    this._loadButtonInit(iterator);
-    render(this._moviesContainerComponent, this._mainMoviesComponent);
+    this._mainMoviesComponent.setCallback(() => {
+      this._renderMainMovies(iterator);
+      this._renderedMoviesAmount += ADD_MOVIES_AMOUNT;
+    });
   }
 
-  _loadButtonInit(iterator) {
-    this._mainMoviesComponent.setLoadButtonCallback((evt) => {
-      evt.preventDefault();
-      this._renderMainMovies(iterator);
-    });
+  _clearMainMovies() {
+    this._subscriptions.forEach((element) => element());
+    this._subscriptions = [];
   }
 }
