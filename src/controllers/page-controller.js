@@ -54,9 +54,7 @@ export class PageController {
       render(mainElement, this._moviesContainerComponent);
       this._sortComponent.setCallback((evt) => {
         if (evt.target.tagName === `A`) {
-          evt.preventDefault();
-          const sortType = evt.target.getAttribute(`data-sort-type`);
-          this._sortComponent.setCurrentSortType(evt.target, sortType);
+          this._sortComponent.setCurrentSortType(evt);
           this._mainMoviesListInit(moviesData);
         }
       });

@@ -23,6 +23,10 @@ export default class Sort extends AbstractComponent {
     this._sortLinkActive = this.getElement().querySelector(`.${SORT_LINK_ACTIVE_CLASS}`);
   }
 
+  get sortType() {
+    return this._sortType;
+  }
+
   getTemplate() {
     return createSortMarkup();
   }
@@ -40,14 +44,17 @@ export default class Sort extends AbstractComponent {
     this.getElement().addEventListener(`click`, this._callback);
   }
 
-  setCurrentSortType(sortLink, sortType) {
-    this._sortLinkActive.classList.remove(SORT_LINK_ACTIVE_CLASS);
-    sortLink.classList.add(SORT_LINK_ACTIVE_CLASS);
-    this._sortLinkActive = sortLink;
-    this._sortType = sortType;
+  setCurrentSortType(evt) {
+    evt.preventDefault();
+    const newSortLink = evt.target;
+    const newSortType = evt.target.getAttribute(`data-sort-type`);
+    this._changeActiveSortLink(newSortLink);
+    this._sortType = newSortType;
   }
 
-  get sortType() {
-    return this._sortType;
+  _changeActiveSortLink(newSortLink) {
+    this._sortLinkActive.classList.remove(SORT_LINK_ACTIVE_CLASS);
+    newSortLink.classList.add(SORT_LINK_ACTIVE_CLASS);
+    this._sortLinkActive = newSortLink;
   }
 }
