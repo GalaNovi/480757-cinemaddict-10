@@ -1,11 +1,5 @@
-import {capitalize, createElement} from '../utils';
-
-export const formatTime = (duration) => {
-  const hours = Math.floor(duration / 60);
-  const minutes = duration % 60;
-
-  return `${hours}h ${minutes}m`;
-};
+import AbstractComponent from './abstract-component';
+import {capitalize, formatTime} from '../utils/common';
 
 const createRatingMarkup = (rating) => rating >= 1 ? `<p class="film-card__rating">${rating}</p>` : ``;
 
@@ -48,9 +42,9 @@ const createCardMarkup = (movieData) => {
   );
 };
 
-export default class Card {
+export default class Card extends AbstractComponent {
   constructor(movieData) {
-    this._element = null;
+    super();
     this._movieData = movieData;
   }
 
@@ -58,16 +52,15 @@ export default class Card {
     return createCardMarkup(this._movieData);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
+  setOpenHandler(handler) {
+    const openingBigCardElements = [
+      this.getElement().querySelector(`.film-card__poster`),
+      this.getElement().querySelector(`.film-card__title`),
+      this.getElement().querySelector(`.film-card__comments`),
+    ];
 
-    return this._element;
-  }
-
-  removeElement() {
-    this._element.remove();
-    this._element = null;
+    openingBigCardElements.forEach((element) => {
+      element.addEventListener(`click`, handler);
+    });
   }
 }

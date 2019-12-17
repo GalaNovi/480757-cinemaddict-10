@@ -1,4 +1,4 @@
-import {createElement} from '../utils';
+import AbstractComponent from './abstract-component';
 
 const createExtraMoviesMarkup = (heading) => {
   return (
@@ -9,9 +9,9 @@ const createExtraMoviesMarkup = (heading) => {
   );
 };
 
-export default class ExtraMovies {
+export default class ExtraMovies extends AbstractComponent {
   constructor(heading) {
-    this._elment = null;
+    super();
     this._heading = heading;
   }
 
@@ -19,16 +19,7 @@ export default class ExtraMovies {
     return createExtraMoviesMarkup(this._heading);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element.remove();
-    this._element = null;
+  getMoviesListElement() {
+    return this.getElement().querySelector(`.films-list__container`);
   }
 }

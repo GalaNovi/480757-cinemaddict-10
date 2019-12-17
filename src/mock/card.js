@@ -1,4 +1,4 @@
-import {shuffleArray} from '../utils';
+import {shuffleArray} from '../utils/common';
 import {EMOTIONS} from '../const';
 
 const MAX_DESCRIPTION_SENTENSES = 6;

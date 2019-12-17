@@ -1,34 +1,52 @@
-import {createElement} from '../utils';
+import AbstractComponent from './abstract-component';
+
+const SORT_LINK_ACTIVE_CLASS = `sort__button--active`;
+const sortParameters = {
+  date: (a, b) => b.movieInfo.release.date - a.movieInfo.release.date,
+  rating: (a, b) => b.movieInfo.rating - a.movieInfo.rating,
+};
 
 const createSortMarkup = () => {
   return (
     `<ul class="sort">
-      <li><a href="#" class="sort__button sort__button--active">Sort by default</a></li>
-      <li><a href="#" class="sort__button">Sort by date</a></li>
-      <li><a href="#" class="sort__button">Sort by rating</a></li>
+      <li><a href="#" class="sort__button sort__button--active" data-sort-type="default">Sort by default</a></li>
+      <li><a href="#" class="sort__button" data-sort-type="date">Sort by date</a></li>
+      <li><a href="#" class="sort__button" data-sort-type="rating">Sort by rating</a></li>
     </ul>`
   );
 };
 
-export default class Sort {
+export default class Sort extends AbstractComponent {
   constructor() {
-    this._elment = null;
+    super();
+    this._sortType = `default`;
+    this._sortLinkActive = this.getElement().querySelector(`.${SORT_LINK_ACTIVE_CLASS}`);
   }
 
   getTemplate() {
     return createSortMarkup();
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
+  sortData(data) {
+    if (this._sortType === `default`) {
+      return data.slice();
+    } else {
+      return data.slice().sort(sortParameters[this._sortType]);
     }
-
-    return this._element;
   }
 
-  removeElement() {
-    this._element.remove();
-    this._element = null;
+  setHandler(handler) {
+    this.getElement().addEventListener(`click`, handler);
+  }
+
+  setCurrentSortType(sortLink, sortType) {
+    this._sortLinkActive.classList.remove(SORT_LINK_ACTIVE_CLASS);
+    sortLink.classList.add(SORT_LINK_ACTIVE_CLASS);
+    this._sortLinkActive = sortLink;
+    this._sortType = sortType;
+  }
+
+  get sortType() {
+    return this._sortType;
   }
 }
