@@ -5,7 +5,7 @@ import MoviesContainer from '../components/movies-container';
 import NoMoviesContainer from '../components/no-movies-container';
 import Profile from '../components/profile';
 import Sort from '../components/sort';
-import MovieController from '../controllers/movie-controller';
+import MovieController from '../controllers/movie';
 import {getNextItemsIterator} from '../utils/common';
 import {render} from '../utils/render';
 import {EXTRA_MOVIES_HEADINGS} from '../const';
