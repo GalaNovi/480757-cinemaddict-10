@@ -1,5 +1,3 @@
-import BigCard from '../components/big-card';
-import Card from '../components/card';
 import MainMovies from '../components/main-movies';
 import ExtraMovies from '../components/extra-movies';
 import Menu from '../components/menu';
@@ -7,6 +5,7 @@ import MoviesContainer from '../components/movies-container';
 import NoMoviesContainer from '../components/no-movies-container';
 import Profile from '../components/profile';
 import Sort from '../components/sort';
+import MovieController from '../controllers/movie-controller';
 import {getNextItemsIterator} from '../utils/common';
 import {render} from '../utils/render';
 import {EXTRA_MOVIES_HEADINGS} from '../const';
@@ -34,7 +33,7 @@ export class PageController {
     this._moviesContainerComponent = new MoviesContainer();
     this._mainMoviesComponent = new MainMovies();
     this._sortComponent = new Sort();
-    this._subscriptions = [];
+    this._shownMoviesControllers = [];
   }
 
   render(moviesData) {
@@ -64,52 +63,18 @@ export class PageController {
     this._container.querySelector(`.footer__statistics p`).textContent = `${moviesData.length} movies inside`;
   }
 
-  _renderMovieCard(movie, container = this._mainMoviesComponent.getMoviesList()) {
-    const cardComponent = new Card(movie);
-    const bigCardComponent = new BigCard(movie);
+  _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
+    const movieController = new MovieController(container);
 
     if (container === this._mainMoviesComponent.getMoviesList()) {
-      this._subscriptions.push(() => {
-        cardComponent.removeElement();
-        bigCardComponent.removeElement();
-      });
+      this._shownMoviesControllers.push(movieController);
     }
-
-    const onEsqKeyDown = (evt) => {
-      if (evt.key === `Escape` || evt.key === `Esc`) {
-        evt.preventDefault();
-        closeBigCard();
-      }
-    };
-
-    const openBigCard = () => {
-      render(this._container, bigCardComponent);
-      document.addEventListener(`keydown`, onEsqKeyDown);
-    };
-
-    const closeBigCard = () => {
-      bigCardComponent.getElement().remove();
-      document.removeEventListener(`keydown`, onEsqKeyDown);
-    };
-
-    const onCloseButtonClick = () => {
-      closeBigCard();
-    };
-
-    const onOpeningElementClick = (evt) => {
-      evt.preventDefault();
-      openBigCard();
-      bigCardComponent.setCloseButtonHandler(onCloseButtonClick);
-    };
-
-    cardComponent.setOpenHandler(onOpeningElementClick);
-
-    render(container, cardComponent);
+    movieController.render(movieData);
   }
 
   _renderMainMovies(iterator) {
     const {value: moviesForRender, done: hasNoMoviesForRender} = iterator.next();
-    moviesForRender.forEach((movie) => this._renderMovieCard(movie));
+    moviesForRender.forEach((movieData) => this._renderMovieCard(movieData));
     this._mainMoviesComponent.toggleShowLoadButton(hasNoMoviesForRender);
   }
 
@@ -141,7 +106,7 @@ export class PageController {
   }
 
   _clearMainMovies() {
-    this._subscriptions.forEach((element) => element());
-    this._subscriptions = [];
+    this._shownMoviesControllers.forEach((movieController) => movieController.removeElements());
+    this._shownMoviesControllers = [];
   }
 }
