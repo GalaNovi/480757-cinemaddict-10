@@ -34,9 +34,11 @@ export class PageController {
     this._mainMoviesComponent = new MainMovies();
     this._sortComponent = new Sort();
     this._shownMoviesControllers = [];
+    this._moviesData = [];
   }
 
   render(moviesData) {
+    this._moviesData = moviesData;
     const headerElement = this._container.querySelector(`.header`);
     const mainElement = this._container.querySelector(`.main`);
     const alredyWatchedMoviesNumber = moviesData.filter((movie) => movie.movieInfo.isAlredyWatched).length;
@@ -64,11 +66,12 @@ export class PageController {
   }
 
   _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
-    const movieController = new MovieController(container);
+    const movieController = new MovieController(container, this._onDataChange);
 
     if (container === this._mainMoviesComponent.getMoviesList()) {
       this._shownMoviesControllers.push(movieController);
     }
+
     movieController.render(movieData);
   }
 
@@ -108,5 +111,8 @@ export class PageController {
   _clearMainMovies() {
     this._shownMoviesControllers.forEach((movieController) => movieController.removeElements());
     this._shownMoviesControllers = [];
+  }
+
+  _onDataChange(oldData, newData) {
   }
 }

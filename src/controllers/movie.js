@@ -3,8 +3,9 @@ import Card from '../components/card';
 import {render} from '../utils/render';
 
 export default class MovieController {
-  constructor(container) {
+  constructor(container, onDataChange) {
     this._container = container;
+    this._onDataChange = onDataChange;
   }
 
   render(movieData) {
@@ -32,13 +33,20 @@ export default class MovieController {
       closeBigCard();
     };
 
-    const onOpeningElementClick = (evt) => {
+    this._cardComponent.setOpenHandler((evt) => {
       evt.preventDefault();
       openBigCard();
       this._bigCardComponent.setCloseButtonHandler(onCloseButtonClick);
-    };
+    });
 
-    this._cardComponent.setOpenHandler(onOpeningElementClick);
+    this._cardComponent.setWatchlistButtonHandler((evt) => {
+      evt.preventDefault();
+      this._onDataChange(movieData, Object.assign({}, movieData, {
+        movieInfo: Object.assign(movieData.movieInfo, {
+          isOnTheWatchlist: !movieData.movieInfo.isOnTheWatchlist
+        })
+      }));
+    });
 
     render(this._container, this._cardComponent);
   }
