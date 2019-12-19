@@ -35,6 +35,8 @@ export class PageController {
     this._sortComponent = new Sort();
     this._shownMoviesControllers = [];
     this._moviesData = [];
+
+    this._onDataChange = this._onDataChange.bind(this);
   }
 
   render(moviesData) {
@@ -114,5 +116,7 @@ export class PageController {
   }
 
   _onDataChange(oldData, newData) {
+    const controllersOfChangedMovies = this._shownMoviesControllers.filter((controller) => controller.id === oldData.id);
+    controllersOfChangedMovies.forEach((controller) => controller.render(newData));
   }
 }
