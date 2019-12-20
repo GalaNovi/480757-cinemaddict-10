@@ -64,18 +64,30 @@ export default class Card extends AbstractComponent {
     });
   }
 
-  setWatchlistButtonHandler(handler) {
+  setWatchlistButtonCallback(callback) {
+    this._watchlistButtonCallback = callback;
     this.getElement().querySelector(`.film-card__controls-item--add-to-watchlist`)
-      .addEventListener(`click`, handler);
+      .addEventListener(`click`, (evt) => {
+        evt.preventDefault();
+        this._watchlistButtonCallback();
+      });
   }
 
-  setWatchedButtonHandler(handler) {
+  setWatchedButtonCallback(callback) {
+    this._watchedButtonCallback = callback;
     this.getElement().querySelector(`.film-card__controls-item--mark-as-watched`)
-      .addEventListener(`click`, handler);
+      .addEventListener(`click`, (evt) => {
+        evt.preventDefault();
+        this._watchedButtonCallback();
+      });
   }
 
-  setFavoriteButtonHandler(handler) {
+  setFavoriteButtonCallback(callback) {
+    this._favoriteButtonCallback = callback;
     this.getElement().querySelector(`.film-card__controls-item--favorite`)
-      .addEventListener(`click`, handler);
+      .addEventListener(`click`, (evt) => {
+        evt.preventDefault();
+        this._favoriteButtonCallback();
+      });
   }
 }

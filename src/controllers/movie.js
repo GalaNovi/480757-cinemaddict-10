@@ -45,8 +45,7 @@ export default class MovieController {
     this._bigCardComponent.setCloseButtonHandler(onCloseButtonClick);
 
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
-      component.setWatchlistButtonHandler((evt) => {
-        evt.preventDefault();
+      component.setWatchlistButtonCallback(() => {
         this._onDataChange(movieData, Object.assign({}, movieData, {
           movieInfo: Object.assign(movieData.movieInfo, {
             isOnTheWatchlist: !movieData.movieInfo.isOnTheWatchlist
@@ -54,8 +53,7 @@ export default class MovieController {
         }));
       });
 
-      component.setWatchedButtonHandler((evt) => {
-        evt.preventDefault();
+      component.setWatchedButtonCallback(() => {
         this._onDataChange(movieData, Object.assign({}, movieData, {
           movieInfo: Object.assign(movieData.movieInfo, {
             isAlredyWatched: !movieData.movieInfo.isAlredyWatched
@@ -63,8 +61,7 @@ export default class MovieController {
         }));
       });
 
-      component.setFavoriteButtonHandler((evt) => {
-        evt.preventDefault();
+      component.setFavoriteButtonCallback(() => {
         this._onDataChange(movieData, Object.assign({}, movieData, {
           movieInfo: Object.assign(movieData.movieInfo, {
             isFavorite: !movieData.movieInfo.isFavorite
