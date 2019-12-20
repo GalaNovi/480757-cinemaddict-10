@@ -1,4 +1,4 @@
-import AbstractComponent from './abstract-component';
+import AbstractSmartComponent from './abstract-smart-component';
 import {capitalize, formatTime} from '../utils/common';
 import {MONTHS} from '../const';
 
@@ -198,14 +198,20 @@ const createBigCardMarkup = (movieData) => {
   );
 };
 
-export default class BigCard extends AbstractComponent {
+export default class BigCard extends AbstractSmartComponent {
   constructor(movieData) {
     super();
     this._movieData = movieData;
+
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
     return createBigCardMarkup(this._movieData);
+  }
+
+  recoveryListeners() {
+
   }
 
   setCloseButtonHandler(handler) {
@@ -226,5 +232,9 @@ export default class BigCard extends AbstractComponent {
   setFavoriteButtonHandler(handler) {
     this.getElement().querySelector(`.film-details__control-label--favorite`)
       .addEventListener(`click`, handler);
+  }
+
+  _subscribeOnEvents() {
+    
   }
 }
