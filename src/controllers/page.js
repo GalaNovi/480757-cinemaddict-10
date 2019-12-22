@@ -71,9 +71,10 @@ export class PageController {
     const movieController = new MovieController(container, this._onDataChange);
 
     if (container === this._mainMoviesComponent.getMoviesList()) {
-      this._shownMoviesControllers.push(movieController);
+      movieController.isFromMainList = true;
     }
 
+    this._shownMoviesControllers.push(movieController);
     movieController.render(movieData);
   }
 
@@ -111,12 +112,15 @@ export class PageController {
   }
 
   _clearMainMovies() {
-    this._shownMoviesControllers.forEach((movieController) => movieController.removeElements());
-    this._shownMoviesControllers = [];
+    const controllersForClean = this._shownMoviesControllers.filter((controller) => controller.isFromMainList);
+    controllersForClean.forEach((movieController) => movieController.removeElements());
+    this._shownMoviesControllers = this._shownMoviesControllers.filter((controller) => !controller.isFromMainList);
   }
 
   _onDataChange(oldData, newData) {
     const controllersOfChangedMovies = this._shownMoviesControllers.filter((controller) => controller.id === oldData.id);
-    controllersOfChangedMovies.forEach((controller) => controller.render(newData));
+    controllersOfChangedMovies.forEach((controller) => {
+      controller.updateComponents(newData);
+    });
   }
 }

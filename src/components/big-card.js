@@ -27,7 +27,12 @@ const getCommentTimeAgoText = (dateTime) => {
   }
 };
 
-const createRatingMarkup = (rating) => rating >= 1 ? `<p class="film-details__total-rating">${rating}</p>` : ``;
+const createRatingMarkup = (commonRating, isAlredyWatched, personalRating) => {
+  return (
+    `${commonRating >= 1 ? `<p class="film-details__total-rating">${commonRating}</p>` : ``}
+    ${isAlredyWatched && personalRating >= 1 ? `<p class="film-details__user-rating">Your rate ${personalRating}</p>` : ``}`
+  );
+};
 
 const createCommentsMarkup = (comment) => {
   const {author, text, date, emotion} = comment;
@@ -50,7 +55,7 @@ const createCommentsMarkup = (comment) => {
   );
 };
 
-const createUserRatingMarkup = (movieData) => {
+const createUserRatingFormMarkup = (movieData) => {
   const {poster, name} = movieData.movieInfo;
 
   return (
@@ -106,25 +111,70 @@ const createUserRatingMarkup = (movieData) => {
   );
 };
 
+const getNewCommentMarkup = (localComment) => {
+  const {comment, emotion} = localComment
+  return (
+    `<div class="film-details__new-comment">
+      <div for="add-emoji" class="film-details__add-emoji-label">
+        ${emotion ? `<img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji">` : ``}
+      </div>
+
+      <label class="film-details__comment-label">
+        <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">
+          ${comment ? comment : ``}
+        </textarea>
+      </label>
+
+      <div class="film-details__emoji-list">
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="sleeping" data-emoji="smile">
+        <label class="film-details__emoji-label" for="emoji-smile">
+          <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
+        </label>
+
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="neutral-face" data-emoji="sleeping">
+        <label class="film-details__emoji-label" for="emoji-sleeping">
+          <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
+        </label>
+
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-gpuke" value="grinning" data-emoji="puke">
+        <label class="film-details__emoji-label" for="emoji-gpuke">
+          <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
+        </label>
+
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="grinning" data-emoji="angry">
+        <label class="film-details__emoji-label" for="emoji-angry">
+          <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
+        </label>
+      </div>
+    </div>`
+  );
+}
+
 const createBigCardMarkup = (movieData) => {
   const {
     poster,
     ageLimit,
     name,
     originalName,
-    rating,
+    rating: commonRating,
     director,
     release,
     duration,
     genres,
     description,
-    isOnTheWatchlist,
-    isAlredyWatched,
-    isFavorite
   } = movieData.movieInfo;
 
+  const {
+    personalRating,
+    isOnTheWatchlist,
+    isAlredyWatched,
+    isFavorite,
+  } = movieData.userInfo;
+
+  const {localComment} = movieData;
+
   const {comments} = movieData;
-  const ratingMarkup = createRatingMarkup(rating);
+  const ratingMarkup = createRatingMarkup(commonRating, isAlredyWatched, personalRating);
   const writers = movieData.movieInfo.writers.join(`, `);
   const actors = movieData.movieInfo.actors.join(`, `);
   const date = new Date(release.date);
@@ -132,7 +182,8 @@ const createBigCardMarkup = (movieData) => {
   const country = release.country;
   const genresMarkup = genres.map((genre) => `<span class="film-details__genre">${capitalize(genre)}</span>`).join(``);
   const commentsMarkup = comments.map((comment) => createCommentsMarkup(comment)).join(``);
-  const userRatingMarkup = createUserRatingMarkup(movieData);
+  const userRatingFormMarkup = createUserRatingFormMarkup(movieData);
+  const newCommentMarkup = getNewCommentMarkup(localComment);
 
   return (
     `<section class="film-details">
@@ -211,6 +262,8 @@ const createBigCardMarkup = (movieData) => {
           </section>
         </div>
 
+        ${isAlredyWatched && !personalRating ? userRatingFormMarkup : ``}
+
         <div class="form-details__bottom-container">
           <section class="film-details__comments-wrap">
             <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
@@ -219,35 +272,7 @@ const createBigCardMarkup = (movieData) => {
               ${commentsMarkup}
             </ul>
 
-            <div class="film-details__new-comment">
-              <div for="add-emoji" class="film-details__add-emoji-label"></div>
-
-              <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
-              </label>
-
-              <div class="film-details__emoji-list">
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="sleeping">
-                <label class="film-details__emoji-label" for="emoji-smile">
-                  <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
-                </label>
-
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="neutral-face">
-                <label class="film-details__emoji-label" for="emoji-sleeping">
-                  <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-                </label>
-
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-gpuke" value="grinning">
-                <label class="film-details__emoji-label" for="emoji-gpuke">
-                  <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-                </label>
-
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="grinning">
-                <label class="film-details__emoji-label" for="emoji-angry">
-                  <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-                </label>
-              </div>
-            </div>
+            ${newCommentMarkup}
           </section>
         </div>
       </form>
@@ -259,25 +284,27 @@ export default class BigCard extends AbstractSmartComponent {
   constructor(movieData) {
     super();
     this._movieData = movieData;
-
-    this._subscribeOnEvents();
   }
 
   getTemplate() {
     return createBigCardMarkup(this._movieData);
   }
 
-  recoveryListeners() {
-    this._subscribeOnEvents();
-  }
-
-  setCloseButtonHandler(handler) {
+  setCloseCallback(callback) {
+    if (callback) {
+      this._closeCallback = callback;
+    }
     this.getElement().querySelector(`.film-details__close-btn`)
-      .addEventListener(`click`, handler);
+      .addEventListener(`click`, (evt) => {
+        evt.preventDefault();
+        this._closeCallback();
+      });
   }
 
   setWatchlistButtonCallback(callback) {
-    this._watchlistButtonCallback = callback;
+    if (callback) {
+      this._watchlistButtonCallback = callback;
+    }
     this.getElement().querySelector(`.film-details__control-label--watchlist`)
       .addEventListener(`click`, (evt) => {
         evt.preventDefault();
@@ -286,7 +313,9 @@ export default class BigCard extends AbstractSmartComponent {
   }
 
   setWatchedButtonCallback(callback) {
-    this._watchedButtonCallback = callback;
+    if (callback) {
+      this._watchedButtonCallback = callback;
+    }
     this.getElement().querySelector(`.film-details__control-label--watched`)
       .addEventListener(`click`, (evt) => {
         evt.preventDefault();
@@ -295,7 +324,9 @@ export default class BigCard extends AbstractSmartComponent {
   }
 
   setFavoriteButtonCallback(callback) {
-    this._favoriteButtonCallback = callback;
+    if (callback) {
+      this._favoriteButtonCallback = callback;
+    }
     this.getElement().querySelector(`.film-details__control-label--favorite`)
       .addEventListener(`click`, (evt) => {
         evt.preventDefault();
@@ -303,9 +334,19 @@ export default class BigCard extends AbstractSmartComponent {
       });
   }
 
-  _subscribeOnEvents() {
-    this.setWatchlistButtonCallback(this._watchlistButtonCallback);
-    this.setWatchedButtonCallback(this._watchedButtonCallback);
-    this.setFavoriteButtonCallback(this._favoriteButtonCallback);
+  setOnEmojiListClickHandler(handler) {
+    if (handler) {
+      this._onEmojiListClickHandler = handler;
+    }
+    this.getElement().querySelector(`.film-details__emoji-list`)
+      .addEventListener(`click`, this._onEmojiListClickHandler);
+  }
+
+  recoveryListeners() {
+    this.setWatchlistButtonCallback();
+    this.setWatchedButtonCallback();
+    this.setFavoriteButtonCallback();
+    this.setCloseCallback();
+    this.setOnEmojiListClickHandler();
   }
 }
