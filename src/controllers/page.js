@@ -13,6 +13,8 @@ import {EXTRA_MOVIES_HEADINGS} from '../const';
 const START_MOVIES_AMOUNT = 5;
 const ADD_MOVIES_AMOUNT = 5;
 const EXTRA_MOVIES_AMOUNT = 2;
+const MAIN_MOVIES_NAME = `main`;
+const EXTRA_MOVIES_NAME = `extra`;
 
 const extraMoviesParameters = {
   topRated: {
@@ -33,7 +35,7 @@ export class PageController {
     this._moviesContainerComponent = new MoviesContainer();
     this._mainMoviesComponent = new MainMovies();
     this._sortComponent = new Sort();
-    this._shownMoviesControllers = [];
+    this._shownMoviesInstances = [];
     this._moviesData = [];
 
     this._onDataChange = this._onDataChange.bind(this);
@@ -69,12 +71,16 @@ export class PageController {
 
   _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
     const movieController = new MovieController(container, this._onDataChange);
+    const movieInstance = {
+      type: MAIN_MOVIES_NAME,
+      controller: movieController,
+    };
 
-    if (container === this._mainMoviesComponent.getMoviesList()) {
-      movieController.isFromMainList = true;
+    if (container !== this._mainMoviesComponent.getMoviesList()) {
+      movieInstance.type = EXTRA_MOVIES_NAME;
     }
 
-    this._shownMoviesControllers.push(movieController);
+    this._shownMoviesInstances.push(movieInstance);
     movieController.render(movieData);
   }
 
@@ -112,9 +118,9 @@ export class PageController {
   }
 
   _clearMainMovies() {
-    const controllersForClean = this._shownMoviesControllers.filter((controller) => controller.isFromMainList);
-    controllersForClean.forEach((movieController) => movieController.removeElements());
-    this._shownMoviesControllers = this._shownMoviesControllers.filter((controller) => !controller.isFromMainList);
+    const movieInstanceForClean = this._shownMoviesInstances.filter((item) => item.type === MAIN_MOVIES_NAME);
+    movieInstanceForClean.forEach((item) => item.controller.removeElements());
+    this._shownMoviesInstances = this._shownMoviesInstances.filter((item) => item.type === EXTRA_MOVIES_NAME);
   }
 
   _onDataChange(oldData, newData) {

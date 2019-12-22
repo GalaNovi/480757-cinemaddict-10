@@ -34,6 +34,16 @@ export default class MovieController {
 
     this._bigCardComponent.setCloseCallback(closeBigCard);
 
+    this._bigCardComponent.setOnEmojiListClickHandler((evt) => {
+      if (evt.target.tagName === `INPUT`) {
+        this._onDataChange(movieData, Object.assign({}, movieData, {
+          localComment: Object.assign(movieData.localComment, {
+            emotion: evt.target.getAttribute(`data-emoji`),
+          })
+        }));
+      }
+    });
+
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
       component.setWatchlistButtonCallback(() => {
         this._onDataChange(movieData, Object.assign({}, movieData, {
@@ -59,16 +69,6 @@ export default class MovieController {
           })
         }));
       });
-    });
-
-    this._bigCardComponent.setOnEmojiListClickHandler((evt) => {
-      if (evt.target.tagName === `INPUT`) {
-        this._onDataChange(movieData, Object.assign({}, movieData, {
-          localComment: Object.assign(movieData.localComment, {
-            emotion: evt.target.getAttribute(`data-emoji`),
-          })
-        }));
-      }
     });
 
     render(this._container, this._cardComponent);
