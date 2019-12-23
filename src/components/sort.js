@@ -42,16 +42,16 @@ export default class Sort extends AbstractComponent {
   setCallback(callback) {
     this.getElement().addEventListener(`click`, (evt) => {
       if (evt.target.tagName === `A`) {
-        this._setCurrentSortType(evt);
+        evt.preventDefault();
+        const sortLink = evt.target;
+        const sortType = sortLink.getAttribute(`data-sort-type`);
+        this._setCurrentSortType(sortLink, sortType);
         callback();
       }
     });
   }
 
-  _setCurrentSortType(evt) {
-    evt.preventDefault();
-    const newSortLink = evt.target;
-    const newSortType = evt.target.getAttribute(`data-sort-type`);
+  _setCurrentSortType(newSortLink, newSortType) {
     this._changeActiveSortLink(newSortLink);
     this._sortType = newSortType;
   }
