@@ -34,9 +34,7 @@ export default class MainMovies extends AbstractComponent {
   toggleShowLoadButton(areAllMoviesShown) {
     const loadMoreButton = this.getElement().querySelector(`.films-list__show-more`);
     if (areAllMoviesShown) {
-      loadMoreButton.style.display = `none`;
-    } else {
-      loadMoreButton.style.display = ``;
+      loadMoreButton.classList.toggle(`visually-hidden`);
     }
   }
 

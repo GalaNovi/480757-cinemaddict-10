@@ -15,10 +15,19 @@ const MONTHS = [
   `November`,
   `December`,
 ];
+const FILM_DETAILS_TITLES = [
+  `Director`,
+  `Writers`,
+  `Actors`,
+  `Release Date`,
+  `Runtime`,
+  `Country`,
+  `Genres`,
+];
 
 const Position = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`,
 };
 
-export {EXTRA_MOVIES_HEADINGS, FILTERS, EMOTIONS, MONTHS, Position};
+export {EXTRA_MOVIES_HEADINGS, FILTERS, EMOTIONS, MONTHS, Position, FILM_DETAILS_TITLES};

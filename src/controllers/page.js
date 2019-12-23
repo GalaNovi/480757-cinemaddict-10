@@ -1,5 +1,3 @@
-import BigCard from '../components/big-card';
-import Card from '../components/card';
 import MainMovies from '../components/main-movies';
 import ExtraMovies from '../components/extra-movies';
 import Menu from '../components/menu';
@@ -7,6 +5,7 @@ import MoviesContainer from '../components/movies-container';
 import NoMoviesContainer from '../components/no-movies-container';
 import Profile from '../components/profile';
 import Sort from '../components/sort';
+import MovieController from '../controllers/movie';
 import {getNextItemsIterator} from '../utils/common';
 import {render} from '../utils/render';
 import {EXTRA_MOVIES_HEADINGS} from '../const';
@@ -14,6 +13,8 @@ import {EXTRA_MOVIES_HEADINGS} from '../const';
 const START_MOVIES_AMOUNT = 5;
 const ADD_MOVIES_AMOUNT = 5;
 const EXTRA_MOVIES_AMOUNT = 2;
+const MAIN_MOVIES_NAME = `main`;
+const EXTRA_MOVIES_NAME = `extra`;
 
 const extraMoviesParameters = {
   topRated: {
@@ -34,7 +35,11 @@ export class PageController {
     this._moviesContainerComponent = new MoviesContainer();
     this._mainMoviesComponent = new MainMovies();
     this._sortComponent = new Sort();
-    this._subscriptions = [];
+    this._shownMoviesInstances = [];
+    this._moviesData = [];
+
+    this._onDataChange = this._onDataChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
   }
 
   render(moviesData) {
@@ -64,52 +69,24 @@ export class PageController {
     this._container.querySelector(`.footer__statistics p`).textContent = `${moviesData.length} movies inside`;
   }
 
-  _renderMovieCard(movie, container = this._mainMoviesComponent.getMoviesList()) {
-    const cardComponent = new Card(movie);
-    const bigCardComponent = new BigCard(movie);
+  _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
+    const movieController = new MovieController(container, this._onDataChange, this._onViewChange);
+    const movieInstance = {
+      type: MAIN_MOVIES_NAME,
+      controller: movieController,
+    };
 
-    if (container === this._mainMoviesComponent.getMoviesList()) {
-      this._subscriptions.push(() => {
-        cardComponent.removeElement();
-        bigCardComponent.removeElement();
-      });
+    if (container !== this._mainMoviesComponent.getMoviesList()) {
+      movieInstance.type = EXTRA_MOVIES_NAME;
     }
 
-    const onEsqKeyDown = (evt) => {
-      if (evt.key === `Escape` || evt.key === `Esc`) {
-        evt.preventDefault();
-        closeBigCard();
-      }
-    };
-
-    const openBigCard = () => {
-      render(this._container, bigCardComponent);
-      document.addEventListener(`keydown`, onEsqKeyDown);
-    };
-
-    const closeBigCard = () => {
-      bigCardComponent.getElement().remove();
-      document.removeEventListener(`keydown`, onEsqKeyDown);
-    };
-
-    const onCloseButtonClick = () => {
-      closeBigCard();
-    };
-
-    const onOpeningElementClick = (evt) => {
-      evt.preventDefault();
-      openBigCard();
-      bigCardComponent.setCloseButtonHandler(onCloseButtonClick);
-    };
-
-    cardComponent.setOpenHandler(onOpeningElementClick);
-
-    render(container, cardComponent);
+    this._shownMoviesInstances.push(movieInstance);
+    movieController.render(movieData);
   }
 
   _renderMainMovies(iterator) {
     const {value: moviesForRender, done: hasNoMoviesForRender} = iterator.next();
-    moviesForRender.forEach((movie) => this._renderMovieCard(movie));
+    moviesForRender.forEach((movieData) => this._renderMovieCard(movieData));
     this._mainMoviesComponent.toggleShowLoadButton(hasNoMoviesForRender);
   }
 
@@ -141,7 +118,19 @@ export class PageController {
   }
 
   _clearMainMovies() {
-    this._subscriptions.forEach((element) => element());
-    this._subscriptions = [];
+    const movieInstanceForClean = this._shownMoviesInstances.filter((item) => item.type === MAIN_MOVIES_NAME);
+    movieInstanceForClean.forEach((item) => item.controller.removeElements());
+    this._shownMoviesInstances = this._shownMoviesInstances.filter((item) => item.type === EXTRA_MOVIES_NAME);
+  }
+
+  _onDataChange(oldData, newData) {
+    const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldData.id);
+    instanceOfChangedMovies.forEach(({controller}) => {
+      controller.updateComponents(newData);
+    });
+  }
+
+  _onViewChange() {
+    this._shownMoviesInstances.forEach(({controller}) => controller.setDefaultView());
   }
 }

@@ -6,7 +6,7 @@ const MAX_GENRES = 3;
 const MIN_ACTORS = 2;
 const MAX_ACTORS = 4;
 const MAX_WRITERS = 3;
-const getRandomBetween = (min, max, demicalPlacesCount = 0) => (parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(demicalPlacesCount));
+const getRandomBetween = (min, max, demicalPlacesCount = 0) => Number(parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(demicalPlacesCount));
 const getRandomArrayItem = (array) => array[getRandomBetween(0, array.length - 1)];
 const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 
@@ -65,42 +65,49 @@ const genres = new Set([
 
 const comments = new Set([
   {
+    id: 1,
     author: `Tim Macoveev`,
     text: `Very good film! Not sorry for the time spent.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(EMOTIONS),
   },
   {
+    id: 2,
     author: `Mike Chakman`,
     text: `Which movie is good? Yes, this is nonsense! The acting is terrible. Blooper on a blooper. Graphics sucks.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(EMOTIONS),
   },
   {
+    id: 3,
     author: `ChinWag`,
     text: `The book was like that))) Cool like))) I can’t remember the name)))`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(EMOTIONS),
   },
   {
+    id: 4,
     author: `derroys`,
     text: `Awesome movie, one of the favorite in our family, great actors. Adore. I recommend.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(EMOTIONS),
   },
   {
+    id: 5,
     author: `Darkmus`,
     text: `Good, funny film, why do sofa critics give such low ratings? :(`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(EMOTIONS),
   },
   {
+    id: 6,
     author: `DarGi`,
     text: `Surprisingly enjoyed watching this movie)`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(EMOTIONS),
   },
   {
+    id: 7,
     author: `Barathrum`,
     text: `A very pleasant psychological-ironic film, it looks in one breath. Cool story, a logical and interesting plot, a wonderful selection of actors. I looked with pleasure.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
@@ -157,6 +164,7 @@ const generateWriters = () => shuffleArray(Array.from(writers)).slice(0, getRand
 const generateActors = () => shuffleArray(Array.from(actors)).slice(0, getRandomBetween(MIN_ACTORS, MAX_ACTORS));
 const generateCountry = () => getRandomArrayItem(Array.from(countries));
 const generateReleaseDate = () => new Date(`${getRandomBetween(1960, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}`).getTime();
+const generateWatchingDate = () => new Date(`2019, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}`).getTime();
 
 const generateDescription = () => {
   const sentenses = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`
@@ -169,6 +177,11 @@ const generateDescription = () => {
 const generateCard = (index) => {
   return {
     id: index,
+    localComment: {
+      comment: null,
+      date: null,
+      emotion: EMOTIONS[getRandomBetween(0, 7)],
+    },
     comments: generateComments(),
     movieInfo: {
       ageLimit: generateAgeLimit(),
@@ -186,10 +199,14 @@ const generateCard = (index) => {
       duration: getRandomBetween(75, 180),
       genres: generateGenres(),
       description: generateDescription(),
+    },
+    userInfo: {
+      personalRating: getRandomBetween(0, 9),
       isOnTheWatchlist: getRandomBoolean(),
-      isAlredyWatched: getRandomBoolean(),
+      isAlredyWatched: true,
       isFavorite: getRandomBoolean(),
-    }
+      watchingDate: generateWatchingDate(),
+    },
   };
 };
 

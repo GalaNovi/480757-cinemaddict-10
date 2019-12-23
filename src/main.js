@@ -1,5 +1,5 @@
 import {generateCards} from './mock/card';
-import {PageController} from './controllers/page-controller';
+import {PageController} from './controllers/page';
 
 const MOVIES_AMOUNT = 23;
 const moviesData = generateCards(MOVIES_AMOUNT);
