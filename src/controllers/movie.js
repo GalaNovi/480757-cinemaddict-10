@@ -26,14 +26,12 @@ export default class MovieController {
 
     this._bigCardComponent.setCloseCallback(this._closeBigCard);
 
-    this._bigCardComponent.setOnEmojiListClickHandler((evt) => {
-      if (evt.target.tagName === `INPUT`) {
-        this._onDataChange(movieData, Object.assign({}, movieData, {
-          localComment: Object.assign(movieData.localComment, {
-            emotion: evt.target.getAttribute(`data-emoji`),
-          })
-        }));
-      }
+    this._bigCardComponent.setOnEmojiListClickCallback((clickedElement) => {
+      this._onDataChange(movieData, Object.assign({}, movieData, {
+        localComment: Object.assign(movieData.localComment, {
+          emotion: clickedElement.getAttribute(`data-emoji`),
+        })
+      }));
     });
 
     [this._cardComponent, this._bigCardComponent].forEach((component) => {

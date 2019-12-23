@@ -43,7 +43,6 @@ export class PageController {
   }
 
   render(moviesData) {
-    this._moviesData = moviesData;
     const headerElement = this._container.querySelector(`.header`);
     const mainElement = this._container.querySelector(`.main`);
     const alredyWatchedMoviesNumber = moviesData.filter((movie) => movie.movieInfo.isAlredyWatched).length;
