@@ -39,6 +39,7 @@ export class PageController {
     this._moviesData = [];
 
     this._onDataChange = this._onDataChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
   }
 
   render(moviesData) {
@@ -70,7 +71,7 @@ export class PageController {
   }
 
   _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
-    const movieController = new MovieController(container, this._onDataChange);
+    const movieController = new MovieController(container, this._onDataChange, this._onViewChange);
     const movieInstance = {
       type: MAIN_MOVIES_NAME,
       controller: movieController,
@@ -128,5 +129,9 @@ export class PageController {
     instanceOfChangedMovies.forEach(({controller}) => {
       controller.updateComponents(newData);
     });
+  }
+
+  _onViewChange() {
+    this._shownMoviesInstances.forEach(({controller}) => controller.setDefaultView());
   }
 }

@@ -112,7 +112,7 @@ const createUserRatingFormMarkup = (movieData) => {
 };
 
 const getNewCommentMarkup = (localComment) => {
-  const {comment, emotion} = localComment
+  const {comment, emotion} = localComment;
   return (
     `<div class="film-details__new-comment">
       <div for="add-emoji" class="film-details__add-emoji-label">
@@ -148,7 +148,7 @@ const getNewCommentMarkup = (localComment) => {
       </div>
     </div>`
   );
-}
+};
 
 const createBigCardMarkup = (movieData) => {
   const {

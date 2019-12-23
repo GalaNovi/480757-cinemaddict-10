@@ -6,7 +6,7 @@ const MAX_GENRES = 3;
 const MIN_ACTORS = 2;
 const MAX_ACTORS = 4;
 const MAX_WRITERS = 3;
-const getRandomBetween = (min, max, demicalPlacesCount = 0) => parseInt(parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(demicalPlacesCount));
+const getRandomBetween = (min, max, demicalPlacesCount = 0) => Number(parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(demicalPlacesCount));
 const getRandomArrayItem = (array) => array[getRandomBetween(0, array.length - 1)];
 const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 

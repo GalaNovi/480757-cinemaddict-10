@@ -3,9 +3,10 @@ import Card from '../components/card';
 import {render} from '../utils/render';
 
 export default class MovieController {
-  constructor(container, onDataChange) {
+  constructor(container, onDataChange, onViewChange) {
     this._container = container;
     this._onDataChange = onDataChange;
+    this._onViewChange = onViewChange;
 
     this._onEsqKeyDown = this._onEsqKeyDown.bind(this);
     this._openBigCard = this._openBigCard.bind(this);
@@ -76,7 +77,7 @@ export default class MovieController {
   }
 
   setDefaultView() {
-
+    this._closeBigCard();
   }
 
   _onEsqKeyDown(evt) {
@@ -87,6 +88,7 @@ export default class MovieController {
   }
 
   _openBigCard() {
+    this._onViewChange();
     render(document.body, this._bigCardComponent);
     document.addEventListener(`keydown`, this._onEsqKeyDown);
   }
