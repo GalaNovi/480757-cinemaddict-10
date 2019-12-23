@@ -1,6 +1,6 @@
 import AbstractSmartComponent from './abstract-smart-component';
 import {capitalize, formatTime} from '../utils/common';
-import {MONTHS} from '../const';
+import {MONTHS, FILM_DETAILS_TITLES} from '../const';
 
 const USER_RATING_SCORES_AMOUNT = 9;
 
@@ -60,14 +60,14 @@ const createCommentsMarkup = (comment) => {
 const createUserRatingScoresMarkup = () => {
   let allMarkup = ``;
 
-  for(let i = 1; i <= USER_RATING_SCORES_AMOUNT; i++) {
+  for (let i = 1; i <= USER_RATING_SCORES_AMOUNT; i++) {
     const itemMarkup = (
       `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}"${i === USER_RATING_SCORES_AMOUNT ? ` checked` : ``}>
       <label class="film-details__user-rating-label" for="rating-${i}">${i}</label>\n`
     );
     allMarkup += itemMarkup;
   }
-  
+
   return allMarkup;
 };
 
@@ -140,6 +140,15 @@ const getNewCommentMarkup = (localComment) => {
   );
 };
 
+const getFilmDetailsMarkup = (filmDetails) => {
+  return FILM_DETAILS_TITLES.map((title, index) => (
+    `<tr class="film-details__row">
+      <td class="film-details__term">${title}</td>
+      <td class="film-details__cell">${filmDetails[index]}</td>
+    </tr>`
+  )).join(`\n`);
+};
+
 const createBigCardMarkup = (movieData) => {
   const {
     poster,
@@ -174,6 +183,7 @@ const createBigCardMarkup = (movieData) => {
   const commentsMarkup = comments.map((comment) => createCommentsMarkup(comment)).join(``);
   const userRatingFormMarkup = createUserRatingFormMarkup(movieData);
   const newCommentMarkup = getNewCommentMarkup(localComment);
+  const filmDetailsMarkup = getFilmDetailsMarkup([director, writers, actors, releaseDate, formatTime(duration), country, genresMarkup]);
 
   return (
     `<section class="film-details">
@@ -202,36 +212,7 @@ const createBigCardMarkup = (movieData) => {
               </div>
 
               <table class="film-details__table">
-                <tr class="film-details__row">
-                  <td class="film-details__term">Director</td>
-                  <td class="film-details__cell">${director}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Writers</td>
-                  <td class="film-details__cell">${writers}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Actors</td>
-                  <td class="film-details__cell">${actors}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${releaseDate}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${formatTime(duration)}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Country</td>
-                  <td class="film-details__cell">${country}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Genres</td>
-                  <td class="film-details__cell">
-                    ${genresMarkup}
-                  </td>
-                </tr>
+                ${filmDetailsMarkup}
               </table>
 
               <p class="film-details__film-description">

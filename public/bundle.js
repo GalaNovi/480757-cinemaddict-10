@@ -126,6 +126,10 @@ class AbstractComponent {
     this.getElement().remove();
     this._element = null;
   }
+
+  set element(value) {
+    this._element = value;
+  }
 }
 
 
@@ -149,13 +153,20 @@ class AbstractSmartComponent extends _abstract_component__WEBPACK_IMPORTED_MODUL
     throw new Error(`Abstract method not implemented: recoveryListeners`);
   }
 
-  render() {
+  rerender() {
     const oldElement = this.getElement();
     const parent = oldElement.parentElement;
-    this.removeElement();
+    this.element = null;
     const newElement = this.getElement();
-    parent.replaceChild(newElement, oldElement);
+    if (parent) {
+      parent.replaceChild(newElement, oldElement);
+    }
     this.recoveryListeners();
+  }
+
+  update(newData) {
+    this._movieData = newData;
+    this.rerender();
   }
 }
 
@@ -178,6 +189,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+const USER_RATING_SCORES_AMOUNT = 9;
 
 const getCommentTimeAgoText = (dateTime) => {
   const secondsAgo = Math.floor((Date.now() - dateTime) / 1000);
@@ -204,7 +217,12 @@ const getCommentTimeAgoText = (dateTime) => {
   }
 };
 
-const createRatingMarkup = (rating) => rating >= 1 ? `<p class="film-details__total-rating">${rating}</p>` : ``;
+const createRatingMarkup = (commonRating, isAlredyWatched, personalRating) => {
+  return (
+    `${commonRating >= 1 ? `<p class="film-details__total-rating">${commonRating}</p>` : ``}
+    ${isAlredyWatched && personalRating >= 1 ? `<p class="film-details__user-rating">Your rate ${personalRating}</p>` : ``}`
+  );
+};
 
 const createCommentsMarkup = (comment) => {
   const {author, text, date, emotion} = comment;
@@ -227,25 +245,123 @@ const createCommentsMarkup = (comment) => {
   );
 };
 
+const createUserRatingScoresMarkup = () => {
+  let allMarkup = ``;
+
+  for (let i = 1; i <= USER_RATING_SCORES_AMOUNT; i++) {
+    const itemMarkup = (
+      `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}"${i === USER_RATING_SCORES_AMOUNT ? ` checked` : ``}>
+      <label class="film-details__user-rating-label" for="rating-${i}">${i}</label>\n`
+    );
+    allMarkup += itemMarkup;
+  }
+
+  return allMarkup;
+};
+
+const createUserRatingFormMarkup = (movieData) => {
+  const {poster, name} = movieData.movieInfo;
+
+  return (
+    `<div class="form-details__middle-container">
+      <section class="film-details__user-rating-wrap">
+        <div class="film-details__user-rating-controls">
+          <button class="film-details__watched-reset" type="button">Undo</button>
+        </div>
+
+        <div class="film-details__user-score">
+          <div class="film-details__user-rating-poster">
+            <img src="${poster}" alt="film-poster" class="film-details__user-rating-img">
+          </div>
+
+          <section class="film-details__user-rating-inner">
+            <h3 class="film-details__user-rating-title">${name}</h3>
+
+            <p class="film-details__user-rating-feelings">How you feel it?</p>
+
+            <div class="film-details__user-rating-score">
+              ${createUserRatingScoresMarkup()}
+            </div>
+          </section>
+        </div>
+      </section>
+    </div>`
+  );
+};
+
+const getNewCommentMarkup = (localComment) => {
+  const {comment, emotion} = localComment;
+  return (
+    `<div class="film-details__new-comment">
+      <div for="add-emoji" class="film-details__add-emoji-label">
+        ${emotion ? `<img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji">` : ``}
+      </div>
+
+      <label class="film-details__comment-label">
+        <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">
+          ${comment ? comment : ``}
+        </textarea>
+      </label>
+
+      <div class="film-details__emoji-list">
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="sleeping" data-emoji="smile">
+        <label class="film-details__emoji-label" for="emoji-smile">
+          <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
+        </label>
+
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="neutral-face" data-emoji="sleeping">
+        <label class="film-details__emoji-label" for="emoji-sleeping">
+          <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
+        </label>
+
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-gpuke" value="grinning" data-emoji="puke">
+        <label class="film-details__emoji-label" for="emoji-gpuke">
+          <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
+        </label>
+
+        <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="grinning" data-emoji="angry">
+        <label class="film-details__emoji-label" for="emoji-angry">
+          <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
+        </label>
+      </div>
+    </div>`
+  );
+};
+
+const getFilmDetailsMarkup = (filmDetails) => {
+  return _const__WEBPACK_IMPORTED_MODULE_2__["FILM_DETAILS_TITLES"].map((title, index) => (
+    `<tr class="film-details__row">
+      <td class="film-details__term">${title}</td>
+      <td class="film-details__cell">${filmDetails[index]}</td>
+    </tr>`
+  )).join(`\n`);
+};
+
 const createBigCardMarkup = (movieData) => {
   const {
     poster,
     ageLimit,
     name,
     originalName,
-    rating,
+    rating: commonRating,
     director,
     release,
     duration,
     genres,
     description,
-    isOnTheWatchlist,
-    isAlredyWatched,
-    isFavorite
   } = movieData.movieInfo;
 
+  const {
+    personalRating,
+    isOnTheWatchlist,
+    isAlredyWatched,
+    isFavorite,
+  } = movieData.userInfo;
+
+  const {localComment} = movieData;
+
   const {comments} = movieData;
-  const ratingMarkup = createRatingMarkup(rating);
+  const ratingMarkup = createRatingMarkup(commonRating, isAlredyWatched, personalRating);
   const writers = movieData.movieInfo.writers.join(`, `);
   const actors = movieData.movieInfo.actors.join(`, `);
   const date = new Date(release.date);
@@ -253,6 +369,9 @@ const createBigCardMarkup = (movieData) => {
   const country = release.country;
   const genresMarkup = genres.map((genre) => `<span class="film-details__genre">${Object(_utils_common__WEBPACK_IMPORTED_MODULE_1__["capitalize"])(genre)}</span>`).join(``);
   const commentsMarkup = comments.map((comment) => createCommentsMarkup(comment)).join(``);
+  const userRatingFormMarkup = createUserRatingFormMarkup(movieData);
+  const newCommentMarkup = getNewCommentMarkup(localComment);
+  const filmDetailsMarkup = getFilmDetailsMarkup([director, writers, actors, releaseDate, Object(_utils_common__WEBPACK_IMPORTED_MODULE_1__["formatTime"])(duration), country, genresMarkup]);
 
   return (
     `<section class="film-details">
@@ -281,36 +400,7 @@ const createBigCardMarkup = (movieData) => {
               </div>
 
               <table class="film-details__table">
-                <tr class="film-details__row">
-                  <td class="film-details__term">Director</td>
-                  <td class="film-details__cell">${director}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Writers</td>
-                  <td class="film-details__cell">${writers}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Actors</td>
-                  <td class="film-details__cell">${actors}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${releaseDate}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${Object(_utils_common__WEBPACK_IMPORTED_MODULE_1__["formatTime"])(duration)}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Country</td>
-                  <td class="film-details__cell">${country}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Genres</td>
-                  <td class="film-details__cell">
-                    ${genresMarkup}
-                  </td>
-                </tr>
+                ${filmDetailsMarkup}
               </table>
 
               <p class="film-details__film-description">
@@ -331,6 +421,8 @@ const createBigCardMarkup = (movieData) => {
           </section>
         </div>
 
+        ${isAlredyWatched && !personalRating ? userRatingFormMarkup : ``}
+
         <div class="form-details__bottom-container">
           <section class="film-details__comments-wrap">
             <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
@@ -339,35 +431,7 @@ const createBigCardMarkup = (movieData) => {
               ${commentsMarkup}
             </ul>
 
-            <div class="film-details__new-comment">
-              <div for="add-emoji" class="film-details__add-emoji-label"></div>
-
-              <label class="film-details__comment-label">
-                <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
-              </label>
-
-              <div class="film-details__emoji-list">
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="sleeping">
-                <label class="film-details__emoji-label" for="emoji-smile">
-                  <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
-                </label>
-
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="neutral-face">
-                <label class="film-details__emoji-label" for="emoji-sleeping">
-                  <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
-                </label>
-
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-gpuke" value="grinning">
-                <label class="film-details__emoji-label" for="emoji-gpuke">
-                  <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
-                </label>
-
-                <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="grinning">
-                <label class="film-details__emoji-label" for="emoji-angry">
-                  <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
-                </label>
-              </div>
-            </div>
+            ${newCommentMarkup}
           </section>
         </div>
       </form>
@@ -379,25 +443,27 @@ class BigCard extends _abstract_smart_component__WEBPACK_IMPORTED_MODULE_0__["de
   constructor(movieData) {
     super();
     this._movieData = movieData;
-
-    this._subscribeOnEvents();
   }
 
   getTemplate() {
     return createBigCardMarkup(this._movieData);
   }
 
-  recoveryListeners() {
-    this._subscribeOnEvents();
-  }
-
-  setCloseButtonHandler(handler) {
+  setCloseCallback(callback) {
+    if (callback) {
+      this._closeCallback = callback;
+    }
     this.getElement().querySelector(`.film-details__close-btn`)
-      .addEventListener(`click`, handler);
+      .addEventListener(`click`, (evt) => {
+        evt.preventDefault();
+        this._closeCallback();
+      });
   }
 
   setWatchlistButtonCallback(callback) {
-    this._watchlistButtonCallback = callback;
+    if (callback) {
+      this._watchlistButtonCallback = callback;
+    }
     this.getElement().querySelector(`.film-details__control-label--watchlist`)
       .addEventListener(`click`, (evt) => {
         evt.preventDefault();
@@ -406,7 +472,9 @@ class BigCard extends _abstract_smart_component__WEBPACK_IMPORTED_MODULE_0__["de
   }
 
   setWatchedButtonCallback(callback) {
-    this._watchedButtonCallback = callback;
+    if (callback) {
+      this._watchedButtonCallback = callback;
+    }
     this.getElement().querySelector(`.film-details__control-label--watched`)
       .addEventListener(`click`, (evt) => {
         evt.preventDefault();
@@ -415,7 +483,9 @@ class BigCard extends _abstract_smart_component__WEBPACK_IMPORTED_MODULE_0__["de
   }
 
   setFavoriteButtonCallback(callback) {
-    this._favoriteButtonCallback = callback;
+    if (callback) {
+      this._favoriteButtonCallback = callback;
+    }
     this.getElement().querySelector(`.film-details__control-label--favorite`)
       .addEventListener(`click`, (evt) => {
         evt.preventDefault();
@@ -423,10 +493,25 @@ class BigCard extends _abstract_smart_component__WEBPACK_IMPORTED_MODULE_0__["de
       });
   }
 
-  _subscribeOnEvents() {
-    this.setWatchlistButtonCallback(this._watchlistButtonCallback);
-    this.setWatchedButtonCallback(this._watchedButtonCallback);
-    this.setFavoriteButtonCallback(this._favoriteButtonCallback);
+  setOnEmojiListClickCallback(callback) {
+    if (callback) {
+      this._onEmojiListClickCallback = callback;
+    }
+
+    this.getElement().querySelector(`.film-details__emoji-list`)
+      .addEventListener(`click`, (evt) => {
+        if (evt.target.tagName === `INPUT`) {
+          this._onEmojiListClickCallback(evt.target);
+        }
+      });
+  }
+
+  recoveryListeners() {
+    this.setWatchlistButtonCallback();
+    this.setWatchedButtonCallback();
+    this.setFavoriteButtonCallback();
+    this.setCloseCallback();
+    this.setOnEmojiListClickCallback();
   }
 }
 
@@ -443,30 +528,33 @@ class BigCard extends _abstract_smart_component__WEBPACK_IMPORTED_MODULE_0__["de
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Card; });
-/* harmony import */ var _abstract_component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./abstract-component */ "./src/components/abstract-component.js");
+/* harmony import */ var _abstract_smart_component__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./abstract-smart-component */ "./src/components/abstract-smart-component.js");
 /* harmony import */ var _utils_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/common */ "./src/utils/common.js");
 
 
 
-const createRatingMarkup = (rating) => rating >= 1 ? `<p class="film-card__rating">${rating}</p>` : ``;
+const createRatingMarkup = (commonRating) => commonRating >= 1 ? `<p class="film-card__rating">${commonRating}</p>` : ``;
 
 const createCardMarkup = (movieData) => {
   const {
     name,
     poster,
-    rating,
+    rating: commonRating,
     description,
+  } = movieData.movieInfo;
+
+  const {
     isOnTheWatchlist,
     isAlredyWatched,
-    isFavorite
-  } = movieData.movieInfo;
+    isFavorite,
+  } = movieData.userInfo;
 
   const {comments} = movieData;
   const year = new Date(movieData.movieInfo.release.date).getFullYear();
   const commentsNumber = comments.length;
   const duration = Object(_utils_common__WEBPACK_IMPORTED_MODULE_1__["formatTime"])(movieData.movieInfo.duration);
   const genres = movieData.movieInfo.genres.map((genre) => Object(_utils_common__WEBPACK_IMPORTED_MODULE_1__["capitalize"])(genre)).join(` `);
-  const ratingMarkup = createRatingMarkup(rating);
+  const ratingMarkup = createRatingMarkup(commonRating);
 
   return (
     `<article class="film-card">
@@ -489,7 +577,7 @@ const createCardMarkup = (movieData) => {
   );
 };
 
-class Card extends _abstract_component__WEBPACK_IMPORTED_MODULE_0__["default"] {
+class Card extends _abstract_smart_component__WEBPACK_IMPORTED_MODULE_0__["default"] {
   constructor(movieData) {
     super();
     this._movieData = movieData;
@@ -499,7 +587,10 @@ class Card extends _abstract_component__WEBPACK_IMPORTED_MODULE_0__["default"] {
     return createCardMarkup(this._movieData);
   }
 
-  setOpenHandler(handler) {
+  setOpenCallback(callback) {
+    if (callback) {
+      this._openCallback = callback;
+    }
     const openingBigCardElements = [
       this.getElement().querySelector(`.film-card__poster`),
       this.getElement().querySelector(`.film-card__title`),
@@ -507,12 +598,17 @@ class Card extends _abstract_component__WEBPACK_IMPORTED_MODULE_0__["default"] {
     ];
 
     openingBigCardElements.forEach((element) => {
-      element.addEventListener(`click`, handler);
+      element.addEventListener(`click`, (evt) => {
+        evt.preventDefault();
+        this._openCallback();
+      });
     });
   }
 
   setWatchlistButtonCallback(callback) {
-    this._watchlistButtonCallback = callback;
+    if (callback) {
+      this._watchlistButtonCallback = callback;
+    }
     this.getElement().querySelector(`.film-card__controls-item--add-to-watchlist`)
       .addEventListener(`click`, (evt) => {
         evt.preventDefault();
@@ -521,7 +617,9 @@ class Card extends _abstract_component__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   setWatchedButtonCallback(callback) {
-    this._watchedButtonCallback = callback;
+    if (callback) {
+      this._watchedButtonCallback = callback;
+    }
     this.getElement().querySelector(`.film-card__controls-item--mark-as-watched`)
       .addEventListener(`click`, (evt) => {
         evt.preventDefault();
@@ -530,12 +628,21 @@ class Card extends _abstract_component__WEBPACK_IMPORTED_MODULE_0__["default"] {
   }
 
   setFavoriteButtonCallback(callback) {
-    this._favoriteButtonCallback = callback;
+    if (callback) {
+      this._favoriteButtonCallback = callback;
+    }
     this.getElement().querySelector(`.film-card__controls-item--favorite`)
       .addEventListener(`click`, (evt) => {
         evt.preventDefault();
         this._favoriteButtonCallback();
       });
+  }
+
+  recoveryListeners() {
+    this.setWatchlistButtonCallback();
+    this.setWatchedButtonCallback();
+    this.setFavoriteButtonCallback();
+    this.setOpenCallback();
   }
 }
 
@@ -629,9 +736,7 @@ class MainMovies extends _abstract_component__WEBPACK_IMPORTED_MODULE_0__["defau
   toggleShowLoadButton(areAllMoviesShown) {
     const loadMoreButton = this.getElement().querySelector(`.films-list__show-more`);
     if (areAllMoviesShown) {
-      loadMoreButton.style.display = `none`;
-    } else {
-      loadMoreButton.style.display = ``;
+      loadMoreButton.classList.toggle(`visually-hidden`);
     }
   }
 
@@ -871,16 +976,16 @@ class Sort extends _abstract_component__WEBPACK_IMPORTED_MODULE_0__["default"] {
   setCallback(callback) {
     this.getElement().addEventListener(`click`, (evt) => {
       if (evt.target.tagName === `A`) {
-        this._setCurrentSortType(evt);
+        evt.preventDefault();
+        const sortLink = evt.target;
+        const sortType = sortLink.getAttribute(`data-sort-type`);
+        this._setCurrentSortType(sortLink, sortType);
         callback();
       }
     });
   }
 
-  _setCurrentSortType(evt) {
-    evt.preventDefault();
-    const newSortLink = evt.target;
-    const newSortType = evt.target.getAttribute(`data-sort-type`);
+  _setCurrentSortType(newSortLink, newSortType) {
     this._changeActiveSortLink(newSortLink);
     this._sortType = newSortType;
   }
@@ -899,7 +1004,7 @@ class Sort extends _abstract_component__WEBPACK_IMPORTED_MODULE_0__["default"] {
 /*!**********************!*\
   !*** ./src/const.js ***!
   \**********************/
-/*! exports provided: EXTRA_MOVIES_HEADINGS, FILTERS, EMOTIONS, MONTHS, Position */
+/*! exports provided: EXTRA_MOVIES_HEADINGS, FILTERS, EMOTIONS, MONTHS, Position, FILM_DETAILS_TITLES */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -909,6 +1014,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EMOTIONS", function() { return EMOTIONS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MONTHS", function() { return MONTHS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Position", function() { return Position; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FILM_DETAILS_TITLES", function() { return FILM_DETAILS_TITLES; });
 const EXTRA_MOVIES_HEADINGS = [`Top rated`, `Most commented`];
 const FILTERS = [`all`, `watchlist`, `history`, `favorites`];
 const EMOTIONS = [`smile`, `sleeping`, `puke`, `angry`];
@@ -925,6 +1031,15 @@ const MONTHS = [
   `October`,
   `November`,
   `December`,
+];
+const FILM_DETAILS_TITLES = [
+  `Director`,
+  `Writers`,
+  `Actors`,
+  `Release Date`,
+  `Runtime`,
+  `Country`,
+  `Genres`,
 ];
 
 const Position = {
@@ -955,79 +1070,65 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class MovieController {
-  constructor(container, onDataChange) {
+  constructor(container, onDataChange, onViewChange) {
     this._container = container;
     this._onDataChange = onDataChange;
+    this._onViewChange = onViewChange;
+
+    this._onEsqKeyDown = this._onEsqKeyDown.bind(this);
+    this._openBigCard = this._openBigCard.bind(this);
+    this._closeBigCard = this._closeBigCard.bind(this);
+  }
+
+  get id() {
+    return this._id;
   }
 
   render(movieData) {
-    const oldCardComponent = this._cardComponent;
-    const oldBigCardComponent = this._bigCardComponent;
-
     this._id = movieData.id;
     this._cardComponent = new _components_card__WEBPACK_IMPORTED_MODULE_1__["default"](movieData);
     this._bigCardComponent = new _components_big_card__WEBPACK_IMPORTED_MODULE_0__["default"](movieData);
 
-    const onEsqKeyDown = (evt) => {
-      if (evt.key === `Escape` || evt.key === `Esc`) {
-        evt.preventDefault();
-        closeBigCard();
-      }
-    };
+    this._cardComponent.setOpenCallback(this._openBigCard);
 
-    const openBigCard = () => {
-      Object(_utils_render__WEBPACK_IMPORTED_MODULE_2__["render"])(document.body, this._bigCardComponent);
-      document.addEventListener(`keydown`, onEsqKeyDown);
-    };
+    this._bigCardComponent.setCloseCallback(this._closeBigCard);
 
-    const closeBigCard = () => {
-      this._bigCardComponent.getElement().remove();
-      document.removeEventListener(`keydown`, onEsqKeyDown);
-    };
-
-    const onCloseButtonClick = () => {
-      closeBigCard();
-    };
-
-    this._cardComponent.setOpenHandler((evt) => {
-      evt.preventDefault();
-      openBigCard();
+    this._bigCardComponent.setOnEmojiListClickCallback((clickedElement) => {
+      this._onDataChange(movieData, Object.assign({}, movieData, {
+        localComment: Object.assign(movieData.localComment, {
+          emotion: clickedElement.getAttribute(`data-emoji`),
+        })
+      }));
     });
-
-    this._bigCardComponent.setCloseButtonHandler(onCloseButtonClick);
 
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
       component.setWatchlistButtonCallback(() => {
         this._onDataChange(movieData, Object.assign({}, movieData, {
-          movieInfo: Object.assign(movieData.movieInfo, {
-            isOnTheWatchlist: !movieData.movieInfo.isOnTheWatchlist
+          userInfo: Object.assign(movieData.userInfo, {
+            isOnTheWatchlist: !movieData.userInfo.isOnTheWatchlist
           })
         }));
       });
 
       component.setWatchedButtonCallback(() => {
         this._onDataChange(movieData, Object.assign({}, movieData, {
-          movieInfo: Object.assign(movieData.movieInfo, {
-            isAlredyWatched: !movieData.movieInfo.isAlredyWatched
+          userInfo: Object.assign(movieData.userInfo, {
+            personalRating: 0,
+            isAlredyWatched: !movieData.userInfo.isAlredyWatched
           })
         }));
       });
 
       component.setFavoriteButtonCallback(() => {
         this._onDataChange(movieData, Object.assign({}, movieData, {
-          movieInfo: Object.assign(movieData.movieInfo, {
-            isFavorite: !movieData.movieInfo.isFavorite
+          userInfo: Object.assign(movieData.userInfo, {
+            isFavorite: !movieData.userInfo.isFavorite
           })
         }));
       });
     });
 
-    if (oldCardComponent && oldBigCardComponent) {
-      Object(_utils_render__WEBPACK_IMPORTED_MODULE_2__["replace"])(this._cardComponent, oldCardComponent);
-      Object(_utils_render__WEBPACK_IMPORTED_MODULE_2__["replace"])(this._bigCardComponent, oldBigCardComponent);
-    } else {
-      Object(_utils_render__WEBPACK_IMPORTED_MODULE_2__["render"])(this._container, this._cardComponent);
-    }
+    Object(_utils_render__WEBPACK_IMPORTED_MODULE_2__["render"])(this._container, this._cardComponent);
   }
 
   removeElements() {
@@ -1035,8 +1136,31 @@ class MovieController {
     this._bigCardComponent.removeElement();
   }
 
-  get id() {
-    return this._id;
+  updateComponents(newData) {
+    this._cardComponent.update(newData);
+    this._bigCardComponent.update(newData);
+  }
+
+  setDefaultView() {
+    this._closeBigCard();
+  }
+
+  _onEsqKeyDown(evt) {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      evt.preventDefault();
+      this._closeBigCard();
+    }
+  }
+
+  _openBigCard() {
+    this._onViewChange();
+    Object(_utils_render__WEBPACK_IMPORTED_MODULE_2__["render"])(document.body, this._bigCardComponent);
+    document.addEventListener(`keydown`, this._onEsqKeyDown);
+  }
+
+  _closeBigCard() {
+    this._bigCardComponent.getElement().remove();
+    document.removeEventListener(`keydown`, this._onEsqKeyDown);
   }
 }
 
@@ -1079,6 +1203,8 @@ __webpack_require__.r(__webpack_exports__);
 const START_MOVIES_AMOUNT = 5;
 const ADD_MOVIES_AMOUNT = 5;
 const EXTRA_MOVIES_AMOUNT = 2;
+const MAIN_MOVIES_NAME = `main`;
+const EXTRA_MOVIES_NAME = `extra`;
 
 const extraMoviesParameters = {
   topRated: {
@@ -1099,14 +1225,14 @@ class PageController {
     this._moviesContainerComponent = new _components_movies_container__WEBPACK_IMPORTED_MODULE_3__["default"]();
     this._mainMoviesComponent = new _components_main_movies__WEBPACK_IMPORTED_MODULE_0__["default"]();
     this._sortComponent = new _components_sort__WEBPACK_IMPORTED_MODULE_6__["default"]();
-    this._shownMoviesControllers = [];
+    this._shownMoviesInstances = [];
     this._moviesData = [];
 
     this._onDataChange = this._onDataChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
   }
 
   render(moviesData) {
-    this._moviesData = moviesData;
     const headerElement = this._container.querySelector(`.header`);
     const mainElement = this._container.querySelector(`.main`);
     const alredyWatchedMoviesNumber = moviesData.filter((movie) => movie.movieInfo.isAlredyWatched).length;
@@ -1134,12 +1260,17 @@ class PageController {
   }
 
   _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
-    const movieController = new _controllers_movie__WEBPACK_IMPORTED_MODULE_7__["default"](container, this._onDataChange);
+    const movieController = new _controllers_movie__WEBPACK_IMPORTED_MODULE_7__["default"](container, this._onDataChange, this._onViewChange);
+    const movieInstance = {
+      type: MAIN_MOVIES_NAME,
+      controller: movieController,
+    };
 
-    if (container === this._mainMoviesComponent.getMoviesList()) {
-      this._shownMoviesControllers.push(movieController);
+    if (container !== this._mainMoviesComponent.getMoviesList()) {
+      movieInstance.type = EXTRA_MOVIES_NAME;
     }
 
+    this._shownMoviesInstances.push(movieInstance);
     movieController.render(movieData);
   }
 
@@ -1177,13 +1308,20 @@ class PageController {
   }
 
   _clearMainMovies() {
-    this._shownMoviesControllers.forEach((movieController) => movieController.removeElements());
-    this._shownMoviesControllers = [];
+    const movieInstanceForClean = this._shownMoviesInstances.filter((item) => item.type === MAIN_MOVIES_NAME);
+    movieInstanceForClean.forEach((item) => item.controller.removeElements());
+    this._shownMoviesInstances = this._shownMoviesInstances.filter((item) => item.type === EXTRA_MOVIES_NAME);
   }
 
   _onDataChange(oldData, newData) {
-    const controllersOfChangedMovies = this._shownMoviesControllers.filter((controller) => controller.id === oldData.id);
-    controllersOfChangedMovies.forEach((controller) => controller.render(newData));
+    const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldData.id);
+    instanceOfChangedMovies.forEach(({controller}) => {
+      controller.updateComponents(newData);
+    });
+  }
+
+  _onViewChange() {
+    this._shownMoviesInstances.forEach(({controller}) => controller.setDefaultView());
   }
 }
 
@@ -1233,7 +1371,7 @@ const MAX_GENRES = 3;
 const MIN_ACTORS = 2;
 const MAX_ACTORS = 4;
 const MAX_WRITERS = 3;
-const getRandomBetween = (min, max, demicalPlacesCount = 0) => (parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(demicalPlacesCount));
+const getRandomBetween = (min, max, demicalPlacesCount = 0) => Number(parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(demicalPlacesCount));
 const getRandomArrayItem = (array) => array[getRandomBetween(0, array.length - 1)];
 const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 
@@ -1292,42 +1430,49 @@ const genres = new Set([
 
 const comments = new Set([
   {
+    id: 1,
     author: `Tim Macoveev`,
     text: `Very good film! Not sorry for the time spent.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(_const__WEBPACK_IMPORTED_MODULE_1__["EMOTIONS"]),
   },
   {
+    id: 2,
     author: `Mike Chakman`,
     text: `Which movie is good? Yes, this is nonsense! The acting is terrible. Blooper on a blooper. Graphics sucks.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(_const__WEBPACK_IMPORTED_MODULE_1__["EMOTIONS"]),
   },
   {
+    id: 3,
     author: `ChinWag`,
     text: `The book was like that))) Cool like))) I can’t remember the name)))`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(_const__WEBPACK_IMPORTED_MODULE_1__["EMOTIONS"]),
   },
   {
+    id: 4,
     author: `derroys`,
     text: `Awesome movie, one of the favorite in our family, great actors. Adore. I recommend.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(_const__WEBPACK_IMPORTED_MODULE_1__["EMOTIONS"]),
   },
   {
+    id: 5,
     author: `Darkmus`,
     text: `Good, funny film, why do sofa critics give such low ratings? :(`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(_const__WEBPACK_IMPORTED_MODULE_1__["EMOTIONS"]),
   },
   {
+    id: 6,
     author: `DarGi`,
     text: `Surprisingly enjoyed watching this movie)`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
     emotion: getRandomArrayItem(_const__WEBPACK_IMPORTED_MODULE_1__["EMOTIONS"]),
   },
   {
+    id: 7,
     author: `Barathrum`,
     text: `A very pleasant psychological-ironic film, it looks in one breath. Cool story, a logical and interesting plot, a wonderful selection of actors. I looked with pleasure.`,
     date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
@@ -1384,6 +1529,7 @@ const generateWriters = () => Object(_utils_common__WEBPACK_IMPORTED_MODULE_0__[
 const generateActors = () => Object(_utils_common__WEBPACK_IMPORTED_MODULE_0__["shuffleArray"])(Array.from(actors)).slice(0, getRandomBetween(MIN_ACTORS, MAX_ACTORS));
 const generateCountry = () => getRandomArrayItem(Array.from(countries));
 const generateReleaseDate = () => new Date(`${getRandomBetween(1960, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}`).getTime();
+const generateWatchingDate = () => new Date(`2019, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}`).getTime();
 
 const generateDescription = () => {
   const sentenses = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`
@@ -1396,6 +1542,11 @@ const generateDescription = () => {
 const generateCard = (index) => {
   return {
     id: index,
+    localComment: {
+      comment: null,
+      date: null,
+      emotion: _const__WEBPACK_IMPORTED_MODULE_1__["EMOTIONS"][getRandomBetween(0, 7)],
+    },
     comments: generateComments(),
     movieInfo: {
       ageLimit: generateAgeLimit(),
@@ -1413,10 +1564,14 @@ const generateCard = (index) => {
       duration: getRandomBetween(75, 180),
       genres: generateGenres(),
       description: generateDescription(),
+    },
+    userInfo: {
+      personalRating: getRandomBetween(0, 9),
       isOnTheWatchlist: getRandomBoolean(),
-      isAlredyWatched: getRandomBoolean(),
+      isAlredyWatched: true,
       isFavorite: getRandomBoolean(),
-    }
+      watchingDate: generateWatchingDate(),
+    },
   };
 };
 
