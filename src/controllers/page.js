@@ -124,8 +124,8 @@ export class PageController {
   }
 
   _onDataChange(oldData, newData) {
-    const controllersOfChangedMovies = this._shownMoviesControllers.filter((controller) => controller.id === oldData.id);
-    controllersOfChangedMovies.forEach((controller) => {
+    const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldData.id);
+    instanceOfChangedMovies.forEach(({controller}) => {
       controller.updateComponents(newData);
     });
   }
