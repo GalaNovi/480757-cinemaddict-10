@@ -16,3 +16,4 @@ build/
 
 # Бандлы
 public/*.js
+public/*.map
