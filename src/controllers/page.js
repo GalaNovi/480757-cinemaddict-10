@@ -4,7 +4,8 @@ import Menu from '../components/menu';
 import MoviesContainer from '../components/movies-container';
 import NoMoviesContainer from '../components/no-movies-container';
 import Profile from '../components/profile';
-import Sort from '../components/sort';
+// import Sort from '../components/sort';
+import SortController from '../controllers/sort';
 import MovieController from '../controllers/movie';
 import {getNextItemsIterator} from '../utils/common';
 import {render} from '../utils/render';
@@ -35,7 +36,7 @@ export class PageController {
     this._renderedMoviesAmount = START_MOVIES_AMOUNT;
     this._moviesContainerComponent = new MoviesContainer();
     this._mainMoviesComponent = new MainMovies();
-    this._sortComponent = new Sort();
+    // this._sortComponent = new Sort();
     this._shownMoviesInstances = [];
     this._moviesData = [];
 
@@ -50,10 +51,11 @@ export class PageController {
     const alredyWatchedMoviesNumber = moviesData.filter((movie) => movie.movieInfo.isAlredyWatched).length;
     const topRatedMovies = this._getExtraMovies(moviesData, `topRated`);
     const mostCommentedMovies = this._getExtraMovies(moviesData, `mostCommented`);
+    const sortController = new SortController(mainElement);
 
     render(headerElement, new Profile(alredyWatchedMoviesNumber));
     render(mainElement, new Menu(moviesData));
-    render(mainElement, this._sortComponent);
+    sortController.render();
 
     if (moviesData.length) {
       render(this._moviesContainerComponent, this._mainMoviesComponent);
