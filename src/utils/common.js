@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
 const shuffleArray = (array) => {
@@ -25,10 +27,8 @@ const getNextItemsIterator = (items, itemsPartAmount, startItemsAmount) => {
 };
 
 const formatTime = (duration) => {
-  const hours = Math.floor(duration / 60);
-  const minutes = duration % 60;
-
-  return `${hours}h ${minutes}m`;
+  const time = moment.duration(duration, `minutes`);
+  return `${time.hours()}h ${time.minutes()}m`;
 };
 
 export {capitalize, shuffleArray, getNextItemsIterator, formatTime};

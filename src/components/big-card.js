@@ -1,8 +1,13 @@
 import AbstractSmartComponent from './abstract-smart-component';
 import {capitalize, formatTime} from '../utils/common';
-import {MONTHS, FILM_DETAILS_TITLES} from '../const';
+import {FILM_DETAILS_TITLES} from '../const';
+import moment from 'moment';
 
 const USER_RATING_SCORES_AMOUNT = 9;
+
+const formatReleaseDate = (timestamp) => {
+  return moment(timestamp).format(`DD MMMM YYYY`);
+};
 
 const getCommentTimeAgoText = (dateTime) => {
   const secondsAgo = Math.floor((Date.now() - dateTime) / 1000);
@@ -176,8 +181,8 @@ const createBigCardMarkup = (movieData) => {
   const ratingMarkup = createRatingMarkup(commonRating, isAlredyWatched, personalRating);
   const writers = movieData.movieInfo.writers.join(`, `);
   const actors = movieData.movieInfo.actors.join(`, `);
-  const date = new Date(release.date);
-  const releaseDate = `${date.getDate()} ${MONTHS[date.getMonth() - 1]} ${date.getFullYear()}`;
+  const date = release.date;
+  const releaseDate = formatReleaseDate(date);
   const country = release.country;
   const genresMarkup = genres.map((genre) => `<span class="film-details__genre">${capitalize(genre)}</span>`).join(``);
   const commentsMarkup = comments.map((comment) => createCommentsMarkup(comment)).join(``);
