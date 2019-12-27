@@ -23,7 +23,6 @@ export default class MovieController {
     this._bigCardComponent = new BigCard(movieData);
 
     this._cardComponent.setOpenCallback(this._openBigCard);
-
     this._bigCardComponent.setCloseCallback(this._closeBigCard);
 
     this._bigCardComponent.setOnEmojiListClickCallback((clickedElement) => {
@@ -69,9 +68,9 @@ export default class MovieController {
     this._bigCardComponent.removeElement();
   }
 
-  updateComponents(newData) {
-    this._cardComponent.update(newData);
-    this._bigCardComponent.update(newData);
+  updateComponents() {
+    this._cardComponent.rerender();
+    this._bigCardComponent.rerender();
   }
 
   setDefaultView() {

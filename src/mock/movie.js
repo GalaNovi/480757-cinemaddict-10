@@ -174,7 +174,7 @@ const generateDescription = () => {
   return sentenses.slice(0, getRandomBetween(1, MAX_DESCRIPTION_SENTENSES)).join(` `).trim();
 };
 
-const generateCard = (index) => {
+const generateMovie = (index) => {
   return {
     id: index,
     localComment: {
@@ -210,4 +210,4 @@ const generateCard = (index) => {
   };
 };
 
-export const generateCards = (count) => new Array(count).fill(``).map((item, index) => generateCard(index));
+export const generateMovies = (count) => new Array(count).fill(``).map((item, index) => generateMovie(index));

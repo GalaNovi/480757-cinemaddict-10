@@ -28,8 +28,9 @@ const extraMoviesParameters = {
 };
 
 export class PageController {
-  constructor(container) {
+  constructor(container, moviesModel) {
     this._container = container;
+    this._moviesModel = moviesModel;
     this._extraMoviesAmount = EXTRA_MOVIES_AMOUNT;
     this._renderedMoviesAmount = START_MOVIES_AMOUNT;
     this._moviesContainerComponent = new MoviesContainer();
@@ -42,7 +43,8 @@ export class PageController {
     this._onViewChange = this._onViewChange.bind(this);
   }
 
-  render(moviesData) {
+  render() {
+    const moviesData = this._moviesModel.movies;
     const headerElement = this._container.querySelector(`.header`);
     const mainElement = this._container.querySelector(`.main`);
     const alredyWatchedMoviesNumber = moviesData.filter((movie) => movie.movieInfo.isAlredyWatched).length;
@@ -123,10 +125,11 @@ export class PageController {
     this._shownMoviesInstances = this._shownMoviesInstances.filter((item) => item.type === EXTRA_MOVIES_NAME);
   }
 
-  _onDataChange(oldData, newData) {
-    const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldData.id);
+  _onDataChange(oldMovie, newMovie) {
+    const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
     instanceOfChangedMovies.forEach(({controller}) => {
-      controller.updateComponents(newData);
+      this._moviesModel.updateMovie(oldMovie.id, newMovie);
+      controller.updateComponents();
     });
   }
 
