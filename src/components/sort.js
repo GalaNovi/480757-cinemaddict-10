@@ -1,10 +1,6 @@
 import AbstractComponent from './abstract-component';
 
 const SORT_LINK_ACTIVE_CLASS = `sort__button--active`;
-const sortParameters = {
-  date: (a, b) => b.movieInfo.release.date - a.movieInfo.release.date,
-  rating: (a, b) => b.movieInfo.rating - a.movieInfo.rating,
-};
 
 const createSortMarkup = () => {
   return (
@@ -19,7 +15,6 @@ const createSortMarkup = () => {
 export default class Sort extends AbstractComponent {
   constructor() {
     super();
-    this._sortType = `default`;
     this._sortLinkActive = this.getElement().querySelector(`.${SORT_LINK_ACTIVE_CLASS}`);
   }
 
@@ -31,32 +26,11 @@ export default class Sort extends AbstractComponent {
     return createSortMarkup();
   }
 
-  sortData(data) {
-    if (this._sortType === `default`) {
-      return data.slice();
-    } else {
-      return data.slice().sort(sortParameters[this._sortType]);
-    }
+  setSortChangeHandler(handler) {
+    this.getElement().addEventListener(`click`, handler);
   }
 
-  setCallback(callback) {
-    this.getElement().addEventListener(`click`, (evt) => {
-      if (evt.target.tagName === `A`) {
-        evt.preventDefault();
-        const sortLink = evt.target;
-        const sortType = sortLink.getAttribute(`data-sort-type`);
-        this._setCurrentSortType(sortLink, sortType);
-        callback();
-      }
-    });
-  }
-
-  _setCurrentSortType(newSortLink, newSortType) {
-    this._changeActiveSortLink(newSortLink);
-    this._sortType = newSortType;
-  }
-
-  _changeActiveSortLink(newSortLink) {
+  setActiveSortLink(newSortLink) {
     this._sortLinkActive.classList.remove(SORT_LINK_ACTIVE_CLASS);
     newSortLink.classList.add(SORT_LINK_ACTIVE_CLASS);
     this._sortLinkActive = newSortLink;
