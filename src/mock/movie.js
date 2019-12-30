@@ -203,7 +203,7 @@ const generateMovie = (index) => {
     userInfo: {
       personalRating: getRandomBetween(0, 9),
       isOnTheWatchlist: getRandomBoolean(),
-      isAlredyWatched: true,
+      isAlredyWatched: getRandomBoolean(),
       isFavorite: getRandomBoolean(),
       watchingDate: generateWatchingDate(),
     },
