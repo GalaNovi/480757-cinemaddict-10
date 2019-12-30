@@ -10,13 +10,13 @@ export class MenuController {
   render() {
     const menuComponent = new MenuComponent(this._moviesModel.movies);
 
-    // filterComponent.setFilterChangeHandler((evt) => {
-    //   if (evt.target.tagName === `A`) {
-    //     evt.preventDefault();
-    //     sortComponent.setActiveSortLink(evt.target);
-    //     this._moviesModel.setSort(evt.target.getAttribute(`data-sort-type`));
-    //   }
-    // });
+    menuComponent.setFilterChangeHandler((evt) => {
+      evt.preventDefault();
+      if (evt.target.tagName === `A` && evt.target.getAttribute(`data-filter-type`) !== this._moviesModel.filterType) {
+        menuComponent.setActiveFilterLink(evt.target);
+        this._moviesModel.setFilter(evt.target.getAttribute(`data-filter-type`));
+      }
+    });
 
     render(this._container, menuComponent);
   }

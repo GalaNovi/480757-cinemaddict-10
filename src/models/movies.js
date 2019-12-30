@@ -48,6 +48,15 @@ export default class Movies {
     this._callHandlers(this._sortChangeHandlers);
   }
 
+  setFilterChangeHandler(handler) {
+    this._filterChangeHandlers.push(handler);
+  }
+
+  setFilter(filterType) {
+    this._filterType = filterType;
+    this._callHandlers(this._filterChangeHandlers);
+  }
+
   _callHandlers(handlers) {
     handlers.forEach((handler) => handler());
   }

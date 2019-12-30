@@ -41,8 +41,10 @@ export class PageController {
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onSortChange = this._onSortChange.bind(this);
+    this._onFilterChange = this._onFilterChange.bind(this);
 
     this._moviesModel.setSortChangeHandler(this._onSortChange);
+    this._moviesModel.setFilterChangeHandler(this._onFilterChange);
   }
 
   render() {
@@ -140,6 +142,10 @@ export class PageController {
   }
 
   _onSortChange() {
+    this._mainMoviesListInit();
+  }
+
+  _onFilterChange() {
     this._mainMoviesListInit();
   }
 }

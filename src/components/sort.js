@@ -18,10 +18,6 @@ export default class Sort extends AbstractComponent {
     this._sortLinkActive = this.getElement().querySelector(`.${SORT_LINK_ACTIVE_CLASS}`);
   }
 
-  get sortType() {
-    return this._sortType;
-  }
-
   getTemplate() {
     return createSortMarkup();
   }
