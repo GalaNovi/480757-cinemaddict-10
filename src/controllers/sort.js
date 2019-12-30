@@ -1,7 +1,7 @@
 import {render} from '../utils/render';
 import SortComponent from '../components/sort';
 
-export default class Sort {
+export class SortController {
   constructor(container, moviesModel) {
     this._container = container;
     this._moviesModel = moviesModel;

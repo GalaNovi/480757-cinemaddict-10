@@ -1,11 +1,11 @@
 import MainMovies from '../components/main-movies';
 import ExtraMovies from '../components/extra-movies';
-import Menu from '../components/menu';
 import MoviesContainer from '../components/movies-container';
 import NoMoviesContainer from '../components/no-movies-container';
 import Profile from '../components/profile';
-import SortController from '../controllers/sort';
-import MovieController from '../controllers/movie';
+import {MovieController} from '../controllers/movie';
+import {SortController} from './sort';
+import {MenuController} from './menu';
 import {getNextItemsIterator} from '../utils/common';
 import {render} from '../utils/render';
 import {EXTRA_MOVIES_HEADINGS} from '../const';
@@ -46,21 +46,23 @@ export class PageController {
   }
 
   render() {
-    const moviesData = this._moviesModel.movies;
+    const allMovies = this._moviesModel.movies;
+    const moviesForRender = this._moviesModel.getMoviesForRender();
     const headerElement = this._container.querySelector(`.header`);
     const mainElement = this._container.querySelector(`.main`);
-    const alredyWatchedMoviesNumber = moviesData.filter((movie) => movie.movieInfo.isAlredyWatched).length;
-    const topRatedMovies = this._getExtraMovies(moviesData, `topRated`);
-    const mostCommentedMovies = this._getExtraMovies(moviesData, `mostCommented`);
+    const alredyWatchedMoviesNumber = allMovies.filter((movie) => movie.userInfo.isOnTheWatchlist).length;
+    const topRatedMovies = this._getExtraMovies(allMovies, `topRated`);
+    const mostCommentedMovies = this._getExtraMovies(allMovies, `mostCommented`);
     const sortController = new SortController(mainElement, this._moviesModel);
+    const menuController = new MenuController(mainElement, this._moviesModel);
 
     render(headerElement, new Profile(alredyWatchedMoviesNumber));
-    render(mainElement, new Menu(moviesData));
+    menuController.render();
     sortController.render();
 
-    if (moviesData.length) {
+    if (moviesForRender.length) {
       render(this._moviesContainerComponent, this._mainMoviesComponent);
-      this._mainMoviesListInit(moviesData);
+      this._mainMoviesListInit(moviesForRender);
       render(mainElement, this._moviesContainerComponent);
       this._renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
       this._renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
@@ -68,7 +70,7 @@ export class PageController {
       render(mainElement, new NoMoviesContainer());
     }
 
-    this._container.querySelector(`.footer__statistics p`).textContent = `${moviesData.length} movies inside`;
+    this._container.querySelector(`.footer__statistics p`).textContent = `${allMovies.length} movies inside`;
   }
 
   _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
@@ -110,7 +112,7 @@ export class PageController {
 
   _mainMoviesListInit() {
     this._clearMainMovies();
-    const moviesData = this._moviesModel.movies;
+    const moviesData = this._moviesModel.getMoviesForRender();
     const iterator = getNextItemsIterator(moviesData, ADD_MOVIES_AMOUNT, this._renderedMoviesAmount);
     this._renderMainMovies(iterator);
     this._mainMoviesComponent.setCallback(() => {

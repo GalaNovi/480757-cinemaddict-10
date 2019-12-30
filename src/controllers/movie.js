@@ -2,7 +2,7 @@ import BigCard from '../components/big-card';
 import Card from '../components/card';
 import {render} from '../utils/render';
 
-export default class MovieController {
+export class MovieController {
   constructor(container, onDataChange, onViewChange) {
     this._container = container;
     this._onDataChange = onDataChange;

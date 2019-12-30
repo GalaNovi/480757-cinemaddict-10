@@ -7,8 +7,8 @@ const sortParameters = {
 
 export const sortMovies = (moviesData, sortType) => {
   if (sortType === DEFAULT_SORT_TYPE) {
-    return moviesData.slice();
+    return moviesData;
   } else {
-    return moviesData.slice().sort(sortParameters[sortType]);
+    return moviesData.sort(sortParameters[sortType]);
   }
 };
