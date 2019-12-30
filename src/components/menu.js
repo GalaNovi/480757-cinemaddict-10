@@ -5,9 +5,9 @@ import {FilterType} from '../const';
 
 const FILTER_LINK_ACTIVE_CLASS = `main-navigation__item--active`;
 
-const createFilterItemMarkup = (filter, movies) => {
-  const activeClass = filter === FilterType.ALL ? ` main-navigation__item--active` : ``;
-  const counterMarkup = filter === FilterType.ALL ? `All movies` : `${capitalize(filter)} <span class="main-navigation__item-count">${filterMovies(movies, filter).length}</span>`;
+const createFilterItemMarkup = (filter, moviesModel) => {
+  const activeClass = filter === moviesModel.filterType ? ` main-navigation__item--active` : ``;
+  const counterMarkup = filter === FilterType.ALL ? `All movies` : `${capitalize(filter)} <span class="main-navigation__item-count">${filterMovies(moviesModel.movies, filter).length}</span>`;
 
   return (
     `<a href="#${filter}" class="main-navigation__item${activeClass}" data-filter-type="${filter}">
@@ -16,14 +16,14 @@ const createFilterItemMarkup = (filter, movies) => {
   );
 };
 
-const createFilterMarkup = (moviesData) => {
+const createFilterMarkup = (moviesModel) => {
   const filters = Object.values(FilterType);
-  const markup = filters.map((filter) => createFilterItemMarkup(filter, moviesData)).join(`\n`);
+  const markup = filters.map((filter) => createFilterItemMarkup(filter, moviesModel)).join(`\n`);
   return markup;
 };
 
-const createMenuMarkup = (moviesData) => {
-  const filterMarkup = createFilterMarkup(moviesData);
+const createMenuMarkup = (moviesModel) => {
+  const filterMarkup = createFilterMarkup(moviesModel);
 
   return (
     `<nav class="main-navigation">
@@ -34,23 +34,23 @@ const createMenuMarkup = (moviesData) => {
 };
 
 export default class Menu extends AbstractComponent {
-  constructor(moviesData) {
+  constructor(moviesModel) {
     super();
-    this._moviesData = moviesData;
-    this._filterLinkActive = this.getElement().querySelector(`.${FILTER_LINK_ACTIVE_CLASS}`);
+    this._moviesModel = moviesModel;
   }
 
   getTemplate() {
-    return createMenuMarkup(this._moviesData);
+    return createMenuMarkup(this._moviesModel);
   }
 
   setFilterChangeHandler(handler) {
     this.getElement().addEventListener(`click`, handler);
   }
 
-  setActiveFilterLink(newFilterLink) {
-    this._filterLinkActive.classList.remove(FILTER_LINK_ACTIVE_CLASS);
-    newFilterLink.classList.add(FILTER_LINK_ACTIVE_CLASS);
-    this._filterLinkActive = newFilterLink;
+  setActiveFilterLink(currentFilterType) {
+    const oldActiveLink = this.getElement().querySelector(`.${FILTER_LINK_ACTIVE_CLASS}`);
+    const newActiveLink = this.getElement().querySelector(`a[data-filter-type="${currentFilterType}"]`);
+    oldActiveLink.classList.remove(FILTER_LINK_ACTIVE_CLASS);
+    newActiveLink.classList.add(FILTER_LINK_ACTIVE_CLASS);
   }
 }

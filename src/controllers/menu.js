@@ -5,7 +5,7 @@ export class MenuController {
   constructor(container, moviesModel) {
     this._container = container;
     this._moviesModel = moviesModel;
-    this._menuComponent = new MenuComponent(this._moviesModel.movies);
+    this._menuComponent = new MenuComponent(this._moviesModel);
   }
 
   render() {
@@ -14,7 +14,7 @@ export class MenuController {
     this._menuComponent.setFilterChangeHandler((evt) => {
       evt.preventDefault();
       if (evt.target.tagName === `A` && evt.target.getAttribute(`data-filter-type`) !== this._moviesModel.filterType) {
-        this._menuComponent.setActiveFilterLink(evt.target);
+        this._menuComponent.setActiveFilterLink(evt.target.getAttribute(`data-filter-type`));
         this._moviesModel.setFilter(evt.target.getAttribute(`data-filter-type`));
       }
     });
