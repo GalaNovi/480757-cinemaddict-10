@@ -56,10 +56,10 @@ export class PageController {
     const topRatedMovies = this._getExtraMovies(allMovies, `topRated`);
     const mostCommentedMovies = this._getExtraMovies(allMovies, `mostCommented`);
     const sortController = new SortController(mainElement, this._moviesModel);
-    const menuController = new MenuController(mainElement, this._moviesModel);
+    this._menuController = new MenuController(mainElement, this._moviesModel);
 
     render(headerElement, new Profile(alredyWatchedMoviesNumber));
-    menuController.render();
+    this._menuController.render();
     sortController.render();
 
     if (moviesForRender.length) {
@@ -135,6 +135,8 @@ export class PageController {
       this._moviesModel.updateMovie(oldMovie.id, newMovie);
       controller.updateComponents();
     });
+    this._mainMoviesListInit();
+    this._menuController.render();
   }
 
   _onViewChange() {

@@ -1,23 +1,24 @@
-import {render} from '../utils/render';
+import {render, Position} from '../utils/render';
 import MenuComponent from '../components/menu';
 
 export class MenuController {
   constructor(container, moviesModel) {
     this._container = container;
     this._moviesModel = moviesModel;
+    this._menuComponent = new MenuComponent(this._moviesModel.movies);
   }
 
   render() {
-    const menuComponent = new MenuComponent(this._moviesModel.movies);
+    this._menuComponent.removeElement();
 
-    menuComponent.setFilterChangeHandler((evt) => {
+    this._menuComponent.setFilterChangeHandler((evt) => {
       evt.preventDefault();
       if (evt.target.tagName === `A` && evt.target.getAttribute(`data-filter-type`) !== this._moviesModel.filterType) {
-        menuComponent.setActiveFilterLink(evt.target);
+        this._menuComponent.setActiveFilterLink(evt.target);
         this._moviesModel.setFilter(evt.target.getAttribute(`data-filter-type`));
       }
     });
 
-    render(this._container, menuComponent);
+    render(this._container, this._menuComponent, Position.AFTERBEGIN);
   }
 }
