@@ -6,14 +6,22 @@ import {FilterType} from '../const';
 export default class Movies {
   constructor() {
     this._movies = null;
-    this._sortType = DEFAULT_SORT_TYPE;
     this._filterType = FilterType.ALL;
+    this._sortType = DEFAULT_SORT_TYPE;
     this._sortChangeHandlers = [];
     this._filterChangeHandlers = [];
   }
 
   get movies() {
     return this._movies;
+  }
+
+  get filterType() {
+    return this._filterType;
+  }
+
+  get sortType() {
+    return this._sortType;
   }
 
   set movies(movies) {

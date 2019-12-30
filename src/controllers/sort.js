@@ -11,8 +11,8 @@ export class SortController {
     const sortComponent = new SortComponent();
 
     sortComponent.setSortChangeHandler((evt) => {
-      if (evt.target.tagName === `A`) {
-        evt.preventDefault();
+      evt.preventDefault();
+      if (evt.target.tagName === `A` && evt.target.getAttribute(`data-sort-type`) !== this._moviesModel.sortType) {
         sortComponent.setActiveSortLink(evt.target);
         this._moviesModel.setSort(evt.target.getAttribute(`data-sort-type`));
       }
