@@ -13,8 +13,8 @@ import {EXTRA_MOVIES_HEADINGS} from '../const';
 const START_MOVIES_AMOUNT = 5;
 const ADD_MOVIES_AMOUNT = 5;
 const EXTRA_MOVIES_AMOUNT = 2;
-const MAIN_MOVIES_NAME = `main`;
-const EXTRA_MOVIES_NAME = `extra`;
+const MAIN_MOVIES_TYPE = `main`;
+const EXTRA_MOVIES_TYPE = `extra`;
 
 const extraMoviesParameters = {
   topRated: {
@@ -78,12 +78,12 @@ export class PageController {
   _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
     const movieController = new MovieController(container, this._onDataChange, this._onViewChange);
     const movieInstance = {
-      type: MAIN_MOVIES_NAME,
+      type: MAIN_MOVIES_TYPE,
       controller: movieController,
     };
 
     if (container !== this._mainMoviesComponent.getMoviesList()) {
-      movieInstance.type = EXTRA_MOVIES_NAME;
+      movieInstance.type = EXTRA_MOVIES_TYPE;
     }
 
     this._shownMoviesInstances.push(movieInstance);
@@ -124,9 +124,9 @@ export class PageController {
   }
 
   _clearMainMovies() {
-    const movieInstanceForClean = this._shownMoviesInstances.filter((item) => item.type === MAIN_MOVIES_NAME);
+    const movieInstanceForClean = this._shownMoviesInstances.filter((item) => item.type === MAIN_MOVIES_TYPE);
     movieInstanceForClean.forEach((item) => item.controller.removeElements());
-    this._shownMoviesInstances = this._shownMoviesInstances.filter((item) => item.type === EXTRA_MOVIES_NAME);
+    this._shownMoviesInstances = this._shownMoviesInstances.filter((item) => item.type === EXTRA_MOVIES_TYPE);
   }
 
   _onDataChange(oldMovie, newMovie) {
@@ -135,7 +135,6 @@ export class PageController {
       this._moviesModel.updateMovie(oldMovie.id, newMovie);
       controller.updateComponents();
     });
-    this._mainMoviesListInit();
     this._menuController.render();
   }
 
