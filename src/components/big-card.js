@@ -106,16 +106,13 @@ const createUserRatingFormMarkup = (movieData) => {
   );
 };
 
-const getNewCommentMarkup = (localComment) => {
-  const {comment, emotion} = localComment;
+const getNewCommentMarkup = () => {
   return (
     `<div class="film-details__new-comment">
-      <div for="add-emoji" class="film-details__add-emoji-label">
-        ${emotion ? `<img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji">` : ``}
-      </div>
+      <div for="add-emoji" class="film-details__add-emoji-label"></div>
 
       <label class="film-details__comment-label">
-        <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${comment ? comment : ``}</textarea>
+        <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
       </label>
 
       <div class="film-details__emoji-list">
@@ -140,6 +137,12 @@ const getNewCommentMarkup = (localComment) => {
         </label>
       </div>
     </div>`
+  );
+};
+
+const getNewCommentEmojiMarkup = (emoji) => {
+  return (
+    `<img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji">`
   );
 };
 
@@ -173,8 +176,6 @@ const createBigCardMarkup = (movieData) => {
     isFavorite,
   } = movieData.userInfo;
 
-  const {localComment} = movieData;
-
   const {comments} = movieData;
   const ratingMarkup = createRatingMarkup(commonRating, isAlredyWatched, personalRating);
   const writers = movieData.movieInfo.writers.join(`, `);
@@ -185,7 +186,7 @@ const createBigCardMarkup = (movieData) => {
   const genresMarkup = genres.map((genre) => `<span class="film-details__genre">${capitalize(genre)}</span>`).join(``);
   const commentsMarkup = comments.map((comment) => createCommentsMarkup(comment)).join(``);
   const userRatingFormMarkup = createUserRatingFormMarkup(movieData);
-  const newCommentMarkup = getNewCommentMarkup(localComment);
+  const newCommentMarkup = getNewCommentMarkup();
   const filmDetailsMarkup = getFilmDetailsMarkup([director, writers, actors, releaseDate, formatTime(duration), country, genresMarkup]);
 
   return (
@@ -258,6 +259,8 @@ export default class BigCard extends AbstractSmartComponent {
   constructor(movieData) {
     super();
     this._movieData = movieData;
+    this._newCommentEmojiContainer = this.getElement().querySelector(`.film-details__add-emoji-label`);
+    this._newCommentField = this.getElement().querySelector(`.film-details__comment-input`);
   }
 
   getTemplate() {
@@ -316,9 +319,18 @@ export default class BigCard extends AbstractSmartComponent {
     this.getElement().querySelector(`.film-details__emoji-list`)
       .addEventListener(`click`, (evt) => {
         if (evt.target.tagName === `INPUT`) {
-          this._onEmojiListClickCallback(evt.target);
+          this._onEmojiListClickCallback(evt.target.getAttribute(`data-emoji`));
         }
       });
+  }
+
+  setEmojiLabel(emoji) {
+    this._newCommentEmojiContainer.innerHTML = getNewCommentEmojiMarkup(emoji);
+  }
+
+  resetNewComment() {
+    this._newCommentEmojiContainer.innerHTML = ``;
+    this._newCommentField.value = ``;
   }
 
   recoveryListeners() {

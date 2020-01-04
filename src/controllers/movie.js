@@ -25,12 +25,8 @@ export class MovieController {
     this._cardComponent.setOpenCallback(this._openBigCard);
     this._bigCardComponent.setCloseCallback(this._closeBigCard);
 
-    this._bigCardComponent.setOnEmojiListClickCallback((clickedElement) => {
-      this._onDataChange(movieData, Object.assign({}, movieData, {
-        localComment: Object.assign(movieData.localComment, {
-          emotion: clickedElement.getAttribute(`data-emoji`),
-        })
-      }));
+    this._bigCardComponent.setOnEmojiListClickCallback((emoji) => {
+      this._bigCardComponent.setEmojiLabel(emoji);
     });
 
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
@@ -68,9 +64,9 @@ export class MovieController {
     this._bigCardComponent.removeElement();
   }
 
-  updateComponents() {
-    this._cardComponent.rerender();
-    this._bigCardComponent.rerender();
+  updateComponents(newMovieData) {
+    this._cardComponent.update(newMovieData);
+    this._bigCardComponent.update(newMovieData);
   }
 
   setDefaultView() {
@@ -91,6 +87,7 @@ export class MovieController {
   }
 
   _closeBigCard() {
+    this._bigCardComponent.resetNewComment();
     this._bigCardComponent.getElement().remove();
     document.removeEventListener(`keydown`, this._onEsqKeyDown);
   }

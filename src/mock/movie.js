@@ -180,7 +180,7 @@ const generateMovie = (index) => {
     localComment: {
       comment: null,
       date: null,
-      emotion: EMOTIONS[getRandomBetween(0, 7)],
+      emotion: null,
     },
     comments: generateComments(),
     movieInfo: {

@@ -15,4 +15,9 @@ export default class AbstractSmartComponent extends AbstractComponent {
     }
     this.recoveryListeners();
   }
+
+  update(newMovieData) {
+    this._movieData = newMovieData;
+    this.rerender();
+  }
 }

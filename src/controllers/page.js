@@ -133,7 +133,7 @@ export class PageController {
     const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
     instanceOfChangedMovies.forEach(({controller}) => {
       this._moviesModel.updateMovie(oldMovie.id, newMovie);
-      controller.updateComponents();
+      controller.updateComponents(newMovie);
     });
     this._menuController.render();
   }
