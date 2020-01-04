@@ -17,3 +17,5 @@ export const FilterType = {
   HISTORY: `history`,
   FAVORITES: `favorites`,
 };
+
+export const DESCRIPTION_MAX_LENGTH = 140;
