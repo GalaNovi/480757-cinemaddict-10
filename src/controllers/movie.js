@@ -29,6 +29,15 @@ export class MovieController {
       this._bigCardComponent.setEmojiLabel(emoji);
     });
 
+    this._bigCardComponent.setOnDeleteCommentClickCallback((commentId) => {
+      this._onDataChange(movieData, Object.assign({}, movieData, {
+        comments: movieData.comments.filter((comment) => Number(comment.id) !== Number(commentId))
+      }));
+      movieData = Object.assign({}, movieData, {
+        comments: movieData.comments.filter((comment) => Number(comment.id) !== Number(commentId))
+      });
+    });
+
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
       component.setWatchlistButtonCallback(() => {
         this._onDataChange(movieData, Object.assign({}, movieData, {

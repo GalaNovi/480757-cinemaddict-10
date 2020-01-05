@@ -35,8 +35,8 @@ export default class Movies {
     return moviesCopy;
   }
 
-  updateMovie(id, movie) {
-    this._movies[id] = movie;
+  updateMovie(oldMovieId, newMovie) {
+    this._movies = this._movies.map((movie) => movie.id === oldMovieId ? newMovie : movie);
   }
 
   setSortChangeHandler(handler) {

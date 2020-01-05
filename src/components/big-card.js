@@ -41,8 +41,8 @@ const createRatingMarkup = (commonRating, isAlredyWatched, personalRating) => {
   );
 };
 
-const createCommentsMarkup = (comment) => {
-  const {author, text, date, emotion} = comment;
+const createCommentMarkup = (comment) => {
+  const {id, author, text, date, emotion} = comment;
   const commentTimeAgoText = getCommentTimeAgoText(date);
 
   return (
@@ -55,7 +55,7 @@ const createCommentsMarkup = (comment) => {
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
           <span class="film-details__comment-day">${commentTimeAgoText}</span>
-          <button class="film-details__comment-delete">Delete</button>
+          <button class="film-details__comment-delete" data-comment-id="${id}">Delete</button>
         </p>
       </div>
     </li>`
@@ -184,7 +184,7 @@ const createBigCardMarkup = (movieData) => {
   const releaseDate = formatReleaseDate(date);
   const country = release.country;
   const genresMarkup = genres.map((genre) => `<span class="film-details__genre">${capitalize(genre)}</span>`).join(``);
-  const commentsMarkup = comments.map((comment) => createCommentsMarkup(comment)).join(``);
+  const commentsMarkup = comments.map((comment) => createCommentMarkup(comment)).join(``);
   const userRatingFormMarkup = createUserRatingFormMarkup(movieData);
   const newCommentMarkup = getNewCommentMarkup();
   const filmDetailsMarkup = getFilmDetailsMarkup([director, writers, actors, releaseDate, formatTime(duration), country, genresMarkup]);
@@ -324,6 +324,20 @@ export default class BigCard extends AbstractSmartComponent {
       });
   }
 
+  setOnDeleteCommentClickCallback(callback) {
+    if (callback) {
+      this._onDeleteCommentClickCallback = callback;
+    }
+
+    this.getElement().querySelector(`.film-details__comments-list`)
+      .addEventListener(`click`, (evt) => {
+        if (evt.target.classList.contains(`film-details__comment-delete`)) {
+          evt.preventDefault();
+          this._onDeleteCommentClickCallback(evt.target.getAttribute(`data-comment-id`));
+        }
+      });
+  }
+
   setEmojiLabel(emoji) {
     this._newCommentEmojiContainer.innerHTML = getNewCommentEmojiMarkup(emoji);
   }
@@ -339,5 +353,6 @@ export default class BigCard extends AbstractSmartComponent {
     this.setFavoriteButtonCallback();
     this.setCloseCallback();
     this.setOnEmojiListClickCallback();
+    this.setOnDeleteCommentClickCallback();
   }
 }
