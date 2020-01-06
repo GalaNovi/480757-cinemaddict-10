@@ -31,4 +31,7 @@ const formatTime = (duration) => {
   return `${time.hours()}h ${time.minutes()}m`;
 };
 
-export {capitalize, shuffleArray, getNextItemsIterator, formatTime};
+const getRandomBetween = (min, max, demicalPlacesCount = 0) => Number(parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(demicalPlacesCount));
+const getRandomArrayItem = (array) => array[getRandomBetween(0, array.length - 1)];
+
+export {capitalize, shuffleArray, getNextItemsIterator, formatTime, getRandomBetween, getRandomArrayItem};
