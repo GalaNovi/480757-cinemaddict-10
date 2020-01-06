@@ -28,9 +28,10 @@ const extraMoviesParameters = {
 };
 
 export class PageController {
-  constructor(container, moviesModel) {
+  constructor(container, moviesModel, commentsModel) {
     this._container = container;
     this._moviesModel = moviesModel;
+    this._commentsModel = commentsModel;
     this._extraMoviesAmount = EXTRA_MOVIES_AMOUNT;
     this._renderedMoviesAmount = START_MOVIES_AMOUNT;
     this._moviesContainerComponent = new MoviesContainer();
@@ -76,7 +77,7 @@ export class PageController {
   }
 
   _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
-    const movieController = new MovieController(container, this._onDataChange, this._onViewChange);
+    const movieController = new MovieController(container, this._commentsModel, this._onDataChange, this._onViewChange);
     const movieInstance = {
       type: MAIN_MOVIES_TYPE,
       controller: movieController,

@@ -155,7 +155,7 @@ const getFilmDetailsMarkup = (filmDetails) => {
   )).join(`\n`);
 };
 
-const createBigCardMarkup = (movieData) => {
+const createBigCardMarkup = (movieData, commentsData) => {
   const {
     poster,
     ageLimit,
@@ -176,7 +176,9 @@ const createBigCardMarkup = (movieData) => {
     isFavorite,
   } = movieData.userInfo;
 
-  const {comments} = movieData;
+  const {comments: commentsId} = movieData;
+
+  const comments = commentsId.map((id) => commentsData.find((comment) => comment.id === id));
   const ratingMarkup = createRatingMarkup(commonRating, isAlredyWatched, personalRating);
   const writers = movieData.movieInfo.writers.join(`, `);
   const actors = movieData.movieInfo.actors.join(`, `);
@@ -256,15 +258,14 @@ const createBigCardMarkup = (movieData) => {
 };
 
 export default class BigCard extends AbstractSmartComponent {
-  constructor(movieData) {
+  constructor(movieData, commentsData) {
     super();
     this._movieData = movieData;
-    this._newCommentEmojiContainer = this.getElement().querySelector(`.film-details__add-emoji-label`);
-    this._newCommentField = this.getElement().querySelector(`.film-details__comment-input`);
+    this._commentsData = commentsData;
   }
 
   getTemplate() {
-    return createBigCardMarkup(this._movieData);
+    return createBigCardMarkup(this._movieData, this._commentsData);
   }
 
   setCloseCallback(callback) {
@@ -333,18 +334,22 @@ export default class BigCard extends AbstractSmartComponent {
       .addEventListener(`click`, (evt) => {
         if (evt.target.classList.contains(`film-details__comment-delete`)) {
           evt.preventDefault();
-          this._onDeleteCommentClickCallback(evt.target.getAttribute(`data-comment-id`));
+          this._onDeleteCommentClickCallback(Number(evt.target.getAttribute(`data-comment-id`)));
         }
       });
   }
 
   setEmojiLabel(emoji) {
-    this._newCommentEmojiContainer.innerHTML = getNewCommentEmojiMarkup(emoji);
+    this.getElement().querySelector(`.film-details__add-emoji-label`).innerHTML = getNewCommentEmojiMarkup(emoji);
   }
 
   resetNewComment() {
-    this._newCommentEmojiContainer.innerHTML = ``;
-    this._newCommentField.value = ``;
+    this.getElement().querySelector(`.film-details__add-emoji-label`).innerHTML = ``;
+    this.getElement().querySelector(`.film-details__comment-input`).value = ``;
+    const checkedEmodji = this.getElement().querySelector(`.film-details__emoji-item:checked`);
+    if (checkedEmodji) {
+      checkedEmodji.checked = false;
+    }
   }
 
   recoveryListeners() {

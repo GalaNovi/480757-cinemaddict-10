@@ -1,6 +1,5 @@
 import {shuffleArray} from '../utils/common';
 import {getRandomBetween, getRandomArrayItem} from '../utils/common';
-import {comments} from './comments';
 
 const MAX_DESCRIPTION_SENTENSES = 6;
 const MAX_GENRES = 3;
@@ -10,6 +9,8 @@ const MAX_WRITERS = 3;
 const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 
 const ageLimits = new Set([0, 6, 12, 16, 18]);
+
+const commentsId = new Array(20).fill(``).map((element, index) => index);
 
 const titles = new Set([
   `The Shawshank Redemption`,
@@ -102,7 +103,7 @@ const countries = new Set([
 ]);
 
 const generateAgeLimit = () => getRandomArrayItem(Array.from(ageLimits));
-const generateComments = () => shuffleArray(comments).slice(0, getRandomBetween(0, 10)).map((comment) => comment.id);
+const generateCommentsId = () => shuffleArray(commentsId).slice(0, getRandomBetween(0, 10));
 const generateTitle = () => getRandomArrayItem(Array.from(titles));
 const generatePoster = () => getRandomArrayItem(Array.from(posters));
 const generateGenres = () => shuffleArray(Array.from(genres)).slice(0, getRandomBetween(1, MAX_GENRES));
@@ -124,7 +125,7 @@ const generateDescription = () => {
 const generateMovie = (index) => {
   return {
     id: index,
-    comments: generateComments(),
+    comments: generateCommentsId(),
     movieInfo: {
       ageLimit: generateAgeLimit(),
       name: generateTitle(),

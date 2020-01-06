@@ -4,8 +4,9 @@ import {DEFAULT_SORT_TYPE} from '../const';
 import {FilterType} from '../const';
 
 export default class Movies {
-  constructor() {
+  constructor(commentsModel) {
     this._movies = null;
+    this._commentsModel = commentsModel;
     this._filterType = FilterType.ALL;
     this._sortType = DEFAULT_SORT_TYPE;
     this._sortChangeHandlers = [];

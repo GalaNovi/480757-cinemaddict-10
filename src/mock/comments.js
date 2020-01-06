@@ -2,7 +2,7 @@
 import {EMOTIONS} from '../const';
 import {getRandomBetween, getRandomArrayItem} from '../utils/common';
 
-const COMMENT_AUTHORS = [`Tim Macoveev`, `Mike Chakman`, `ChinWag`, `derroys`, `Darkmus`, `DarGi`, `Barathrum`, `Duddle`, `PiedPiper`];
+const COMMENT_AUTHORS = [`Tim Macoveev`, `Mike Chakman`, `ChinWag`, `derroys`, `Darkmus`, `DarGi`, `Barathrum`, `Duddle`, `PiedPiper`, `Brunduliak`];
 const COMMENT_TEXTS = [
   `Very good film! Not sorry for the time spent.`,
   `Which movie is good? Yes, this is nonsense! The acting is terrible. Blooper on a blooper. Graphics sucks.`,
@@ -23,8 +23,6 @@ const generateComment = (commentId) => {
   };
 };
 
-const generateComments = () => {
-  return new Array(20).fill(null).map((element, index) => generateComment(index + getRandomBetween(1, 10000)));
+export const generateComments = () => {
+  return new Array(20).fill(null).map((element, index) => generateComment(index));
 };
-
-export const comments = generateComments();
