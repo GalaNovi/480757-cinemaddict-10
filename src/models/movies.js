@@ -4,9 +4,9 @@ import {DEFAULT_SORT_TYPE} from '../const';
 import {FilterType} from '../const';
 
 export default class Movies {
-  constructor(commentsModel) {
+  constructor() {
     this._movies = null;
-    this._commentsModel = commentsModel;
+    this._comments = null;
     this._filterType = FilterType.ALL;
     this._sortType = DEFAULT_SORT_TYPE;
     this._sortChangeHandlers = [];
@@ -15,6 +15,10 @@ export default class Movies {
 
   get movies() {
     return this._movies;
+  }
+
+  get comments() {
+    return this._comments;
   }
 
   get filterType() {
@@ -27,6 +31,10 @@ export default class Movies {
 
   set movies(movies) {
     this._movies = Array.from(movies);
+  }
+
+  set comments(comments) {
+    this._comments = comments;
   }
 
   getMoviesForRender() {
@@ -56,6 +64,10 @@ export default class Movies {
   setFilter(filterType) {
     this._filterType = filterType;
     this._callHandlers(this._filterChangeHandlers);
+  }
+
+  deleteComment(deletingComment) {
+    this._comments = this._comments.filter((comment) => comment !== deletingComment);
   }
 
   _callHandlers(handlers) {

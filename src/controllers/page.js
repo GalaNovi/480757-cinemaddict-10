@@ -28,10 +28,9 @@ const extraMoviesParameters = {
 };
 
 export class PageController {
-  constructor(container, moviesModel, commentsModel) {
+  constructor(container, moviesModel) {
     this._container = container;
     this._moviesModel = moviesModel;
-    this._commentsModel = commentsModel;
     this._extraMoviesAmount = EXTRA_MOVIES_AMOUNT;
     this._renderedMoviesAmount = START_MOVIES_AMOUNT;
     this._moviesContainerComponent = new MoviesContainer();
@@ -77,7 +76,8 @@ export class PageController {
   }
 
   _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
-    const movieController = new MovieController(container, this._commentsModel, this._onDataChange, this._onViewChange);
+    const comments = this._moviesModel.comments;
+    const movieController = new MovieController(container, this._onDataChange, this._onViewChange);
     const movieInstance = {
       type: MAIN_MOVIES_TYPE,
       controller: movieController,
@@ -88,7 +88,7 @@ export class PageController {
     }
 
     this._shownMoviesInstances.push(movieInstance);
-    movieController.render(movieData);
+    movieController.render(movieData, comments);
   }
 
   _renderMainMovies(iterator) {
@@ -130,11 +130,15 @@ export class PageController {
     this._shownMoviesInstances = this._shownMoviesInstances.filter((item) => item.type === EXTRA_MOVIES_TYPE);
   }
 
-  _onDataChange(oldMovie, newMovie) {
+  _onDataChange(oldMovie, newMovie, newCommentsData) {
     const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
     instanceOfChangedMovies.forEach(({controller}) => {
       this._moviesModel.updateMovie(oldMovie.id, newMovie);
-      controller.updateComponents(newMovie);
+      if (newCommentsData) {
+        controller.updateComponents(newMovie, newCommentsData);
+      } else {
+        controller.updateComponents(newMovie, null);
+      }
     });
     this._menuController.render();
   }

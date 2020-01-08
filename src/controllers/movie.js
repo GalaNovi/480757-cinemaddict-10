@@ -3,9 +3,8 @@ import Card from '../components/card';
 import {render} from '../utils/render';
 
 export class MovieController {
-  constructor(container, commentsModel, onDataChange, onViewChange) {
+  constructor(container, onDataChange, onViewChange) {
     this._container = container;
-    this._commentsModel = commentsModel;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
 
@@ -18,10 +17,10 @@ export class MovieController {
     return this._id;
   }
 
-  render(movieData) {
+  render(movieData, comments) {
     this._id = movieData.id;
     this._cardComponent = new Card(movieData);
-    this._bigCardComponent = new BigCard(movieData, this._commentsModel.comments);
+    this._bigCardComponent = new BigCard(movieData, comments);
 
     this._cardComponent.setOpenCallback(this._openBigCard);
     this._bigCardComponent.setCloseCallback(this._closeBigCard);
@@ -34,9 +33,10 @@ export class MovieController {
       const newMovieData = Object.assign({}, movieData, {
         comments: movieData.comments.filter((id) => id !== commentId)
       });
-      this._onDataChange(movieData, newMovieData);
-      this._onCommentsDataChange(commentId, null);
+      const newComments = comments.filter((comment) => comment.id !== commentId);
+      this._onDataChange(movieData, newMovieData, newComments);
       movieData = newMovieData;
+      comments = newComments;
     });
 
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
@@ -74,9 +74,9 @@ export class MovieController {
     this._bigCardComponent.removeElement();
   }
 
-  updateComponents(newMovieData) {
-    this._cardComponent.update(newMovieData);
-    this._bigCardComponent.update(newMovieData);
+  updateComponents(newMovieData, newCommentsData) {
+    this._cardComponent.update(newMovieData, newCommentsData);
+    this._bigCardComponent.update(newMovieData, newCommentsData);
   }
 
   setDefaultView() {
@@ -100,11 +100,5 @@ export class MovieController {
     this._bigCardComponent.resetNewComment();
     this._bigCardComponent.getElement().remove();
     document.removeEventListener(`keydown`, this._onEsqKeyDown);
-  }
-
-  _onCommentsDataChange(oldCommentId, newComment) {
-    if (!newComment) {
-      this._commentsModel.delete(oldCommentId);
-    }
   }
 }
