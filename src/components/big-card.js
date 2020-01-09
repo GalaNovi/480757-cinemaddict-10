@@ -312,19 +312,6 @@ export default class BigCard extends AbstractSmartComponent {
       });
   }
 
-  setOnEmojiListClickCallback(callback) {
-    if (callback) {
-      this._onEmojiListClickCallback = callback;
-    }
-
-    this.getElement().querySelector(`.film-details__emoji-list`)
-      .addEventListener(`click`, (evt) => {
-        if (evt.target.tagName === `INPUT`) {
-          this._onEmojiListClickCallback(evt.target.getAttribute(`data-emoji`));
-        }
-      });
-  }
-
   setOnDeleteCommentClickCallback(callback) {
     if (callback) {
       this._onDeleteCommentClickCallback = callback;
@@ -339,8 +326,15 @@ export default class BigCard extends AbstractSmartComponent {
       });
   }
 
-  setEmojiLabel(emoji) {
-    this.getElement().querySelector(`.film-details__add-emoji-label`).innerHTML = getNewCommentEmojiMarkup(emoji);
+  setOnEmojiListClickHandler() {
+    this.getElement().querySelector(`.film-details__emoji-list`)
+      .addEventListener(`click`, (evt) => {
+        if (evt.target.tagName === `INPUT`) {
+          const emojiContainerElement = this.getElement().querySelector(`.film-details__add-emoji-label`);
+          const emojiMarkup = getNewCommentEmojiMarkup(evt.target.getAttribute(`data-emoji`));
+          emojiContainerElement.innerHTML = emojiMarkup;
+        }
+      });
   }
 
   resetNewComment() {
@@ -357,7 +351,7 @@ export default class BigCard extends AbstractSmartComponent {
     this.setWatchedButtonCallback();
     this.setFavoriteButtonCallback();
     this.setCloseCallback();
-    this.setOnEmojiListClickCallback();
     this.setOnDeleteCommentClickCallback();
+    this.setOnEmojiListClickHandler();
   }
 }

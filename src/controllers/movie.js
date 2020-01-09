@@ -19,24 +19,20 @@ export class MovieController {
 
   render(movieData, comments) {
     this._id = movieData.id;
-    this._cardComponent = new Card(movieData);
-    this._bigCardComponent = new BigCard(movieData, comments);
+    this._movieData = movieData;
+    this._cardComponent = new Card(this._movieData);
+    this._bigCardComponent = new BigCard(this._movieData, comments);
 
     this._cardComponent.setOpenCallback(this._openBigCard);
     this._bigCardComponent.setCloseCallback(this._closeBigCard);
-
-    this._bigCardComponent.setOnEmojiListClickCallback((emoji) => {
-      this._bigCardComponent.setEmojiLabel(emoji);
-    });
+    this._bigCardComponent.setOnEmojiListClickHandler();
 
     this._bigCardComponent.setOnDeleteCommentClickCallback((commentId) => {
-      const newMovieData = Object.assign({}, movieData, {
-        comments: movieData.comments.filter((id) => id !== commentId)
+      const newMovieData = Object.assign({}, this._movieData, {
+        comments: this._movieData.comments.filter((id) => id !== commentId)
       });
       const newComments = comments.filter((comment) => comment.id !== commentId);
-      this._onDataChange(movieData, newMovieData, newComments);
-      movieData = newMovieData;
-      comments = newComments;
+      this._onDataChange(this._movieData, newMovieData, newComments);
     });
 
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
@@ -77,6 +73,10 @@ export class MovieController {
   updateComponents(newMovieData, newCommentsData) {
     this._cardComponent.update(newMovieData, newCommentsData);
     this._bigCardComponent.update(newMovieData, newCommentsData);
+  }
+
+  updateMovieData(newMovieData) {
+    this._movieData = newMovieData;
   }
 
   setDefaultView() {

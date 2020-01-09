@@ -134,6 +134,7 @@ export class PageController {
     const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
     instanceOfChangedMovies.forEach(({controller}) => {
       this._moviesModel.updateMovie(oldMovie.id, newMovie);
+      controller.updateMovieData(newMovie);
       if (newCommentsData) {
         controller.updateComponents(newMovie, newCommentsData);
         this._moviesModel.comments = newCommentsData;
