@@ -136,6 +136,7 @@ export class PageController {
       this._moviesModel.updateMovie(oldMovie.id, newMovie);
       if (newCommentsData) {
         controller.updateComponents(newMovie, newCommentsData);
+        this._moviesModel.comments = newCommentsData;
       } else {
         controller.updateComponents(newMovie, null);
       }

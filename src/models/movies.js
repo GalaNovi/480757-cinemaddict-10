@@ -66,10 +66,6 @@ export default class Movies {
     this._callHandlers(this._filterChangeHandlers);
   }
 
-  deleteComment(deletingComment) {
-    this._comments = this._comments.filter((comment) => comment !== deletingComment);
-  }
-
   _callHandlers(handlers) {
     handlers.forEach((handler) => handler());
   }
