@@ -35,6 +35,18 @@ export class MovieController {
       this._onDataChange(this._movieData, newMovieData, newComments);
     });
 
+    this._bigCardComponent.setOnCommentAddCallback((commentValue, dateValue, emojiValue) => {
+      const newMovieData = Object.assign({}, this._movieData, {
+        localComment: {
+          comment: commentValue,
+          date: dateValue,
+          emotion: emojiValue,
+        }
+      });
+      this._onDataChange(this._movieData, newMovieData);
+      console.log(1);
+    });
+
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
       component.setWatchlistButtonCallback(() => {
         this._onDataChange(movieData, Object.assign({}, movieData, {

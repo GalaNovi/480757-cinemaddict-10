@@ -142,7 +142,7 @@ const getNewCommentMarkup = () => {
 
 const getNewCommentEmojiMarkup = (emoji) => {
   return (
-    `<img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji">`
+    `<img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji" data-emoji="${emoji}">`
   );
 };
 
@@ -262,6 +262,7 @@ export default class BigCard extends AbstractSmartComponent {
     super();
     this._movieData = movieData;
     this._commentsData = commentsData;
+    this.setOnCommentAddCallback();
   }
 
   getTemplate() {
@@ -312,6 +313,17 @@ export default class BigCard extends AbstractSmartComponent {
       });
   }
 
+  setOnEmojiListClickHandler() {
+    this.getElement().querySelector(`.film-details__emoji-list`)
+      .addEventListener(`click`, (evt) => {
+        if (evt.target.tagName === `INPUT`) {
+          const emojiContainerElement = this.getElement().querySelector(`.film-details__add-emoji-label`);
+          const emojiMarkup = getNewCommentEmojiMarkup(evt.target.getAttribute(`data-emoji`));
+          emojiContainerElement.innerHTML = emojiMarkup;
+        }
+      });
+  }
+
   setOnDeleteCommentClickCallback(callback) {
     if (callback) {
       this._onDeleteCommentClickCallback = callback;
@@ -326,15 +338,23 @@ export default class BigCard extends AbstractSmartComponent {
       });
   }
 
-  setOnEmojiListClickHandler() {
-    this.getElement().querySelector(`.film-details__emoji-list`)
-      .addEventListener(`click`, (evt) => {
-        if (evt.target.tagName === `INPUT`) {
-          const emojiContainerElement = this.getElement().querySelector(`.film-details__add-emoji-label`);
-          const emojiMarkup = getNewCommentEmojiMarkup(evt.target.getAttribute(`data-emoji`));
-          emojiContainerElement.innerHTML = emojiMarkup;
+  setOnCommentAddCallback(callback) {
+    if (callback) {
+      this._onCommentAddCallback = callback;
+    }
+
+    document.addEventListener(`keydown`, (evt) => {
+      if ((evt.ctrlKey || evt.metaKey) && evt.key === `Enter`) {
+        evt.preventDefault();
+        const comment = this.getElement().querySelector(`.film-details__comment-input`).value;
+        const date = new Date().toISOString();
+        const emoji = this.getElement().querySelector(`.film-details__add-emoji-label img`).getAttribute(`data-emoji`);
+
+        if (comment && emoji) {
+          this._onCommentAddCallback(comment, date, emoji);
         }
-      });
+      }
+    });
   }
 
   resetNewComment() {
@@ -351,7 +371,8 @@ export default class BigCard extends AbstractSmartComponent {
     this.setWatchedButtonCallback();
     this.setFavoriteButtonCallback();
     this.setCloseCallback();
-    this.setOnDeleteCommentClickCallback();
     this.setOnEmojiListClickHandler();
+    this.setOnDeleteCommentClickCallback();
+    this.setOnCommentAddCallback();
   }
 }
