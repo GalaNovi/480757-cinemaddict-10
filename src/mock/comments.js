@@ -17,12 +17,14 @@ const generateComment = (commentId) => {
   return {
     id: commentId,
     author: getRandomArrayItem(COMMENT_AUTHORS),
-    text: getRandomArrayItem(COMMENT_TEXTS),
+    comment: getRandomArrayItem(COMMENT_TEXTS),
     date: new Date(Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000).toISOString(),
     emotion: getRandomArrayItem(EMOTIONS),
   };
 };
 
-export const generateComments = () => {
+const generateComments = () => {
   return new Array(20).fill(null).map((element, index) => generateComment(index));
 };
+
+export {generateComments, COMMENT_AUTHORS};

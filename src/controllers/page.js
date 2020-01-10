@@ -130,18 +130,19 @@ export class PageController {
     this._shownMoviesInstances = this._shownMoviesInstances.filter((item) => item.type === EXTRA_MOVIES_TYPE);
   }
 
-  _onDataChange(oldMovie, newMovie, newCommentsData) {
+  _onDataChange(oldMovie, newMovie) {
     const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
+    this._moviesModel.updateMovie(oldMovie.id, newMovie);
+
+    if (newMovie.localComment) {
+      newMovie = this._moviesModel.movies.find((movie) => movie.id === newMovie.id);
+    }
+
     instanceOfChangedMovies.forEach(({controller}) => {
-      this._moviesModel.updateMovie(oldMovie.id, newMovie);
       controller.updateMovieData(newMovie);
-      if (newCommentsData) {
-        controller.updateComponents(newMovie, newCommentsData);
-        this._moviesModel.comments = newCommentsData;
-      } else {
-        controller.updateComponents(newMovie, null);
-      }
+      controller.updateComponents(newMovie, this._moviesModel.comments);
     });
+
     this._menuController.render();
   }
 

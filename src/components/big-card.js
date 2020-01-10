@@ -10,6 +10,7 @@ const formatReleaseDate = (timestamp) => {
 };
 
 const getCommentTimeAgoText = (dateTime) => {
+  dateTime = new Date(dateTime).getTime();
   const secondsAgo = Math.floor((Date.now() - dateTime) / 1000);
   const minutesAgo = Math.floor((Date.now() - dateTime) / 1000 / 60);
   const hoursAgo = Math.floor((Date.now() - dateTime) / 1000 / 60 / 60);
@@ -41,8 +42,8 @@ const createRatingMarkup = (commonRating, isAlredyWatched, personalRating) => {
   );
 };
 
-const createCommentMarkup = (comment) => {
-  const {id, author, text, date, emotion} = comment;
+const createCommentMarkup = (commentData) => {
+  const {id, author, comment, date, emotion} = commentData;
   const commentTimeAgoText = getCommentTimeAgoText(date);
 
   return (
@@ -51,7 +52,7 @@ const createCommentMarkup = (comment) => {
         <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji">
       </span>
       <div>
-        <p class="film-details__comment-text">${text}</p>
+        <p class="film-details__comment-text">${comment}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
           <span class="film-details__comment-day">${commentTimeAgoText}</span>
@@ -262,7 +263,6 @@ export default class BigCard extends AbstractSmartComponent {
     super();
     this._movieData = movieData;
     this._commentsData = commentsData;
-    this.setOnCommentAddCallback();
   }
 
   getTemplate() {
@@ -338,25 +338,6 @@ export default class BigCard extends AbstractSmartComponent {
       });
   }
 
-  setOnCommentAddCallback(callback) {
-    if (callback) {
-      this._onCommentAddCallback = callback;
-    }
-
-    document.addEventListener(`keydown`, (evt) => {
-      if ((evt.ctrlKey || evt.metaKey) && evt.key === `Enter`) {
-        evt.preventDefault();
-        const comment = this.getElement().querySelector(`.film-details__comment-input`).value;
-        const date = new Date().toISOString();
-        const emoji = this.getElement().querySelector(`.film-details__add-emoji-label img`).getAttribute(`data-emoji`);
-
-        if (comment && emoji) {
-          this._onCommentAddCallback(comment, date, emoji);
-        }
-      }
-    });
-  }
-
   resetNewComment() {
     this.getElement().querySelector(`.film-details__add-emoji-label`).innerHTML = ``;
     this.getElement().querySelector(`.film-details__comment-input`).value = ``;
@@ -373,6 +354,5 @@ export default class BigCard extends AbstractSmartComponent {
     this.setCloseCallback();
     this.setOnEmojiListClickHandler();
     this.setOnDeleteCommentClickCallback();
-    this.setOnCommentAddCallback();
   }
 }
