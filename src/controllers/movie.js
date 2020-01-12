@@ -96,7 +96,7 @@ export class MovieController {
       const dateValue = new Date().toISOString();
       const emotionImageElement = this._bigCardComponent.getElement().querySelector(`.film-details__add-emoji-label img`);
 
-      if (commentFieldElement && emotionImageElement) {
+      if (commentFieldElement.value && emotionImageElement) {
         this._onDataChange(this._movieData, Object.assign({}, this._movieData, {
           localComment: {
             comment: commentFieldElement.value,
@@ -113,6 +113,7 @@ export class MovieController {
     render(document.body, this._bigCardComponent);
     document.addEventListener(`keydown`, this._onEsqKeyDown);
     document.addEventListener(`keydown`, this._onCtrlEnderDown);
+    this._bigCardComponent.rerender();
   }
 
   _closeBigCard() {
