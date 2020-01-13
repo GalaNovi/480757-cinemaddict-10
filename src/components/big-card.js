@@ -9,32 +9,6 @@ const formatReleaseDate = (timestamp) => {
   return moment(timestamp).format(`DD MMMM YYYY`);
 };
 
-const getCommentTimeAgoText = (dateTime) => {
-  dateTime = new Date(dateTime).getTime();
-  const secondsAgo = Math.floor((Date.now() - dateTime) / 1000);
-  const minutesAgo = Math.floor((Date.now() - dateTime) / 1000 / 60);
-  const hoursAgo = Math.floor((Date.now() - dateTime) / 1000 / 60 / 60);
-  const daysAgo = Math.floor((Date.now() - dateTime) / 1000 / 60 / 60 / 24);
-
-  if (secondsAgo < 60) {
-    return `now`;
-  } else if (minutesAgo <= 3) {
-    return `a minute ago`;
-  } else if (minutesAgo < 60) {
-    return `a few minutes ago`;
-  } else if (hoursAgo < 2) {
-    return `a hour ago`;
-  } else if (hoursAgo < 24) {
-    return `a few hours ago`;
-  } else if (daysAgo === 1) {
-    return `a day ago`;
-  } else if (daysAgo === 2) {
-    return `a two days ago`;
-  } else {
-    return `more then two days ago`;
-  }
-};
-
 const createRatingMarkup = (commonRating, isAlredyWatched, personalRating) => {
   return (
     `${commonRating >= 1 ? `<p class="film-details__total-rating">${commonRating}</p>` : ``}
@@ -44,7 +18,7 @@ const createRatingMarkup = (commonRating, isAlredyWatched, personalRating) => {
 
 const createCommentMarkup = (commentData) => {
   const {id, author, comment, date, emotion} = commentData;
-  const commentTimeAgoText = getCommentTimeAgoText(date);
+  const commentDate = moment(date).format(`YYYY/MM/DD HH:mm`);
 
   return (
     `<li class="film-details__comment">
@@ -55,7 +29,7 @@ const createCommentMarkup = (commentData) => {
         <p class="film-details__comment-text">${comment}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
-          <span class="film-details__comment-day">${commentTimeAgoText}</span>
+          <span class="film-details__comment-day">${commentDate}</span>
           <button class="film-details__comment-delete" data-comment-id="${id}">Delete</button>
         </p>
       </div>

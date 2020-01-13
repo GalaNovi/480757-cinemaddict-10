@@ -18,7 +18,7 @@ const generateComment = (commentId) => {
     id: commentId,
     author: getRandomArrayItem(COMMENT_AUTHORS),
     comment: getRandomArrayItem(COMMENT_TEXTS),
-    date: new Date(Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000).toISOString(),
+    date: new Date(Date.now() - getRandomBetween(0, 363333) * 60 * 60 * 1000).toISOString(),
     emotion: getRandomArrayItem(EMOTIONS),
   };
 };

@@ -1,6 +1,6 @@
 import BigCard from '../components/big-card';
 import Card from '../components/card';
-import { render } from '../utils/render';
+import {render} from '../utils/render';
 
 export class MovieController {
   constructor(container, onDataChange, onViewChange, onCloseBigCard) {
