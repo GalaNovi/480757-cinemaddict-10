@@ -10,8 +10,8 @@ export default class Movies {
     this._comments = null;
     this._filterType = FilterType.ALL;
     this._sortType = DEFAULT_SORT_TYPE;
-    this._sortChangeHandlers = [];
-    this._filterChangeHandlers = [];
+    this._sortChangeHandlers = null;
+    this._filterChangeHandler = null;
   }
 
   get movies() {
@@ -47,7 +47,7 @@ export default class Movies {
 
   updateMovie(oldMovieId, newMovie) {
     if (newMovie.localComment) {
-      this.addcomment(Object.assign(newMovie.localComment, {
+      this.addComment(Object.assign(newMovie.localComment, {
         id: this._comments.length + 1,
         author: getRandomArrayItem(COMMENT_AUTHORS),
       }));
@@ -60,28 +60,24 @@ export default class Movies {
   }
 
   setSortChangeHandler(handler) {
-    this._sortChangeHandlers.push(handler);
+    this._sortChangeHandler = handler;
   }
 
   setSort(sortType) {
     this._sortType = sortType;
-    this._callHandlers(this._sortChangeHandlers);
+    this._sortChangeHandler();
   }
 
   setFilterChangeHandler(handler) {
-    this._filterChangeHandlers.push(handler);
+    this._filterChangeHandler = handler;
   }
 
   setFilter(filterType) {
     this._filterType = filterType;
-    this._callHandlers(this._filterChangeHandlers);
+    this._filterChangeHandler();
   }
 
-  addcomment(comment) {
+  addComment(comment) {
     this._comments.unshift(comment);
-  }
-
-  _callHandlers(handlers) {
-    handlers.forEach((handler) => handler());
   }
 }
