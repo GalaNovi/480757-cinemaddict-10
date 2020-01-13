@@ -42,7 +42,7 @@ const createUserRatingScoresMarkup = () => {
 
   for (let i = 1; i <= USER_RATING_SCORES_AMOUNT; i++) {
     const itemMarkup = (
-      `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}"${i === USER_RATING_SCORES_AMOUNT ? ` checked` : ``}>
+      `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}">
       <label class="film-details__user-rating-label" for="rating-${i}">${i}</label>\n`
     );
     allMarkup += itemMarkup;
@@ -312,6 +312,18 @@ export default class BigCard extends AbstractSmartComponent {
       });
   }
 
+  setOnUserRatingClickCallback(callback) {
+    if (callback) {
+      this._onUserRatingClickCallback = callback;
+    }
+
+    this.getElement().addEventListener(`click`, (evt) => {
+      if (evt.target.classList.contains(`film-details__user-rating-input`)) {
+        this._onUserRatingClickCallback(evt.target.value);
+      }
+    });
+  }
+
   resetNewComment() {
     this.getElement().querySelector(`.film-details__add-emoji-label`).innerHTML = ``;
     this.getElement().querySelector(`.film-details__comment-input`).value = ``;
@@ -328,5 +340,6 @@ export default class BigCard extends AbstractSmartComponent {
     this.setCloseCallback();
     this.setOnEmojiListClickHandler();
     this.setOnDeleteCommentClickCallback();
+    this.setOnUserRatingClickCallback();
   }
 }

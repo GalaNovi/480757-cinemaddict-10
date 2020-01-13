@@ -36,6 +36,14 @@ export class MovieController {
       }));
     });
 
+    this._bigCardComponent.setOnUserRatingClickCallback((userRating) => {
+      this._onDataChange(this._movieData, Object.assign({}, this._movieData, {
+        userInfo: Object.assign({}, this._movieData.userInfo, {
+          personalRating: userRating
+        })
+      }));
+    });
+
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
       component.setWatchlistButtonCallback(() => {
         this._onDataChange(movieData, Object.assign({}, movieData, {
