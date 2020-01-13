@@ -3,10 +3,11 @@ import Card from '../components/card';
 import { render } from '../utils/render';
 
 export class MovieController {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, onDataChange, onViewChange, onCloseBigCard) {
     this._container = container;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
+    this._onCloseBigCard = onCloseBigCard;
 
     this._onEsqKeyDown = this._onEsqKeyDown.bind(this);
     this._openBigCard = this._openBigCard.bind(this);
@@ -121,5 +122,6 @@ export class MovieController {
     this._bigCardComponent.getElement().remove();
     document.removeEventListener(`keydown`, this._onEsqKeyDown);
     document.removeEventListener(`keydown`, this._onCtrlEnderDown);
+    this._onCloseBigCard();
   }
 }

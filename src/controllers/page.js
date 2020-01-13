@@ -37,11 +37,13 @@ export class PageController {
     this._mainMoviesComponent = new MainMovies();
     this._shownMoviesInstances = [];
     this._moviesData = [];
+    this._extraMoviesComponents = [];
 
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onSortChange = this._onSortChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
+    this._onCloseBigCard = this._onCloseBigCard.bind(this);
 
     this._moviesModel.setSortChangeHandler(this._onSortChange);
     this._moviesModel.setFilterChangeHandler(this._onFilterChange);
@@ -53,8 +55,6 @@ export class PageController {
     const headerElement = this._container.querySelector(`.header`);
     const mainElement = this._container.querySelector(`.main`);
     const alredyWatchedMoviesNumber = allMovies.filter((movie) => movie.userInfo.isOnTheWatchlist).length;
-    const topRatedMovies = this._getExtraMovies(allMovies, `topRated`);
-    const mostCommentedMovies = this._getExtraMovies(allMovies, `mostCommented`);
     const sortController = new SortController(mainElement, this._moviesModel);
     this._menuController = new MenuController(mainElement, this._moviesModel);
 
@@ -66,8 +66,7 @@ export class PageController {
       render(this._moviesContainerComponent, this._mainMoviesComponent);
       this._mainMoviesListInit(moviesForRender);
       render(mainElement, this._moviesContainerComponent);
-      this._renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
-      this._renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
+      this._extraMoviesListsInit();
     } else {
       render(mainElement, new NoMoviesContainer());
     }
@@ -77,7 +76,7 @@ export class PageController {
 
   _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
     const comments = this._moviesModel.comments;
-    const movieController = new MovieController(container, this._onDataChange, this._onViewChange);
+    const movieController = new MovieController(container, this._onDataChange, this._onViewChange, this._onCloseBigCard);
     const movieInstance = {
       type: MAIN_MOVIES_TYPE,
       controller: movieController,
@@ -97,16 +96,17 @@ export class PageController {
     this._mainMoviesComponent.toggleShowLoadButton(hasNoMoviesForRender);
   }
 
-  _getExtraMovies(movies, parameter) {
-    const extraMovies = movies.filter(extraMoviesParameters[parameter].filter);
-    return extraMovies.length ? extraMovies.sort(extraMoviesParameters[parameter].sort).slice(0, this._extraMoviesAmount) : false;
+  _getExtraMovies(parameter) {
+    const extraMovies = this._moviesModel.movies.filter(extraMoviesParameters[parameter].filter);
+    return extraMovies.length ? extraMovies.sort(extraMoviesParameters[parameter].sort).slice(0, this._extraMoviesAmount) : null;
   }
 
   _renderExtraMovies(movies, heading) {
     const doesHasMovies = Boolean(movies.length);
+    const extraMoviesComponent = new ExtraMovies(heading);
+    this._extraMoviesComponents.push(extraMoviesComponent);
 
     if (doesHasMovies) {
-      const extraMoviesComponent = new ExtraMovies(heading);
       const extraMoviesListElement = extraMoviesComponent.getMoviesListElement();
       movies.forEach((movie) => this._renderMovieCard(movie, extraMoviesListElement));
       render(this._moviesContainerComponent, extraMoviesComponent);
@@ -114,7 +114,7 @@ export class PageController {
   }
 
   _mainMoviesListInit() {
-    this._clearMainMovies();
+    this._clearMovies(MAIN_MOVIES_TYPE);
     const moviesData = this._moviesModel.getMoviesForRender();
     const iterator = getNextItemsIterator(moviesData, ADD_MOVIES_AMOUNT, this._renderedMoviesAmount);
     this._renderMainMovies(iterator);
@@ -124,10 +124,42 @@ export class PageController {
     });
   }
 
-  _clearMainMovies() {
-    const movieInstanceForClean = this._shownMoviesInstances.filter((item) => item.type === MAIN_MOVIES_TYPE);
+  _extraMoviesListsInit() {
+    this._clearExtraMovies();
+    const topRatedMovies = this._getExtraMovies(Object.keys(extraMoviesParameters)[0]);
+    const mostCommentedMovies = this._getExtraMovies(Object.keys(extraMoviesParameters)[1]);
+    this._renderExtraMovies(topRatedMovies, EXTRA_MOVIES_HEADINGS[0]);
+    this._renderExtraMovies(mostCommentedMovies, EXTRA_MOVIES_HEADINGS[1]);
+  }
+
+  _clearMovies(moviesType) {
+    const movieInstanceForClean = this._shownMoviesInstances.filter((item) => item.type === moviesType);
     movieInstanceForClean.forEach((item) => item.controller.removeElements());
-    this._shownMoviesInstances = this._shownMoviesInstances.filter((item) => item.type === EXTRA_MOVIES_TYPE);
+    this._shownMoviesInstances = this._shownMoviesInstances.filter((item) => item.type !== moviesType);
+  }
+
+  _clearExtraMovies() {
+    this._clearMovies(EXTRA_MOVIES_TYPE);
+    this._extraMoviesComponents.forEach((component) => component.removeElement());
+    this._extraMoviesComponents = [];
+  }
+
+  _isExtraMoviesRatingChange() {
+    const currentExtraMoviesIdsString = this._shownMoviesInstances
+      .filter((item) => item.type === EXTRA_MOVIES_TYPE)
+      .map(({controller}) => controller.id)
+      .join(``);
+
+    const topRatedMoviesIdsString = this._getExtraMovies(Object.keys(extraMoviesParameters)[0])
+      .map((controller) => controller.id)
+      .join(``);
+
+    const mostCommentedMoviesIdsString = this._getExtraMovies(Object.keys(extraMoviesParameters)[1])
+      .map((controller) => controller.id)
+      .join(``);
+
+    const newExtraMoviesIdsString = topRatedMoviesIdsString + mostCommentedMoviesIdsString;
+    return currentExtraMoviesIdsString !== newExtraMoviesIdsString;
   }
 
   _onDataChange(oldMovie, newMovie) {
@@ -144,6 +176,12 @@ export class PageController {
     });
 
     this._menuController.render();
+  }
+
+  _onCloseBigCard() {
+    if (this._isExtraMoviesRatingChange()) {
+      this._extraMoviesListsInit();
+    }
   }
 
   _onViewChange() {
