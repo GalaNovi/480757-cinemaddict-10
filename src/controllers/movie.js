@@ -1,6 +1,7 @@
 import BigCard from '../components/big-card';
 import Card from '../components/card';
 import {render} from '../utils/render';
+import he from 'he';
 
 export class MovieController {
   constructor(container, onDataChange, onViewChange, onCloseBigCard) {
@@ -100,7 +101,7 @@ export class MovieController {
       if (commentFieldElement.value && emotionImageElement) {
         this._onDataChange(this._movieData, Object.assign({}, this._movieData, {
           localComment: {
-            comment: commentFieldElement.value,
+            comment: he.encode(commentFieldElement.value),
             date: dateValue,
             emotion: emotionImageElement.getAttribute(`data-emoji`),
           }
