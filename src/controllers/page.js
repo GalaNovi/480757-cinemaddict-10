@@ -57,14 +57,14 @@ export class PageController {
     const moviesForRender = this._moviesModel.getMoviesForRender();
     const headerElement = this._container.querySelector(`.header`);
     const mainElement = this._container.querySelector(`.main`);
-    const alredyWatchedMoviesNumber = allMovies.filter((movie) => movie.userInfo.isOnTheWatchlist).length;
-    const sortController = new SortController(mainElement, this._moviesModel);
+    const alreadyWatchedMoviesNumber = allMovies.filter((movie) => movie.userInfo.isAlreadyWatched).length;
+    this._sortController = new SortController(mainElement, this._moviesModel);
     this._menuController = new MenuController(mainElement, this._moviesModel, this._showMovies, this._showStatistic);
     this._statisticController = new StatisticController(mainElement, allMovies);
 
-    render(headerElement, new Profile(alredyWatchedMoviesNumber));
+    render(headerElement, new Profile(alreadyWatchedMoviesNumber));
     this._menuController.render();
-    sortController.render();
+    this._sortController.render();
     this._statisticController.render();
 
     if (moviesForRender.length) {
@@ -107,7 +107,7 @@ export class PageController {
   }
 
   _renderExtraMovies(movies, heading) {
-    const doesHasMovies = Boolean(movies.length);
+    const doesHasMovies = Boolean(movies);
     const extraMoviesComponent = new ExtraMovies(heading);
     this._extraMoviesComponents.push(extraMoviesComponent);
 
@@ -205,10 +205,12 @@ export class PageController {
   _showMovies() {
     this._statisticController.hideStatistic();
     this._moviesContainerComponent.show();
+    this._sortController.showSort();
   }
 
   _showStatistic() {
     this._moviesContainerComponent.hide();
     this._statisticController.showStatistic();
+    this._sortController.hideSort();
   }
 }

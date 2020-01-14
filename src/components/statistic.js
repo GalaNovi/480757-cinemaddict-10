@@ -1,10 +1,14 @@
 import AbstractComponent from './abstract-component';
+import {getUserRank} from '../utils/common';
 
-const createStatisticMarkup = () => {
+const createStatisticMarkup = (moviesData) => {
+  const alreadyWatchedMoviesAmount = moviesData.filter((movie) => movie.userInfo.isAlreadyWatched).length;
+  const userRank = alreadyWatchedMoviesAmount ? `${getUserRank(alreadyWatchedMoviesAmount)}` : ``;
+
   return (
     `<section class="statistic">
       <p class="statistic__rank">
-        Your rank
+        ${userRank}
         <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
         <span class="statistic__rank-label">Sci-Fighter</span>
       </p>
