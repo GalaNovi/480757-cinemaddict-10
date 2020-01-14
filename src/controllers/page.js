@@ -3,6 +3,7 @@ import ExtraMovies from '../components/extra-movies';
 import MoviesContainer from '../components/movies-container';
 import NoMoviesContainer from '../components/no-movies-container';
 import Profile from '../components/profile';
+import Statistic from '../components/statistic';
 import {MovieController} from '../controllers/movie';
 import {SortController} from './sort';
 import {MenuController} from './menu';
@@ -35,6 +36,7 @@ export class PageController {
     this._renderedMoviesAmount = START_MOVIES_AMOUNT;
     this._moviesContainerComponent = new MoviesContainer();
     this._mainMoviesComponent = new MainMovies();
+    this._statisticComponent = new Statistic();
     this._shownMoviesInstances = [];
     this._moviesData = [];
     this._extraMoviesComponents = [];
@@ -44,6 +46,8 @@ export class PageController {
     this._onSortChange = this._onSortChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
     this._onCloseBigCard = this._onCloseBigCard.bind(this);
+    this._showMovies = this._showMovies.bind(this);
+    this._showStatistic = this._showStatistic.bind(this);
 
     this._moviesModel.setSortChangeHandler(this._onSortChange);
     this._moviesModel.setFilterChangeHandler(this._onFilterChange);
@@ -56,7 +60,7 @@ export class PageController {
     const mainElement = this._container.querySelector(`.main`);
     const alredyWatchedMoviesNumber = allMovies.filter((movie) => movie.userInfo.isOnTheWatchlist).length;
     const sortController = new SortController(mainElement, this._moviesModel);
-    this._menuController = new MenuController(mainElement, this._moviesModel);
+    this._menuController = new MenuController(mainElement, this._moviesModel, this._showMovies, this._showStatistic);
 
     render(headerElement, new Profile(alredyWatchedMoviesNumber));
     this._menuController.render();
@@ -70,6 +74,9 @@ export class PageController {
     } else {
       render(mainElement, new NoMoviesContainer());
     }
+
+    this._statisticComponent.getElement().classList.add(`visually-hidden`);
+    render(mainElement, this._statisticComponent);
 
     this._container.querySelector(`.footer__statistics p`).textContent = `${allMovies.length} movies inside`;
   }
@@ -193,6 +200,17 @@ export class PageController {
   }
 
   _onFilterChange() {
+    this._showMovies();
     this._mainMoviesListInit();
+  }
+
+  _showMovies() {
+    this._statisticComponent.hide();
+    this._moviesContainerComponent.show();
+  }
+
+  _showStatistic() {
+    this._moviesContainerComponent.hide();
+    this._statisticComponent.show();
   }
 }

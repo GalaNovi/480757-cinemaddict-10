@@ -9,10 +9,10 @@ const formatReleaseDate = (timestamp) => {
   return moment(timestamp).format(`DD MMMM YYYY`);
 };
 
-const createRatingMarkup = (commonRating, isAlredyWatched, personalRating) => {
+const createRatingMarkup = (commonRating, isAlreadyWatched, personalRating) => {
   return (
     `${commonRating >= 1 ? `<p class="film-details__total-rating">${commonRating}</p>` : ``}
-    ${isAlredyWatched && personalRating >= 1 ? `<p class="film-details__user-rating">Your rate ${personalRating}</p>` : ``}`
+    ${isAlreadyWatched && personalRating >= 1 ? `<p class="film-details__user-rating">Your rate ${personalRating}</p>` : ``}`
   );
 };
 
@@ -147,14 +147,14 @@ const createBigCardMarkup = (movieData, commentsData) => {
   const {
     personalRating,
     isOnTheWatchlist,
-    isAlredyWatched,
+    isAlreadyWatched,
     isFavorite,
   } = movieData.userInfo;
 
   const {comments: commentsId} = movieData;
 
   const comments = commentsId.map((id) => commentsData.find((comment) => comment.id === id));
-  const ratingMarkup = createRatingMarkup(commonRating, isAlredyWatched, personalRating);
+  const ratingMarkup = createRatingMarkup(commonRating, isAlreadyWatched, personalRating);
   const writers = movieData.movieInfo.writers.join(`, `);
   const actors = movieData.movieInfo.actors.join(`, `);
   const date = release.date;
@@ -206,7 +206,7 @@ const createBigCardMarkup = (movieData, commentsData) => {
             <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist"${isOnTheWatchlist ? ` checked` : ``}>
             <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
 
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched"${isAlredyWatched ? ` checked` : ``}>
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched"${isAlreadyWatched ? ` checked` : ``}>
             <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
 
             <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite"${isFavorite ? ` checked` : ``}>
@@ -214,7 +214,7 @@ const createBigCardMarkup = (movieData, commentsData) => {
           </section>
         </div>
 
-        ${isAlredyWatched && !personalRating ? userRatingFormMarkup : ``}
+        ${isAlreadyWatched && !personalRating ? userRatingFormMarkup : ``}
 
         <div class="form-details__bottom-container">
           <section class="film-details__comments-wrap">

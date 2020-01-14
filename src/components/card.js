@@ -22,7 +22,7 @@ const createCardMarkup = (movieData) => {
 
   const {
     isOnTheWatchlist,
-    isAlredyWatched,
+    isAlreadyWatched,
     isFavorite,
   } = movieData.userInfo;
 
@@ -47,7 +47,7 @@ const createCardMarkup = (movieData) => {
       <a class="film-card__comments">${commentsNumber} comments</a>
       <form class="film-card__controls">
         <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist${isOnTheWatchlist ? ` film-card__controls-item--active` : ``}">Add to watchlist</button>
-        <button class="film-card__controls-item button film-card__controls-item--mark-as-watched${isAlredyWatched ? ` film-card__controls-item--active` : ``}">Mark as watched</button>
+        <button class="film-card__controls-item button film-card__controls-item--mark-as-watched${isAlreadyWatched ? ` film-card__controls-item--active` : ``}">Mark as watched</button>
         <button class="film-card__controls-item button film-card__controls-item--favorite${isFavorite ? ` film-card__controls-item--active` : ``}">Mark as favorite</button>
       </form>
     </article>`
