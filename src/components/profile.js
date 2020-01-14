@@ -1,4 +1,5 @@
 import AbstractComponent from './abstract-component';
+import {getUserRank} from '../utils/common';
 
 const createProfileRatingMarkup = (moviesAmount) => {
   let markup = ``;
@@ -15,11 +16,9 @@ const createProfileRatingMarkup = (moviesAmount) => {
 };
 
 const createProfileMarkup = (moviesAmount) => {
-  const profileRatingMarkup = createProfileRatingMarkup(moviesAmount);
-
   return (
     `<section class="header__profile profile">
-      ${profileRatingMarkup}
+      ${moviesAmount ? `<p class="profile__rating">${getUserRank(moviesAmount)}</p>` : ``}
       <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
     </section>`
   );

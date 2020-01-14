@@ -1,4 +1,5 @@
 import moment from 'moment';
+import {UserRank} from '../const';
 
 const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -34,4 +35,8 @@ const formatTime = (duration) => {
 const getRandomBetween = (min, max, demicalPlacesCount = 0) => Number(parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(demicalPlacesCount));
 const getRandomArrayItem = (array) => array[getRandomBetween(0, array.length - 1)];
 
-export {capitalize, shuffleArray, getNextItemsIterator, formatTime, getRandomBetween, getRandomArrayItem};
+const getUserRank = (moviesAmount) => {
+  return UserRank[Object.keys(UserRank).reverse().find((key) => moviesAmount > key)];
+};
+
+export {capitalize, shuffleArray, getNextItemsIterator, formatTime, getRandomBetween, getRandomArrayItem, getUserRank};

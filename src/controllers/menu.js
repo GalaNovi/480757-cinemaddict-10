@@ -15,15 +15,16 @@ export class MenuController {
 
     this._menuComponent.setFilterChangeHandler((evt) => {
       evt.preventDefault();
-      if (evt.target.tagName === `A` && evt.target.getAttribute(`href`) !== `#stats`) {
+
+      if (evt.target.getAttribute(`href`) !== `#stats`) {
         this._showMovies();
-        this._menuComponent.setActiveLink(evt.target);
+        this._menuComponent.setActiveLink(evt.currentTarget);
         if (evt.target.getAttribute(`data-filter-type`) !== this._moviesModel.filterType) {
-          this._moviesModel.setFilter(evt.target.getAttribute(`data-filter-type`));
+          this._moviesModel.setFilter(evt.currentTarget.getAttribute(`data-filter-type`));
         }
       } else {
         this._showStatistic();
-        this._menuComponent.setActiveLink(evt.target);
+        this._menuComponent.setActiveLink(evt.currentTarget);
       }
     });
 

@@ -44,7 +44,11 @@ export default class Menu extends AbstractComponent {
   }
 
   setFilterChangeHandler(handler) {
-    this.getElement().addEventListener(`click`, handler);
+    const links = this.getElement().querySelectorAll(`.main-navigation__item`);
+
+    links.forEach((link) => {
+      link.addEventListener(`click`, handler);
+    });
   }
 
   setActiveLink(newActiveLink) {
