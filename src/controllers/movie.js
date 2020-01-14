@@ -12,7 +12,7 @@ export class MovieController {
     this._onEsqKeyDown = this._onEsqKeyDown.bind(this);
     this._openBigCard = this._openBigCard.bind(this);
     this._closeBigCard = this._closeBigCard.bind(this);
-    this._onCtrlEnderDown = this._onCtrlEnderDown.bind(this);
+    this._onCtrlEnterDown = this._onCtrlEnterDown.bind(this);
   }
 
   get id() {
@@ -56,7 +56,7 @@ export class MovieController {
         this._onDataChange(movieData, Object.assign({}, movieData, {
           userInfo: Object.assign(movieData.userInfo, {
             personalRating: 0,
-            isAlredyWatched: !movieData.userInfo.isAlredyWatched
+            isAlreadyWatched: !movieData.userInfo.isAlreadyWatched
           })
         }));
       });
@@ -98,7 +98,7 @@ export class MovieController {
     }
   }
 
-  _onCtrlEnderDown(evt) {
+  _onCtrlEnterDown(evt) {
     if ((evt.ctrlKey || evt.metaKey) && evt.key === `Enter`) {
       evt.preventDefault();
       const commentFieldElement = this._bigCardComponent.getElement().querySelector(`.film-details__comment-input`);
@@ -121,7 +121,7 @@ export class MovieController {
     this._onViewChange();
     render(document.body, this._bigCardComponent);
     document.addEventListener(`keydown`, this._onEsqKeyDown);
-    document.addEventListener(`keydown`, this._onCtrlEnderDown);
+    document.addEventListener(`keydown`, this._onCtrlEnterDown);
     this._bigCardComponent.rerender();
   }
 
@@ -129,7 +129,7 @@ export class MovieController {
     this._bigCardComponent.resetNewComment();
     this._bigCardComponent.getElement().remove();
     document.removeEventListener(`keydown`, this._onEsqKeyDown);
-    document.removeEventListener(`keydown`, this._onCtrlEnderDown);
+    document.removeEventListener(`keydown`, this._onCtrlEnterDown);
     this._onCloseBigCard();
   }
 }
