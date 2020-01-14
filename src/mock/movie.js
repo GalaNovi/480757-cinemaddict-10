@@ -1,16 +1,16 @@
 import {shuffleArray} from '../utils/common';
-import {EMOTIONS} from '../const';
+import {getRandomBetween, getRandomArrayItem} from '../utils/common';
 
 const MAX_DESCRIPTION_SENTENSES = 6;
 const MAX_GENRES = 3;
 const MIN_ACTORS = 2;
 const MAX_ACTORS = 4;
 const MAX_WRITERS = 3;
-const getRandomBetween = (min, max, demicalPlacesCount = 0) => Number(parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(demicalPlacesCount));
-const getRandomArrayItem = (array) => array[getRandomBetween(0, array.length - 1)];
 const getRandomBoolean = () => Boolean(Math.round(Math.random()));
 
 const ageLimits = new Set([0, 6, 12, 16, 18]);
+
+const commentsId = new Array(20).fill(``).map((element, index) => index);
 
 const titles = new Set([
   `The Shawshank Redemption`,
@@ -63,58 +63,6 @@ const genres = new Set([
   `mystery`,
 ]);
 
-const comments = new Set([
-  {
-    id: 1,
-    author: `Tim Macoveev`,
-    text: `Very good film! Not sorry for the time spent.`,
-    date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(EMOTIONS),
-  },
-  {
-    id: 2,
-    author: `Mike Chakman`,
-    text: `Which movie is good? Yes, this is nonsense! The acting is terrible. Blooper on a blooper. Graphics sucks.`,
-    date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(EMOTIONS),
-  },
-  {
-    id: 3,
-    author: `ChinWag`,
-    text: `The book was like that))) Cool like))) I can’t remember the name)))`,
-    date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(EMOTIONS),
-  },
-  {
-    id: 4,
-    author: `derroys`,
-    text: `Awesome movie, one of the favorite in our family, great actors. Adore. I recommend.`,
-    date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(EMOTIONS),
-  },
-  {
-    id: 5,
-    author: `Darkmus`,
-    text: `Good, funny film, why do sofa critics give such low ratings? :(`,
-    date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(EMOTIONS),
-  },
-  {
-    id: 6,
-    author: `DarGi`,
-    text: `Surprisingly enjoyed watching this movie)`,
-    date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(EMOTIONS),
-  },
-  {
-    id: 7,
-    author: `Barathrum`,
-    text: `A very pleasant psychological-ironic film, it looks in one breath. Cool story, a logical and interesting plot, a wonderful selection of actors. I looked with pleasure.`,
-    date: Date.now() - getRandomBetween(0, 36) * 60 * 60 * 1000,
-    emotion: getRandomArrayItem(EMOTIONS),
-  },
-]);
-
 const writers = new Set([
   `Anthony Mann`,
   `Stanley Kubrick`,
@@ -155,10 +103,10 @@ const countries = new Set([
 ]);
 
 const generateAgeLimit = () => getRandomArrayItem(Array.from(ageLimits));
+const generateCommentsId = () => shuffleArray(commentsId).slice(0, getRandomBetween(0, 10));
 const generateTitle = () => getRandomArrayItem(Array.from(titles));
 const generatePoster = () => getRandomArrayItem(Array.from(posters));
 const generateGenres = () => shuffleArray(Array.from(genres)).slice(0, getRandomBetween(1, MAX_GENRES));
-const generateComments = () => shuffleArray(Array.from(comments)).slice(0, getRandomBetween(0, comments.size));
 const generateDirector = () => getRandomArrayItem(Array.from(directors));
 const generateWriters = () => shuffleArray(Array.from(writers)).slice(0, getRandomBetween(1, MAX_WRITERS));
 const generateActors = () => shuffleArray(Array.from(actors)).slice(0, getRandomBetween(MIN_ACTORS, MAX_ACTORS));
@@ -174,15 +122,10 @@ const generateDescription = () => {
   return sentenses.slice(0, getRandomBetween(1, MAX_DESCRIPTION_SENTENSES)).join(` `).trim();
 };
 
-const generateCard = (index) => {
+const generateMovie = (index) => {
   return {
     id: index,
-    localComment: {
-      comment: null,
-      date: null,
-      emotion: EMOTIONS[getRandomBetween(0, 7)],
-    },
-    comments: generateComments(),
+    comments: generateCommentsId(),
     movieInfo: {
       ageLimit: generateAgeLimit(),
       name: generateTitle(),
@@ -203,11 +146,13 @@ const generateCard = (index) => {
     userInfo: {
       personalRating: getRandomBetween(0, 9),
       isOnTheWatchlist: getRandomBoolean(),
-      isAlredyWatched: true,
+      isAlreadyWatched: getRandomBoolean(),
       isFavorite: getRandomBoolean(),
       watchingDate: generateWatchingDate(),
     },
   };
 };
 
-export const generateCards = (count) => new Array(count).fill(``).map((item, index) => generateCard(index));
+const generateMovies = (count) => new Array(count).fill(``).map((item, index) => generateMovie(index));
+
+export {getRandomBetween, getRandomArrayItem, generateMovies};

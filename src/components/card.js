@@ -1,7 +1,16 @@
 import AbstractSmartComponent from './abstract-smart-component';
 import {capitalize, formatTime} from '../utils/common';
+import {DESCRIPTION_MAX_LENGTH} from '../const';
 
 const createRatingMarkup = (commonRating) => commonRating >= 1 ? `<p class="film-card__rating">${commonRating}</p>` : ``;
+
+const shortenText = (text, characters) => {
+  if (text.length > characters) {
+    text = `${text.slice(0, characters - 1)}...`;
+  }
+
+  return text;
+};
 
 const createCardMarkup = (movieData) => {
   const {
@@ -34,7 +43,7 @@ const createCardMarkup = (movieData) => {
         <span class="film-card__genre">${genres}</span>
       </p>
       <img src="${poster}" alt="${name}" class="film-card__poster">
-      <p class="film-card__description">${description}</p>
+      <p class="film-card__description">${shortenText(description, DESCRIPTION_MAX_LENGTH)}</p>
       <a class="film-card__comments">${commentsNumber} comments</a>
       <form class="film-card__controls">
         <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist${isOnTheWatchlist ? ` film-card__controls-item--active` : ``}">Add to watchlist</button>

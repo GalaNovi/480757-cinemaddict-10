@@ -9,31 +9,6 @@ const formatReleaseDate = (timestamp) => {
   return moment(timestamp).format(`DD MMMM YYYY`);
 };
 
-const getCommentTimeAgoText = (dateTime) => {
-  const secondsAgo = Math.floor((Date.now() - dateTime) / 1000);
-  const minutesAgo = Math.floor((Date.now() - dateTime) / 1000 / 60);
-  const hoursAgo = Math.floor((Date.now() - dateTime) / 1000 / 60 / 60);
-  const daysAgo = Math.floor((Date.now() - dateTime) / 1000 / 60 / 60 / 24);
-
-  if (secondsAgo < 60) {
-    return `now`;
-  } else if (minutesAgo <= 3) {
-    return `a minute ago`;
-  } else if (minutesAgo < 60) {
-    return `a few minutes ago`;
-  } else if (hoursAgo < 2) {
-    return `a hour ago`;
-  } else if (hoursAgo < 24) {
-    return `a few hours ago`;
-  } else if (daysAgo === 1) {
-    return `a day ago`;
-  } else if (daysAgo === 2) {
-    return `a two days ago`;
-  } else {
-    return `more then two days ago`;
-  }
-};
-
 const createRatingMarkup = (commonRating, isAlredyWatched, personalRating) => {
   return (
     `${commonRating >= 1 ? `<p class="film-details__total-rating">${commonRating}</p>` : ``}
@@ -41,9 +16,9 @@ const createRatingMarkup = (commonRating, isAlredyWatched, personalRating) => {
   );
 };
 
-const createCommentsMarkup = (comment) => {
-  const {author, text, date, emotion} = comment;
-  const commentTimeAgoText = getCommentTimeAgoText(date);
+const createCommentMarkup = (commentData) => {
+  const {id, author, comment, date, emotion} = commentData;
+  const commentDate = moment(date).format(`YYYY/MM/DD HH:mm`);
 
   return (
     `<li class="film-details__comment">
@@ -51,11 +26,11 @@ const createCommentsMarkup = (comment) => {
         <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji">
       </span>
       <div>
-        <p class="film-details__comment-text">${text}</p>
+        <p class="film-details__comment-text">${comment}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
-          <span class="film-details__comment-day">${commentTimeAgoText}</span>
-          <button class="film-details__comment-delete">Delete</button>
+          <span class="film-details__comment-day">${commentDate}</span>
+          <button class="film-details__comment-delete" data-comment-id="${id}">Delete</button>
         </p>
       </div>
     </li>`
@@ -67,7 +42,7 @@ const createUserRatingScoresMarkup = () => {
 
   for (let i = 1; i <= USER_RATING_SCORES_AMOUNT; i++) {
     const itemMarkup = (
-      `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}"${i === USER_RATING_SCORES_AMOUNT ? ` checked` : ``}>
+      `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}">
       <label class="film-details__user-rating-label" for="rating-${i}">${i}</label>\n`
     );
     allMarkup += itemMarkup;
@@ -106,18 +81,13 @@ const createUserRatingFormMarkup = (movieData) => {
   );
 };
 
-const getNewCommentMarkup = (localComment) => {
-  const {comment, emotion} = localComment;
+const getNewCommentMarkup = () => {
   return (
     `<div class="film-details__new-comment">
-      <div for="add-emoji" class="film-details__add-emoji-label">
-        ${emotion ? `<img src="images/emoji/${emotion}.png" width="55" height="55" alt="emoji">` : ``}
-      </div>
+      <div for="add-emoji" class="film-details__add-emoji-label"></div>
 
       <label class="film-details__comment-label">
-        <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">
-          ${comment ? comment : ``}
-        </textarea>
+        <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
       </label>
 
       <div class="film-details__emoji-list">
@@ -145,6 +115,12 @@ const getNewCommentMarkup = (localComment) => {
   );
 };
 
+const getNewCommentEmojiMarkup = (emoji) => {
+  return (
+    `<img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji" data-emoji="${emoji}">`
+  );
+};
+
 const getFilmDetailsMarkup = (filmDetails) => {
   return FILM_DETAILS_TITLES.map((title, index) => (
     `<tr class="film-details__row">
@@ -154,7 +130,7 @@ const getFilmDetailsMarkup = (filmDetails) => {
   )).join(`\n`);
 };
 
-const createBigCardMarkup = (movieData) => {
+const createBigCardMarkup = (movieData, commentsData) => {
   const {
     poster,
     ageLimit,
@@ -175,9 +151,9 @@ const createBigCardMarkup = (movieData) => {
     isFavorite,
   } = movieData.userInfo;
 
-  const {localComment} = movieData;
+  const {comments: commentsId} = movieData;
 
-  const {comments} = movieData;
+  const comments = commentsId.map((id) => commentsData.find((comment) => comment.id === id));
   const ratingMarkup = createRatingMarkup(commonRating, isAlredyWatched, personalRating);
   const writers = movieData.movieInfo.writers.join(`, `);
   const actors = movieData.movieInfo.actors.join(`, `);
@@ -185,9 +161,9 @@ const createBigCardMarkup = (movieData) => {
   const releaseDate = formatReleaseDate(date);
   const country = release.country;
   const genresMarkup = genres.map((genre) => `<span class="film-details__genre">${capitalize(genre)}</span>`).join(``);
-  const commentsMarkup = comments.map((comment) => createCommentsMarkup(comment)).join(``);
+  const commentsMarkup = comments.map((comment) => createCommentMarkup(comment)).join(``);
   const userRatingFormMarkup = createUserRatingFormMarkup(movieData);
-  const newCommentMarkup = getNewCommentMarkup(localComment);
+  const newCommentMarkup = getNewCommentMarkup();
   const filmDetailsMarkup = getFilmDetailsMarkup([director, writers, actors, releaseDate, formatTime(duration), country, genresMarkup]);
 
   return (
@@ -257,13 +233,14 @@ const createBigCardMarkup = (movieData) => {
 };
 
 export default class BigCard extends AbstractSmartComponent {
-  constructor(movieData) {
+  constructor(movieData, commentsData) {
     super();
     this._movieData = movieData;
+    this._commentsData = commentsData;
   }
 
   getTemplate() {
-    return createBigCardMarkup(this._movieData);
+    return createBigCardMarkup(this._movieData, this._commentsData);
   }
 
   setCloseCallback(callback) {
@@ -310,17 +287,50 @@ export default class BigCard extends AbstractSmartComponent {
       });
   }
 
-  setOnEmojiListClickCallback(callback) {
-    if (callback) {
-      this._onEmojiListClickCallback = callback;
-    }
-
+  setOnEmojiListClickHandler() {
     this.getElement().querySelector(`.film-details__emoji-list`)
       .addEventListener(`click`, (evt) => {
         if (evt.target.tagName === `INPUT`) {
-          this._onEmojiListClickCallback(evt.target);
+          const emojiContainerElement = this.getElement().querySelector(`.film-details__add-emoji-label`);
+          const emojiMarkup = getNewCommentEmojiMarkup(evt.target.getAttribute(`data-emoji`));
+          emojiContainerElement.innerHTML = emojiMarkup;
         }
       });
+  }
+
+  setOnDeleteCommentClickCallback(callback) {
+    if (callback) {
+      this._onDeleteCommentClickCallback = callback;
+    }
+
+    this.getElement().querySelector(`.film-details__comments-list`)
+      .addEventListener(`click`, (evt) => {
+        if (evt.target.classList.contains(`film-details__comment-delete`)) {
+          evt.preventDefault();
+          this._onDeleteCommentClickCallback(Number(evt.target.getAttribute(`data-comment-id`)));
+        }
+      });
+  }
+
+  setOnUserRatingClickCallback(callback) {
+    if (callback) {
+      this._onUserRatingClickCallback = callback;
+    }
+
+    this.getElement().addEventListener(`click`, (evt) => {
+      if (evt.target.classList.contains(`film-details__user-rating-input`)) {
+        this._onUserRatingClickCallback(evt.target.value);
+      }
+    });
+  }
+
+  resetNewComment() {
+    this.getElement().querySelector(`.film-details__add-emoji-label`).innerHTML = ``;
+    this.getElement().querySelector(`.film-details__comment-input`).value = ``;
+    const checkedEmodji = this.getElement().querySelector(`.film-details__emoji-item:checked`);
+    if (checkedEmodji) {
+      checkedEmodji.checked = false;
+    }
   }
 
   recoveryListeners() {
@@ -328,6 +338,8 @@ export default class BigCard extends AbstractSmartComponent {
     this.setWatchedButtonCallback();
     this.setFavoriteButtonCallback();
     this.setCloseCallback();
-    this.setOnEmojiListClickCallback();
+    this.setOnEmojiListClickHandler();
+    this.setOnDeleteCommentClickCallback();
+    this.setOnUserRatingClickCallback();
   }
 }

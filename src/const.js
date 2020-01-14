@@ -1,7 +1,7 @@
-const EXTRA_MOVIES_HEADINGS = [`Top rated`, `Most commented`];
-const FILTERS = [`all`, `watchlist`, `history`, `favorites`];
-const EMOTIONS = [`smile`, `sleeping`, `puke`, `angry`];
-const FILM_DETAILS_TITLES = [
+export const EXTRA_MOVIES_HEADINGS = [`Top rated`, `Most commented`];
+export const EMOTIONS = [`smile`, `sleeping`, `puke`, `angry`];
+export const DEFAULT_SORT_TYPE = `default`;
+export const FILM_DETAILS_TITLES = [
   `Director`,
   `Writers`,
   `Actors`,
@@ -11,9 +11,11 @@ const FILM_DETAILS_TITLES = [
   `Genres`,
 ];
 
-const Position = {
-  AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`,
+export const FilterType = {
+  ALL: `all`,
+  WATCHLIST: `watchlist`,
+  HISTORY: `history`,
+  FAVORITES: `favorites`,
 };
 
-export {EXTRA_MOVIES_HEADINGS, FILTERS, EMOTIONS, Position, FILM_DETAILS_TITLES};
+export const DESCRIPTION_MAX_LENGTH = 140;

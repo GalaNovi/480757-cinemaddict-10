@@ -11,6 +11,10 @@ export default class AbstractComponent {
     this.removeElement = this.removeElement.bind(this);
   }
 
+  set element(element) {
+    this._element = element;
+  }
+
   getTemplate() {
     throw new Error(`Abstract method not implemented: getTemplate`);
   }
@@ -26,9 +30,5 @@ export default class AbstractComponent {
   removeElement() {
     this.getElement().remove();
     this._element = null;
-  }
-
-  set element(value) {
-    this._element = value;
   }
 }

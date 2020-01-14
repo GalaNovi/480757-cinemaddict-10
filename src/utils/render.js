@@ -1,4 +1,3 @@
-import {Position} from '../const';
 import AbstractComponent from '../components/abstract-component';
 
 const createElement = (templateString) => {
@@ -47,4 +46,9 @@ const replace = (newComponent, oldComponent) => {
   }
 };
 
-export {createElement, render, replace};
+const Position = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`,
+};
+
+export {createElement, render, replace, Position};
