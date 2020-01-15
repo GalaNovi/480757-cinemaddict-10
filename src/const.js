@@ -2,6 +2,7 @@ const EXTRA_MOVIES_HEADINGS = [`Top rated`, `Most commented`];
 const EMOTIONS = [`smile`, `sleeping`, `puke`, `angry`];
 const DEFAULT_SORT_TYPE = `default`;
 const DESCRIPTION_MAX_LENGTH = 140;
+const HIDDEN_CLASS = `visually-hidden`;
 const FILM_DETAILS_TITLES = [
   `Director`,
   `Writers`,
@@ -32,4 +33,5 @@ export {
   FilterType,
   DESCRIPTION_MAX_LENGTH,
   UserRank,
+  HIDDEN_CLASS,
 };

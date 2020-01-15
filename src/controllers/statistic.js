@@ -1,5 +1,6 @@
 import Statistic from '../components/statistic';
 import {render} from '../utils/render';
+import {HIDDEN_CLASS} from '../const';
 
 export class StatisticController {
   constructor(container, moviesData) {
@@ -10,7 +11,7 @@ export class StatisticController {
 
   render() {
     this._statisticComponent.removeElement();
-    this._statisticComponent.getElement().classList.add(`visually-hidden`);
+    this._statisticComponent.getElement().classList.add(HIDDEN_CLASS);
     render(this._container, this._statisticComponent);
   }
 

@@ -1,4 +1,5 @@
 import AbstractComponent from './abstract-component';
+import {HIDDEN_CLASS} from '../const';
 
 const createMainMoviesMarkup = () => {
   return (
@@ -34,8 +35,8 @@ export default class MainMovies extends AbstractComponent {
   toggleShowLoadButton(areAllMoviesShown) {
     const loadMoreButton = this.getElement().querySelector(`.films-list__show-more`);
     return areAllMoviesShown ?
-      loadMoreButton.classList.add(`visually-hidden`) :
-      loadMoreButton.classList.remove(`visually-hidden`);
+      loadMoreButton.classList.add(HIDDEN_CLASS) :
+      loadMoreButton.classList.remove(HIDDEN_CLASS);
   }
 
   getMoviesList() {
