@@ -1,6 +1,8 @@
 import AbstractComponent from './abstract-component';
 import {getUserRank} from '../utils/common';
 import {capitalize} from '../utils/common';
+import Chart from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 const FILTERS = [`All time`, `Today`, `Week`, `Month`, `Year`];
 
