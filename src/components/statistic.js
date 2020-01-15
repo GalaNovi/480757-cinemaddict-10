@@ -91,4 +91,8 @@ export default class Statistic extends AbstractComponent {
   getTemplate() {
     return createStatisticMarkup(this._movieData);
   }
+
+  updateData(newMoviesData) {
+    this._moviesData = newMoviesData;
+  }
 }

@@ -9,6 +9,7 @@ export class StatisticController {
   }
 
   render() {
+    this._statisticComponent.removeElement();
     this._statisticComponent.getElement().classList.add(`visually-hidden`);
     render(this._container, this._statisticComponent);
   }
@@ -23,5 +24,11 @@ export class StatisticController {
 
   hideStatistic() {
     this._statisticComponent.hide();
+  }
+
+  update(newMoviesData) {
+    this._moviesData = newMoviesData;
+    this._statisticComponent.updateData(this._moviesData);
+    this.render();
   }
 }

@@ -181,6 +181,7 @@ export class PageController {
     });
 
     this._menuController.render();
+    this._statisticController.update(this._moviesModel.movies);
   }
 
   _onCloseBigCard() {
