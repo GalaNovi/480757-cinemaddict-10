@@ -1,9 +1,50 @@
 import AbstractComponent from './abstract-component';
 import {getUserRank} from '../utils/common';
+import {capitalize} from '../utils/common';
+
+const FILTERS = [`All time`, `Today`, `Week`, `Month`, `Year`];
+
+const getTopGenre = (moviesData) => {
+  const allGenres = [].concat(...moviesData.map(({movieInfo}) => movieInfo.genres));
+
+  const genresStats = allGenres.reduce((acc, genre) => {
+    if (acc[genre]) {
+      acc[genre]++;
+    } else {
+      acc[genre] = 1;
+    }
+
+    return acc;
+  }, {});
+
+  const topGenre = Object.keys(genresStats)[Object.values(genresStats).findIndex((value) => value === Math.max(...Object.values(genresStats)))];
+
+  return topGenre;
+};
+
+const formatStringForAttribute = (string) => {
+  return string.toLowerCase().replace(` `, `-`);
+};
+
+const createFiltersMarkup = () => {
+  return FILTERS.map((filter, index) => {
+    return (
+      `<input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-${formatStringForAttribute(filter)}" value="${formatStringForAttribute(filter)}"${index ? `` : ` checked`}>
+      <label for="statistic-${formatStringForAttribute(filter)}" class="statistic__filters-label">${filter}</label>`
+    );
+  }).join(`\n`);
+};
 
 const createStatisticMarkup = (moviesData) => {
   const alreadyWatchedMoviesAmount = moviesData.filter((movie) => movie.userInfo.isAlreadyWatched).length;
   const userRank = alreadyWatchedMoviesAmount ? `${getUserRank(alreadyWatchedMoviesAmount)}` : ``;
+  const totalDuration = moviesData
+    .filter((movie) => movie.userInfo.isAlreadyWatched)
+    .reduce((acc, {movieInfo}) => acc + movieInfo.duration, 0);
+  const totalHours = Math.floor(totalDuration / 60);
+  const totalMinutes = totalDuration % 60;
+  const topGenre = getTopGenre(moviesData);
+  const filtersMarkup = createFiltersMarkup();
 
   return (
     `<section class="statistic">
@@ -15,35 +56,21 @@ const createStatisticMarkup = (moviesData) => {
 
       <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
         <p class="statistic__filters-description">Show stats:</p>
-
-        <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" checked="">
-        <label for="statistic-all-time" class="statistic__filters-label">All time</label>
-
-        <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today">
-        <label for="statistic-today" class="statistic__filters-label">Today</label>
-
-        <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week">
-        <label for="statistic-week" class="statistic__filters-label">Week</label>
-
-        <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month">
-        <label for="statistic-month" class="statistic__filters-label">Month</label>
-
-        <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year">
-        <label for="statistic-year" class="statistic__filters-label">Year</label>
+        ${filtersMarkup}
       </form>
 
       <ul class="statistic__text-list">
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">You watched</h4>
-          <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
+          <p class="statistic__item-text">${alreadyWatchedMoviesAmount} <span class="statistic__item-description">movies</span></p>
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Total duration</h4>
-          <p class="statistic__item-text">130 <span class="statistic__item-description">h</span> 22 <span class="statistic__item-description">m</span></p>
+          <p class="statistic__item-text">${totalHours} <span class="statistic__item-description">h</span> ${totalMinutes} <span class="statistic__item-description">m</span></p>
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Top genre</h4>
-          <p class="statistic__item-text">Sci-Fi</p>
+          <p class="statistic__item-text">${capitalize(topGenre)}</p>
         </li>
       </ul>
 

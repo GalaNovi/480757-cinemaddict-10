@@ -9,7 +9,7 @@ const FILM_DETAILS_TITLES = [
   `Release Date`,
   `Runtime`,
   `Country`,
-  `Genres`,
+  `Genre`,
 ];
 
 const FilterType = {
