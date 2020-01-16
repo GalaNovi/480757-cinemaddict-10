@@ -60,7 +60,7 @@ export class PageController {
     const alreadyWatchedMoviesNumber = allMovies.filter((movie) => movie.userInfo.isAlreadyWatched).length;
     this._sortController = new SortController(mainElement, this._moviesModel);
     this._menuController = new MenuController(mainElement, this._moviesModel, this._showMovies, this._showStatistic);
-    this._statisticController = new StatisticController(mainElement, allMovies);
+    this._statisticController = new StatisticController(mainElement, allMovies.filter((movie) => movie.userInfo.isAlreadyWatched));
 
     render(headerElement, new Profile(alreadyWatchedMoviesNumber));
     this._menuController.render();
@@ -181,7 +181,7 @@ export class PageController {
     });
 
     this._menuController.render();
-    this._statisticController.update(this._moviesModel.movies);
+    this._statisticController.update(this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched));
   }
 
   _onCloseBigCard() {

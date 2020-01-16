@@ -13,6 +13,7 @@ export class StatisticController {
     this._statisticComponent.removeElement();
     this._statisticComponent.getElement().classList.add(HIDDEN_CLASS);
     this._statisticComponent.renderChart();
+    this._statisticComponent.setOnFilterClickHandler();
     render(this._container, this._statisticComponent);
   }
 

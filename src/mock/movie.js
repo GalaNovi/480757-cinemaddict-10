@@ -112,7 +112,7 @@ const generateWriters = () => shuffleArray(Array.from(writers)).slice(0, getRand
 const generateActors = () => shuffleArray(Array.from(actors)).slice(0, getRandomBetween(MIN_ACTORS, MAX_ACTORS));
 const generateCountry = () => getRandomArrayItem(Array.from(countries));
 const generateReleaseDate = () => new Date(`${getRandomBetween(1960, 2019)}, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}`).getTime();
-const generateWatchingDate = () => new Date(`2019, ${getRandomBetween(1, 12)}, ${getRandomBetween(1, 28)}`).getTime();
+const generateWatchingDate = () => new Date(`2020, 01, ${getRandomBetween(1, 17)}`).toISOString();
 
 const generateDescription = () => {
   const sentenses = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`

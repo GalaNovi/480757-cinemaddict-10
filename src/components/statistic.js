@@ -3,17 +3,27 @@ import {getUserRank} from '../utils/common';
 import {capitalize} from '../utils/common';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import moment from 'moment';
 
 const FILTERS = [`All time`, `Today`, `Week`, `Month`, `Year`];
-const CHART_CONTAINER_CLASS = `statistic__chart`;
+const HEIGHT_FOR_CHART_BAR = 60;
 
-// Глобальные настройки для Chart.js
+const periodFilter = {
+  'all-time': (item) => item,
+  'today': (item) => Number(moment(item.userInfo.watchingDate).format(`YYYYMMDD`)) === Number(moment(new Date()).format(`YYYYMMDD`)),
+  'week': (item) => Number(moment(item.userInfo.watchingDate).format(`YYYYMMDD`)) >= Number(moment(new Date()).format(`YYYYMMDD`) - 7),
+  'month': (item) => Number(moment(item.userInfo.watchingDate).format(`YYYYMM`)) === Number(moment(new Date()).format(`YYYYMM`)),
+  'year': (item) => Number(moment(item.userInfo.watchingDate).format(`YYYY`)) === Number(moment(new Date()).format(`YYYY`)),
+};
+
+// Глобальные настройки для Chart
 Chart.helpers.merge(Chart.defaults, {
   scale: {
     ticks: {
       fontColor: `#ffffff`,
       padding: 80,
-      fontSize: `22`,
+      fontSize: `20`,
+      fontFamily: `Open Sans`,
     },
   },
   global: {
@@ -30,7 +40,8 @@ Chart.helpers.merge(Chart.defaults, {
         clamp: true,
         color: `#ffffff`,
         font: {
-          size: `22`,
+          size: `20`,
+          family: `Open Sans`,
         },
         offset: 20,
       },
@@ -126,56 +137,83 @@ const getGenresData = (genres, moviesData) => {
     .find((item) => item === genre.toLowerCase())).length));
 };
 
-const renderChart = (container, moviesData) => {
-  const genres = getGenres(moviesData);
-  const genresData = getGenresData(genres, moviesData);
-  container.height = genres.length * 60;
-
-  const chart = new Chart(container, {
-    type: `horizontalBar`,
-    data: {
-      plugins: [ChartDataLabels],
-      labels: genres,
-      datasets: [{
-        label: false,
-        data: genresData,
-        backgroundColor: `#ffe800`,
-        barThickness: 30,
-      }]
-    },
-    options: {
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
-          }
-        }],
-        xAxes: [{
-          offset: true,
-          display: false,
-        }]
-      }
-    }
-  });
-};
-
 export default class Statistic extends AbstractComponent {
   constructor(moviesData) {
     super();
-    this._alreadyWatchedMoviesData = moviesData.filter((movie) => movie.userInfo.isAlreadyWatched);
+    this._moviesData = moviesData;
   }
 
   getTemplate() {
-    return createStatisticMarkup(this._alreadyWatchedMoviesData);
+    return createStatisticMarkup(this._moviesData);
   }
 
   updateData(newMoviesData) {
-    this._alreadyWatchedMoviesData = newMoviesData.filter((movie) => movie.userInfo.isAlreadyWatched);
+    this._moviesData = newMoviesData;
   }
 
   renderChart() {
-    getGenres(this._alreadyWatchedMoviesData);
-    const chartContainerElement = this.getElement().querySelector(`.${CHART_CONTAINER_CLASS}`);
-    renderChart(chartContainerElement, this._alreadyWatchedMoviesData);
+    this._chart = this._createChart(this._chartContainerElement);
+  }
+
+  setOnFilterClickHandler() {
+    this.getElement().querySelector(`.statistic__filters`)
+      .addEventListener(`click`, (evt) => {
+        if (evt.target.tagName === `INPUT`) {
+          this._updateChartPeriod((evt.target.value));
+        }
+      });
+  }
+
+  _setChartContainerHeight(barsAmount) {
+    const containerHeight = barsAmount * HEIGHT_FOR_CHART_BAR;
+    this._chartContainerElement.height = containerHeight;
+    this._chartContainerElement.style.height = `${containerHeight}px`;
+  }
+
+  _createChart() {
+    const genres = getGenres(this._moviesData);
+    const genresData = getGenresData(genres, this._moviesData);
+    this._chartContainerElement = this.getElement().querySelector(`.statistic__chart`);
+    this._setChartContainerHeight(genres.length);
+  
+    return new Chart(this._chartContainerElement, {
+      type: `horizontalBar`,
+      data: {
+        plugins: [ChartDataLabels],
+        labels: genres,
+        datasets: [{
+          label: false,
+          data: genresData,
+          backgroundColor: `#ffe800`,
+          barThickness: 30,
+        }]
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }],
+          xAxes: [{
+            offset: true,
+            display: false,
+          }]
+        }
+      }
+    });
+  };
+
+  _updateChartPeriod(period) {
+    const moviesDataForPeriod = this._moviesData.filter(periodFilter[period]);
+    const genres = getGenres(moviesDataForPeriod);
+    const genresData = getGenresData(genres, moviesDataForPeriod);
+    console.log(genres);
+    console.log(genresData);
+    this._chart.data.labels = genres;
+    console.log(this._chart.data.labels);
+    this._chart.data.datasets[0].data = genresData;
+    this._setChartContainerHeight(genresData.length);
+    this._chart.update();
   }
 }

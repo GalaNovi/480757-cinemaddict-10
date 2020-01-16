@@ -56,7 +56,8 @@ export class MovieController {
         this._onDataChange(movieData, Object.assign({}, movieData, {
           userInfo: Object.assign(movieData.userInfo, {
             personalRating: 0,
-            isAlreadyWatched: !movieData.userInfo.isAlreadyWatched
+            isAlreadyWatched: !movieData.userInfo.isAlreadyWatched,
+            watchingDate: !movieData.userInfo.isAlreadyWatched ? new Date().toDateString() : null,
           })
         }));
       });
