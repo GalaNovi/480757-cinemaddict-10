@@ -12,6 +12,7 @@ export class StatisticController {
   render() {
     this._statisticComponent.removeElement();
     this._statisticComponent.getElement().classList.add(HIDDEN_CLASS);
+    this._statisticComponent.renderChart();
     render(this._container, this._statisticComponent);
   }
 

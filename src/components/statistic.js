@@ -5,6 +5,38 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 const FILTERS = [`All time`, `Today`, `Week`, `Month`, `Year`];
+const CHART_CONTAINER_CLASS = `statistic__chart`;
+
+// Глобальные настройки для Chart.js
+Chart.helpers.merge(Chart.defaults, {
+  scale: {
+    ticks: {
+      fontColor: `#ffffff`,
+      padding: 80,
+      fontSize: `22`,
+    },
+  },
+  global: {
+    tooltips: {
+      enabled: false,
+    },
+    legend: {
+      display: false,
+    },
+    plugins: {
+      datalabels: {
+        align: `start`,
+        anchor: `start`,
+        clamp: true,
+        color: `#ffffff`,
+        font: {
+          size: `22`,
+        },
+        offset: 20,
+      },
+    },
+  },
+});
 
 const getTopGenre = (moviesData) => {
   const allGenres = [].concat(...moviesData.map(({movieInfo}) => movieInfo.genres));
@@ -38,11 +70,9 @@ const createFiltersMarkup = () => {
 };
 
 const createStatisticMarkup = (moviesData) => {
-  const alreadyWatchedMoviesAmount = moviesData.filter((movie) => movie.userInfo.isAlreadyWatched).length;
+  const alreadyWatchedMoviesAmount = moviesData.length;
   const userRank = alreadyWatchedMoviesAmount ? `${getUserRank(alreadyWatchedMoviesAmount)}` : ``;
-  const totalDuration = moviesData
-    .filter((movie) => movie.userInfo.isAlreadyWatched)
-    .reduce((acc, {movieInfo}) => acc + movieInfo.duration, 0);
+  const totalDuration = moviesData.reduce((acc, { movieInfo }) => acc + movieInfo.duration, 0);
   const totalHours = Math.floor(totalDuration / 60);
   const totalMinutes = totalDuration % 60;
   const topGenre = getTopGenre(moviesData);
@@ -72,7 +102,7 @@ const createStatisticMarkup = (moviesData) => {
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Top genre</h4>
-          <p class="statistic__item-text">${capitalize(topGenre)}</p>
+          <p class="statistic__item-text">${topGenre ? capitalize(topGenre) : ``}</p>
         </li>
       </ul>
 
@@ -84,17 +114,68 @@ const createStatisticMarkup = (moviesData) => {
   );
 };
 
+const getGenres = (moviesData) => {
+  const genres = [];
+  moviesData.forEach((movie) => genres.push(...movie.movieInfo.genres));
+  return Array.from(new Set(genres)).map((genre) => capitalize(genre));
+};
+
+const getGenresData = (genres, moviesData) => {
+  return genres.map((genre) => Number(moviesData
+    .filter((movie) => movie.movieInfo.genres
+    .find((item) => item === genre.toLowerCase())).length));
+};
+
+const renderChart = (container, moviesData) => {
+  const genres = getGenres(moviesData);
+  const genresData = getGenresData(genres, moviesData);
+  container.height = genres.length * 60;
+
+  const chart = new Chart(container, {
+    type: `horizontalBar`,
+    data: {
+      plugins: [ChartDataLabels],
+      labels: genres,
+      datasets: [{
+        label: false,
+        data: genresData,
+        backgroundColor: `#ffe800`,
+        barThickness: 30,
+      }]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }],
+        xAxes: [{
+          offset: true,
+          display: false,
+        }]
+      }
+    }
+  });
+};
+
 export default class Statistic extends AbstractComponent {
-  constructor(movieData) {
+  constructor(moviesData) {
     super();
-    this._movieData = movieData;
+    this._alreadyWatchedMoviesData = moviesData.filter((movie) => movie.userInfo.isAlreadyWatched);
   }
 
   getTemplate() {
-    return createStatisticMarkup(this._movieData);
+    return createStatisticMarkup(this._alreadyWatchedMoviesData);
   }
 
   updateData(newMoviesData) {
-    this._moviesData = newMoviesData;
+    this._alreadyWatchedMoviesData = newMoviesData.filter((movie) => movie.userInfo.isAlreadyWatched);
+  }
+
+  renderChart() {
+    getGenres(this._alreadyWatchedMoviesData);
+    const chartContainerElement = this.getElement().querySelector(`.${CHART_CONTAINER_CLASS}`);
+    renderChart(chartContainerElement, this._alreadyWatchedMoviesData);
   }
 }
