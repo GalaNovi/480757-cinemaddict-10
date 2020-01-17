@@ -10,13 +10,13 @@ const HEIGHT_FOR_CHART_BAR = 60;
 
 const periodFilter = {
   'all-time': (item) => item,
-  'today': (item) => Number(moment(item.userInfo.watchingDate).format(`YYYYMMDD`)) === Number(moment(new Date()).format(`YYYYMMDD`)),
-  'week': (item) => Number(moment(item.userInfo.watchingDate).format(`YYYYMMDD`)) >= Number(moment(new Date()).format(`YYYYMMDD`) - 7),
-  'month': (item) => Number(moment(item.userInfo.watchingDate).format(`YYYYMM`)) === Number(moment(new Date()).format(`YYYYMM`)),
-  'year': (item) => Number(moment(item.userInfo.watchingDate).format(`YYYY`)) === Number(moment(new Date()).format(`YYYY`)),
+  'today': (item) => Number(moment(new Date(item.userInfo.watchingDate).getTime()).format(`YYYYMMDD`)) === Number(moment(new Date()).format(`YYYYMMDD`)),
+  'week': (item) => Number(moment(new Date(item.userInfo.watchingDate).getTime()).format(`YYYYMMDD`)) >= Number(moment(new Date()).format(`YYYYMMDD`) - 7),
+  'month': (item) => Number(moment(new Date(item.userInfo.watchingDate).getTime()).format(`YYYYMM`)) === Number(moment(new Date()).format(`YYYYMM`)),
+  'year': (item) => Number(moment(new Date(item.userInfo.watchingDate).getTime()).format(`YYYY`)) === Number(moment(new Date()).format(`YYYY`)),
 };
 
-// Глобальные настройки для Chart
+// Global settings for Chart
 Chart.helpers.merge(Chart.defaults, {
   scale: {
     ticks: {
@@ -83,7 +83,7 @@ const createFiltersMarkup = () => {
 const createStatisticMarkup = (moviesData) => {
   const alreadyWatchedMoviesAmount = moviesData.length;
   const userRank = alreadyWatchedMoviesAmount ? `${getUserRank(alreadyWatchedMoviesAmount)}` : ``;
-  const totalDuration = moviesData.reduce((acc, { movieInfo }) => acc + movieInfo.duration, 0);
+  const totalDuration = moviesData.reduce((acc, {movieInfo}) => acc + movieInfo.duration, 0);
   const totalHours = Math.floor(totalDuration / 60);
   const totalMinutes = totalDuration % 60;
   const topGenre = getTopGenre(moviesData);
@@ -113,7 +113,7 @@ const createStatisticMarkup = (moviesData) => {
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Top genre</h4>
-          <p class="statistic__item-text">${topGenre ? capitalize(topGenre) : ``}</p>
+          <p class="statistic__item-text">${topGenre ? capitalize(topGenre) : `-`}</p>
         </li>
       </ul>
 
@@ -125,16 +125,17 @@ const createStatisticMarkup = (moviesData) => {
   );
 };
 
-const getGenres = (moviesData) => {
-  const genres = [];
+const getGenresStatistic = (moviesData) => {
+  let genres = [];
   moviesData.forEach((movie) => genres.push(...movie.movieInfo.genres));
-  return Array.from(new Set(genres)).map((genre) => capitalize(genre));
-};
-
-const getGenresData = (genres, moviesData) => {
-  return genres.map((genre) => Number(moviesData
-    .filter((movie) => movie.movieInfo.genres
-    .find((item) => item === genre.toLowerCase())).length));
+  genres = Array.from(new Set(genres)).map((genre) => capitalize(genre));
+  const genresStatistic = genres.map((genre) => {
+    return {name: genre};
+  });
+  genresStatistic.forEach((item) => {
+    item.amount = moviesData.filter(({movieInfo}) => movieInfo.genres.find((genre) => genre === item.name.toLowerCase())).length;
+  });
+  return genresStatistic.sort((a, b) => b.amount - a.amount);
 };
 
 export default class Statistic extends AbstractComponent {
@@ -166,35 +167,33 @@ export default class Statistic extends AbstractComponent {
 
   _setChartContainerHeight(barsAmount) {
     const containerHeight = barsAmount * HEIGHT_FOR_CHART_BAR;
-    this._chartContainerElement.height = containerHeight;
+    this._chartContainerElement.height = `${containerHeight}`;
     this._chartContainerElement.style.height = `${containerHeight}px`;
   }
 
   _createChart() {
-    const genres = getGenres(this._moviesData);
-    const genresData = getGenresData(genres, this._moviesData);
+    // const genres = getGenres(this._moviesData);
+    // const genresData = getGenresData(genres, this._moviesData);
+    const genresStatistic = getGenresStatistic(this._moviesData);
     this._chartContainerElement = this.getElement().querySelector(`.statistic__chart`);
-    this._setChartContainerHeight(genres.length);
-  
+    this._setChartContainerHeight(genresStatistic.length);
+
     return new Chart(this._chartContainerElement, {
       type: `horizontalBar`,
       data: {
         plugins: [ChartDataLabels],
-        labels: genres,
+        labels: genresStatistic.map((item) => item.name),
         datasets: [{
           label: false,
-          data: genresData,
+          data: genresStatistic.map((item) => item.amount),
           backgroundColor: `#ffe800`,
           barThickness: 30,
         }]
       },
       options: {
+        responsiveAnimationDuration: 400,
+        maintainAspectRatio: false,
         scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            }
-          }],
           xAxes: [{
             offset: true,
             display: false,
@@ -202,18 +201,14 @@ export default class Statistic extends AbstractComponent {
         }
       }
     });
-  };
+  }
 
   _updateChartPeriod(period) {
     const moviesDataForPeriod = this._moviesData.filter(periodFilter[period]);
-    const genres = getGenres(moviesDataForPeriod);
-    const genresData = getGenresData(genres, moviesDataForPeriod);
-    console.log(genres);
-    console.log(genresData);
-    this._chart.data.labels = genres;
-    console.log(this._chart.data.labels);
-    this._chart.data.datasets[0].data = genresData;
-    this._setChartContainerHeight(genresData.length);
+    const genresStatistic = getGenresStatistic(moviesDataForPeriod);
+    this._setChartContainerHeight(genresStatistic.length);
+    this._chart.data.labels = genresStatistic.map((item) => item.name);
+    this._chart.data.datasets[0].data = genresStatistic.map((item) => item.amount);
     this._chart.update();
   }
 }
