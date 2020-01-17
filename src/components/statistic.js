@@ -172,8 +172,6 @@ export default class Statistic extends AbstractComponent {
   }
 
   _createChart() {
-    // const genres = getGenres(this._moviesData);
-    // const genresData = getGenresData(genres, this._moviesData);
     const genresStatistic = getGenresStatistic(this._moviesData);
     this._chartContainerElement = this.getElement().querySelector(`.statistic__chart`);
     this._setChartContainerHeight(genresStatistic.length);
