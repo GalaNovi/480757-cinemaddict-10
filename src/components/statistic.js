@@ -1,4 +1,4 @@
-import AbstractComponent from './abstract-component';
+import AbstractSmartComponent from './abstract-smart-component';
 import {getUserRank} from '../utils/common';
 import {capitalize} from '../utils/common';
 import Chart from 'chart.js';
@@ -71,23 +71,27 @@ const formatStringForAttribute = (string) => {
   return string.toLowerCase().replace(` `, `-`);
 };
 
-const createFiltersMarkup = () => {
-  return FILTERS.map((filter, index) => {
+const createFiltersMarkup = (currentFilter) => {
+  return FILTERS.map((filter) => {
+    const filterAttribute = formatStringForAttribute(filter);
+
     return (
-      `<input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-${formatStringForAttribute(filter)}" value="${formatStringForAttribute(filter)}"${index ? `` : ` checked`}>
-      <label for="statistic-${formatStringForAttribute(filter)}" class="statistic__filters-label">${filter}</label>`
+      `<input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-${filterAttribute}" value="${filterAttribute}"${filterAttribute === currentFilter ? ` checked` : ``}>
+      <label for="statistic-${filterAttribute}" class="statistic__filters-label">${filter}</label>`
     );
   }).join(`\n`);
 };
 
-const createStatisticMarkup = (moviesData) => {
-  const alreadyWatchedMoviesAmount = moviesData.length;
-  const userRank = alreadyWatchedMoviesAmount ? `${getUserRank(alreadyWatchedMoviesAmount)}` : ``;
+const createStatisticMarkup = (moviesData, currentFilter) => {
+  const alreadyWatchedMoviesAmount = moviesData
+    .filter((movie) => movie.userInfo.isAlreadyWatched)
+    .filter(periodFilter[currentFilter]).length;
+  const userRank = getUserRank(moviesData.filter((movie) => movie.userInfo.isAlreadyWatched).length);
   const totalDuration = moviesData.reduce((acc, {movieInfo}) => acc + movieInfo.duration, 0);
   const totalHours = Math.floor(totalDuration / 60);
   const totalMinutes = totalDuration % 60;
-  const topGenre = getTopGenre(moviesData);
-  const filtersMarkup = createFiltersMarkup();
+  const topGenre = moviesData.length ? getTopGenre(moviesData) : null;
+  const filtersMarkup = createFiltersMarkup(currentFilter);
 
   return (
     `<section class="statistic">
@@ -138,18 +142,24 @@ const getGenresStatistic = (moviesData) => {
   return genresStatistic.sort((a, b) => b.amount - a.amount);
 };
 
-export default class Statistic extends AbstractComponent {
+export default class Statistic extends AbstractSmartComponent {
   constructor(moviesData) {
     super();
     this._moviesData = moviesData;
+    this._currentFilter = Object.keys(periodFilter)[0];
   }
+
+  // set currentFilter(fiterType) {
+  //   this._currentFilter = fiterType;
+  // }
 
   getTemplate() {
-    return createStatisticMarkup(this._moviesData);
+    return createStatisticMarkup(this._moviesData, this._currentFilter);
   }
 
-  updateData(newMoviesData) {
+  update(newMoviesData) {
     this._moviesData = newMoviesData;
+    this.rerender();
   }
 
   renderChart() {
@@ -160,9 +170,14 @@ export default class Statistic extends AbstractComponent {
     this.getElement().querySelector(`.statistic__filters`)
       .addEventListener(`click`, (evt) => {
         if (evt.target.tagName === `INPUT`) {
-          this._updateChartPeriod((evt.target.value));
+          this._currentFilter = evt.target.value;
+          this.rerender();
         }
       });
+  }
+
+  recoveryListeners() {
+    this.setOnFilterClickHandler();
   }
 
   _setChartContainerHeight(barsAmount) {
@@ -201,12 +216,12 @@ export default class Statistic extends AbstractComponent {
     });
   }
 
-  _updateChartPeriod(period) {
-    const moviesDataForPeriod = this._moviesData.filter(periodFilter[period]);
-    const genresStatistic = getGenresStatistic(moviesDataForPeriod);
-    this._setChartContainerHeight(genresStatistic.length);
-    this._chart.data.labels = genresStatistic.map((item) => item.name);
-    this._chart.data.datasets[0].data = genresStatistic.map((item) => item.amount);
-    this._chart.update();
-  }
+  // _updateChartPeriod(period) {
+  //   const moviesDataForPeriod = this._moviesData.filter(periodFilter[period]);
+  //   const genresStatistic = getGenresStatistic(moviesDataForPeriod);
+  //   this._setChartContainerHeight(genresStatistic.length);
+  //   this._chart.data.labels = genresStatistic.map((item) => item.name);
+  //   this._chart.data.datasets[0].data = genresStatistic.map((item) => item.amount);
+  //   this._chart.update();
+  // }
 }

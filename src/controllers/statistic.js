@@ -12,7 +12,7 @@ export class StatisticController {
   render() {
     this._statisticComponent.removeElement();
     this._statisticComponent.getElement().classList.add(HIDDEN_CLASS);
-    this._statisticComponent.renderChart();
+    // this._statisticComponent.renderChart();
     this._statisticComponent.setOnFilterClickHandler();
     render(this._container, this._statisticComponent);
   }
@@ -31,7 +31,6 @@ export class StatisticController {
 
   update(newMoviesData) {
     this._moviesData = newMoviesData;
-    this._statisticComponent.updateData(this._moviesData);
-    this.render();
+    this._statisticComponent.update(this._moviesData);
   }
 }
