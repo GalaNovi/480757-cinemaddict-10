@@ -1,6 +1,5 @@
 import Statistic from '../components/statistic';
 import {render} from '../utils/render';
-import {HIDDEN_CLASS} from '../const';
 
 export class StatisticController {
   constructor(container, moviesData) {
@@ -11,7 +10,6 @@ export class StatisticController {
 
   render() {
     this._statisticComponent.removeElement();
-    this._statisticComponent.getElement().classList.add(HIDDEN_CLASS);
     // this._statisticComponent.renderChart();
     this._statisticComponent.setOnFilterClickHandler();
     render(this._container, this._statisticComponent);
@@ -23,10 +21,12 @@ export class StatisticController {
 
   showStatistic() {
     this._statisticComponent.show();
+    this._statisticComponent.isHidden = false;
   }
 
   hideStatistic() {
     this._statisticComponent.hide();
+    this._statisticComponent.isHidden = true;
   }
 
   update(newMoviesData) {

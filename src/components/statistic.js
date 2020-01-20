@@ -1,6 +1,7 @@
 import AbstractSmartComponent from './abstract-smart-component';
 import {getUserRank} from '../utils/common';
 import {capitalize} from '../utils/common';
+import {HIDDEN_CLASS} from '../const';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import moment from 'moment';
@@ -82,19 +83,19 @@ const createFiltersMarkup = (currentFilter) => {
   }).join(`\n`);
 };
 
-const createStatisticMarkup = (moviesData, currentFilter) => {
-  const alreadyWatchedMoviesAmount = moviesData
-    .filter((movie) => movie.userInfo.isAlreadyWatched)
-    .filter(periodFilter[currentFilter]).length;
-  const userRank = getUserRank(moviesData.filter((movie) => movie.userInfo.isAlreadyWatched).length);
-  const totalDuration = moviesData.reduce((acc, {movieInfo}) => acc + movieInfo.duration, 0);
+const createStatisticMarkup = (moviesData, currentFilter, isHidden) => {
+  const watchedMovies = moviesData
+    .filter((movie) => movie.userInfo.isAlreadyWatched);
+  const watchedMoviesForPeriod = watchedMovies.filter(periodFilter[currentFilter]);
+  const userRank = getUserRank(watchedMovies.length);
+  const totalDuration = watchedMoviesForPeriod.reduce((acc, {movieInfo}) => acc + movieInfo.duration, 0);
   const totalHours = Math.floor(totalDuration / 60);
   const totalMinutes = totalDuration % 60;
-  const topGenre = moviesData.length ? getTopGenre(moviesData) : null;
+  const topGenre = watchedMoviesForPeriod.length ? getTopGenre(watchedMoviesForPeriod) : null;
   const filtersMarkup = createFiltersMarkup(currentFilter);
 
   return (
-    `<section class="statistic">
+    `<section class="statistic${isHidden ? ` ${HIDDEN_CLASS}` : ``}">
       <p class="statistic__rank">
         ${userRank}
         <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
@@ -109,7 +110,7 @@ const createStatisticMarkup = (moviesData, currentFilter) => {
       <ul class="statistic__text-list">
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">You watched</h4>
-          <p class="statistic__item-text">${alreadyWatchedMoviesAmount} <span class="statistic__item-description">movies</span></p>
+          <p class="statistic__item-text">${watchedMoviesForPeriod.length} <span class="statistic__item-description">movies</span></p>
         </li>
         <li class="statistic__text-item">
           <h4 class="statistic__item-title">Total duration</h4>
@@ -147,14 +148,15 @@ export default class Statistic extends AbstractSmartComponent {
     super();
     this._moviesData = moviesData;
     this._currentFilter = Object.keys(periodFilter)[0];
+    this._isHidden = true;
   }
 
-  // set currentFilter(fiterType) {
-  //   this._currentFilter = fiterType;
-  // }
+  set isHidden(value) {
+    this._isHidden = value;
+  }
 
   getTemplate() {
-    return createStatisticMarkup(this._moviesData, this._currentFilter);
+    return createStatisticMarkup(this._moviesData, this._currentFilter, this._isHidden);
   }
 
   update(newMoviesData) {
