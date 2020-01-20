@@ -162,10 +162,19 @@ export default class Statistic extends AbstractSmartComponent {
   update(newMoviesData) {
     this._moviesData = newMoviesData;
     this.rerender();
+    this.renderChart();
   }
 
   renderChart() {
-    this._chart = this._createChart(this._chartContainerElement);
+    if (this._chart) {
+      this._chart.destroy();
+      this._chart = null;
+    }
+
+    const watchedMoviesForPeriod = this._moviesData
+      .filter((movie) => movie.userInfo.isAlreadyWatched)
+      .filter(periodFilter[this._currentFilter]);
+    this._chart = this._createChart(watchedMoviesForPeriod);
   }
 
   setOnFilterClickHandler() {
@@ -174,6 +183,7 @@ export default class Statistic extends AbstractSmartComponent {
         if (evt.target.tagName === `INPUT`) {
           this._currentFilter = evt.target.value;
           this.rerender();
+          this.renderChart();
         }
       });
   }
@@ -188,8 +198,8 @@ export default class Statistic extends AbstractSmartComponent {
     this._chartContainerElement.style.height = `${containerHeight}px`;
   }
 
-  _createChart() {
-    const genresStatistic = getGenresStatistic(this._moviesData);
+  _createChart(moviesData) {
+    const genresStatistic = getGenresStatistic(moviesData);
     this._chartContainerElement = this.getElement().querySelector(`.statistic__chart`);
     this._setChartContainerHeight(genresStatistic.length);
 

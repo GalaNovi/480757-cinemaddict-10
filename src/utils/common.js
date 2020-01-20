@@ -36,7 +36,9 @@ const getRandomBetween = (min, max, demicalPlacesCount = 0) => Number(parseFloat
 const getRandomArrayItem = (array) => array[getRandomBetween(0, array.length - 1)];
 
 const getUserRank = (moviesAmount) => {
-  return UserRank[Object.keys(UserRank).reverse().find((key) => moviesAmount > key)];
+  return moviesAmount ?
+    UserRank[Object.keys(UserRank).reverse().find((key) => moviesAmount > key || moviesAmount === 0)] :
+    UserRank[0];
 };
 
 export {capitalize, shuffleArray, getNextItemsIterator, formatTime, getRandomBetween, getRandomArrayItem, getUserRank};

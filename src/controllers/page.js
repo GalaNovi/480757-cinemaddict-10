@@ -7,7 +7,7 @@ import {MovieController} from '../controllers/movie';
 import {SortController} from './sort';
 import {MenuController} from './menu';
 import {StatisticController} from '../controllers/statistic';
-import {getNextItemsIterator} from '../utils/common';
+import {getNextItemsIterator, getUserRank} from '../utils/common';
 import {render} from '../utils/render';
 import {EXTRA_MOVIES_HEADINGS} from '../const';
 
@@ -61,8 +61,9 @@ export class PageController {
     this._sortController = new SortController(mainElement, this._moviesModel);
     this._menuController = new MenuController(mainElement, this._moviesModel, this._showMovies, this._showStatistic);
     this._statisticController = new StatisticController(mainElement, allMovies);
+    this._profileComponent = new Profile(alreadyWatchedMoviesNumber);
 
-    render(headerElement, new Profile(alreadyWatchedMoviesNumber));
+    render(headerElement, this._profileComponent);
     this._menuController.render();
     this._sortController.render();
     this._statisticController.render();
@@ -170,6 +171,7 @@ export class PageController {
   _onDataChange(oldMovie, newMovie) {
     const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
     this._moviesModel.updateMovie(oldMovie.id, newMovie);
+    const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
 
     if (newMovie.localComment) {
       newMovie = this._moviesModel.movies.find((movie) => movie.id === newMovie.id);
@@ -181,7 +183,8 @@ export class PageController {
     });
 
     this._menuController.render();
-    this._statisticController.update(this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched));
+    this._statisticController.update(alreadyWatchedMovies);
+    this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
   }
 
   _onCloseBigCard() {
@@ -213,5 +216,6 @@ export class PageController {
     this._moviesContainerComponent.hide();
     this._statisticController.showStatistic();
     this._sortController.hideSort();
+    this._mainMoviesListInit();
   }
 }

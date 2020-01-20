@@ -20,4 +20,12 @@ export default class Profile extends AbstractComponent {
   getTemplate() {
     return createProfileMarkup(this._moviesAmount);
   }
+
+  updateRating(newRating) {
+    const ratingField = this.getElement().querySelector(`.profile__rating`);
+
+    if (newRating !== ratingField.textContent) {
+      ratingField.textContent = newRating;
+    }
+  }
 }

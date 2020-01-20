@@ -9,8 +9,7 @@ export class StatisticController {
   }
 
   render() {
-    this._statisticComponent.removeElement();
-    // this._statisticComponent.renderChart();
+    this._statisticComponent.renderChart();
     this._statisticComponent.setOnFilterClickHandler();
     render(this._container, this._statisticComponent);
   }
