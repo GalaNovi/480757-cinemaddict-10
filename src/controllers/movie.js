@@ -79,13 +79,19 @@ export class MovieController {
     this._bigCardComponent.removeElement();
   }
 
-  updateComponents(newMovieData, comments) {
+  // updateComponents(newMovieData, comments) {
+  //   this._cardComponent.update(newMovieData, comments);
+  //   this._bigCardComponent.update(newMovieData, comments);
+  // }
+
+  // updateMovieData(newMovieData) {
+  //   this._movieData = newMovieData;
+  // }
+
+  update(newMovieData, comments) {
+    this._movieData = newMovieData;
     this._cardComponent.update(newMovieData, comments);
     this._bigCardComponent.update(newMovieData, comments);
-  }
-
-  updateMovieData(newMovieData) {
-    this._movieData = newMovieData;
   }
 
   setDefaultView() {

@@ -14,10 +14,6 @@ export class StatisticController {
     render(this._container, this._statisticComponent);
   }
 
-  updateMoviesData(newMoviesData) {
-    this._moviesData = newMoviesData;
-  }
-
   showStatistic() {
     this._statisticComponent.show();
     this._statisticComponent.isHidden = false;
