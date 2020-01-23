@@ -56,7 +56,8 @@ export class MovieController {
         this._onDataChange(movieData, Object.assign({}, movieData, {
           userInfo: Object.assign(movieData.userInfo, {
             personalRating: 0,
-            isAlreadyWatched: !movieData.userInfo.isAlreadyWatched
+            isAlreadyWatched: !movieData.userInfo.isAlreadyWatched,
+            watchingDate: !movieData.userInfo.isAlreadyWatched ? new Date().toDateString() : null,
           })
         }));
       });
@@ -78,13 +79,19 @@ export class MovieController {
     this._bigCardComponent.removeElement();
   }
 
-  updateComponents(newMovieData, comments) {
+  // updateComponents(newMovieData, comments) {
+  //   this._cardComponent.update(newMovieData, comments);
+  //   this._bigCardComponent.update(newMovieData, comments);
+  // }
+
+  // updateMovieData(newMovieData) {
+  //   this._movieData = newMovieData;
+  // }
+
+  update(newMovieData, comments) {
+    this._movieData = newMovieData;
     this._cardComponent.update(newMovieData, comments);
     this._bigCardComponent.update(newMovieData, comments);
-  }
-
-  updateMovieData(newMovieData) {
-    this._movieData = newMovieData;
   }
 
   setDefaultView() {

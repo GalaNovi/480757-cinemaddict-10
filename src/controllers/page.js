@@ -6,7 +6,8 @@ import Profile from '../components/profile';
 import {MovieController} from '../controllers/movie';
 import {SortController} from './sort';
 import {MenuController} from './menu';
-import {getNextItemsIterator} from '../utils/common';
+import {StatisticController} from '../controllers/statistic';
+import {getNextItemsIterator, getUserRank} from '../utils/common';
 import {render} from '../utils/render';
 import {EXTRA_MOVIES_HEADINGS} from '../const';
 
@@ -44,6 +45,8 @@ export class PageController {
     this._onSortChange = this._onSortChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
     this._onCloseBigCard = this._onCloseBigCard.bind(this);
+    this._showMovies = this._showMovies.bind(this);
+    this._showStatistic = this._showStatistic.bind(this);
 
     this._moviesModel.setSortChangeHandler(this._onSortChange);
     this._moviesModel.setFilterChangeHandler(this._onFilterChange);
@@ -54,13 +57,16 @@ export class PageController {
     const moviesForRender = this._moviesModel.getMoviesForRender();
     const headerElement = this._container.querySelector(`.header`);
     const mainElement = this._container.querySelector(`.main`);
-    const alredyWatchedMoviesNumber = allMovies.filter((movie) => movie.userInfo.isOnTheWatchlist).length;
-    const sortController = new SortController(mainElement, this._moviesModel);
-    this._menuController = new MenuController(mainElement, this._moviesModel);
+    const alreadyWatchedMoviesNumber = allMovies.filter((movie) => movie.userInfo.isAlreadyWatched).length;
+    this._sortController = new SortController(mainElement, this._moviesModel);
+    this._menuController = new MenuController(mainElement, this._moviesModel, this._showMovies, this._showStatistic);
+    this._statisticController = new StatisticController(mainElement, allMovies);
+    this._profileComponent = new Profile(alreadyWatchedMoviesNumber);
 
-    render(headerElement, new Profile(alredyWatchedMoviesNumber));
+    render(headerElement, this._profileComponent);
     this._menuController.render();
-    sortController.render();
+    this._sortController.render();
+    this._statisticController.render();
 
     if (moviesForRender.length) {
       render(this._moviesContainerComponent, this._mainMoviesComponent);
@@ -102,7 +108,7 @@ export class PageController {
   }
 
   _renderExtraMovies(movies, heading) {
-    const doesHasMovies = Boolean(movies.length);
+    const doesHasMovies = Boolean(movies);
     const extraMoviesComponent = new ExtraMovies(heading);
     this._extraMoviesComponents.push(extraMoviesComponent);
 
@@ -165,17 +171,19 @@ export class PageController {
   _onDataChange(oldMovie, newMovie) {
     const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
     this._moviesModel.updateMovie(oldMovie.id, newMovie);
+    const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
 
     if (newMovie.localComment) {
       newMovie = this._moviesModel.movies.find((movie) => movie.id === newMovie.id);
     }
 
     instanceOfChangedMovies.forEach(({controller}) => {
-      controller.updateMovieData(newMovie);
-      controller.updateComponents(newMovie, this._moviesModel.comments);
+      controller.update(newMovie, this._moviesModel.comments);
     });
 
     this._menuController.render();
+    this._statisticController.update(alreadyWatchedMovies);
+    this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
   }
 
   _onCloseBigCard() {
@@ -193,6 +201,20 @@ export class PageController {
   }
 
   _onFilterChange() {
+    this._showMovies();
+    this._mainMoviesListInit();
+  }
+
+  _showMovies() {
+    this._statisticController.hideStatistic();
+    this._moviesContainerComponent.show();
+    this._sortController.showSort();
+  }
+
+  _showStatistic() {
+    this._moviesContainerComponent.hide();
+    this._statisticController.showStatistic();
+    this._sortController.hideSort();
     this._mainMoviesListInit();
   }
 }

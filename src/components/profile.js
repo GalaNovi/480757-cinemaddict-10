@@ -1,25 +1,11 @@
 import AbstractComponent from './abstract-component';
-
-const createProfileRatingMarkup = (moviesAmount) => {
-  let markup = ``;
-
-  if (moviesAmount > 0 && moviesAmount <= 10) {
-    markup = `<p class="profile__rating">Novice</p>`;
-  } else if (moviesAmount > 10 && moviesAmount <= 20) {
-    markup = `<p class="profile__rating">Fan</p>`;
-  } else if (moviesAmount > 20) {
-    markup = `<p class="profile__rating">Movie Buff</p>`;
-  }
-
-  return markup;
-};
+import {getUserRank} from '../utils/common';
 
 const createProfileMarkup = (moviesAmount) => {
-  const profileRatingMarkup = createProfileRatingMarkup(moviesAmount);
-
+  const userRank = moviesAmount ? getUserRank(moviesAmount) : null;
   return (
     `<section class="header__profile profile">
-      ${profileRatingMarkup}
+      ${userRank ? `<p class="profile__rating">${userRank}</p>` : ``}
       <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
     </section>`
   );
@@ -33,5 +19,13 @@ export default class Profile extends AbstractComponent {
 
   getTemplate() {
     return createProfileMarkup(this._moviesAmount);
+  }
+
+  updateRating(newRating) {
+    const ratingField = this.getElement().querySelector(`.profile__rating`);
+
+    if (newRating !== ratingField.textContent) {
+      ratingField.textContent = newRating;
+    }
   }
 }

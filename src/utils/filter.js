@@ -2,7 +2,7 @@ import {FilterType} from '../const';
 
 const filterParametens = {
   watchlist: ({userInfo}) => userInfo.isOnTheWatchlist,
-  history: ({userInfo}) => userInfo.isAlredyWatched,
+  history: ({userInfo}) => userInfo.isAlreadyWatched,
   favorites: ({userInfo}) => userInfo.isFavorite,
 };
 

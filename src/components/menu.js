@@ -3,7 +3,7 @@ import {capitalize} from '../utils/common';
 import {filterMovies} from '../utils/filter';
 import {FilterType} from '../const';
 
-const FILTER_LINK_ACTIVE_CLASS = `main-navigation__item--active`;
+const LINK_ACTIVE_CLASS = `main-navigation__item--active`;
 
 const createFilterItemMarkup = (filter, moviesModel) => {
   const activeClass = filter === moviesModel.filterType ? ` main-navigation__item--active` : ``;
@@ -44,13 +44,16 @@ export default class Menu extends AbstractComponent {
   }
 
   setFilterChangeHandler(handler) {
-    this.getElement().addEventListener(`click`, handler);
+    const links = this.getElement().querySelectorAll(`.main-navigation__item`);
+
+    links.forEach((link) => {
+      link.addEventListener(`click`, handler);
+    });
   }
 
-  setActiveFilterLink(currentFilterType) {
-    const oldActiveLink = this.getElement().querySelector(`.${FILTER_LINK_ACTIVE_CLASS}`);
-    const newActiveLink = this.getElement().querySelector(`a[data-filter-type="${currentFilterType}"]`);
-    oldActiveLink.classList.remove(FILTER_LINK_ACTIVE_CLASS);
-    newActiveLink.classList.add(FILTER_LINK_ACTIVE_CLASS);
+  setActiveLink(newActiveLink) {
+    const oldActiveLink = this.getElement().querySelector(`.${LINK_ACTIVE_CLASS}`);
+    oldActiveLink.classList.remove(LINK_ACTIVE_CLASS);
+    newActiveLink.classList.add(LINK_ACTIVE_CLASS);
   }
 }

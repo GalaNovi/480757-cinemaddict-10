@@ -9,10 +9,10 @@ const formatReleaseDate = (timestamp) => {
   return moment(timestamp).format(`DD MMMM YYYY`);
 };
 
-const createRatingMarkup = (commonRating, isAlredyWatched, personalRating) => {
+const createRatingMarkup = (commonRating, isAlreadyWatched, personalRating) => {
   return (
     `${commonRating >= 1 ? `<p class="film-details__total-rating">${commonRating}</p>` : ``}
-    ${isAlredyWatched && personalRating >= 1 ? `<p class="film-details__user-rating">Your rate ${personalRating}</p>` : ``}`
+    ${isAlreadyWatched && personalRating >= 1 ? `<p class="film-details__user-rating">Your rate ${personalRating}</p>` : ``}`
   );
 };
 
@@ -81,7 +81,7 @@ const createUserRatingFormMarkup = (movieData) => {
   );
 };
 
-const getNewCommentMarkup = () => {
+const createNewCommentMarkup = () => {
   return (
     `<div class="film-details__new-comment">
       <div for="add-emoji" class="film-details__add-emoji-label"></div>
@@ -115,16 +115,16 @@ const getNewCommentMarkup = () => {
   );
 };
 
-const getNewCommentEmojiMarkup = (emoji) => {
+const createNewCommentEmojiMarkup = (emoji) => {
   return (
     `<img src="images/emoji/${emoji}.png" width="55" height="55" alt="emoji" data-emoji="${emoji}">`
   );
 };
 
-const getFilmDetailsMarkup = (filmDetails) => {
+const createFilmDetailsMarkup = (filmDetails) => {
   return FILM_DETAILS_TITLES.map((title, index) => (
     `<tr class="film-details__row">
-      <td class="film-details__term">${title}</td>
+      <td class="film-details__term">${title === `Genre` && filmDetails[index].split(`\n`).length > 1 ? `${title}s` : title}</td>
       <td class="film-details__cell">${filmDetails[index]}</td>
     </tr>`
   )).join(`\n`);
@@ -147,24 +147,24 @@ const createBigCardMarkup = (movieData, commentsData) => {
   const {
     personalRating,
     isOnTheWatchlist,
-    isAlredyWatched,
+    isAlreadyWatched,
     isFavorite,
   } = movieData.userInfo;
 
   const {comments: commentsId} = movieData;
 
   const comments = commentsId.map((id) => commentsData.find((comment) => comment.id === id));
-  const ratingMarkup = createRatingMarkup(commonRating, isAlredyWatched, personalRating);
+  const ratingMarkup = createRatingMarkup(commonRating, isAlreadyWatched, personalRating);
   const writers = movieData.movieInfo.writers.join(`, `);
   const actors = movieData.movieInfo.actors.join(`, `);
   const date = release.date;
   const releaseDate = formatReleaseDate(date);
   const country = release.country;
-  const genresMarkup = genres.map((genre) => `<span class="film-details__genre">${capitalize(genre)}</span>`).join(``);
+  const genresMarkup = genres.map((genre) => `<span class="film-details__genre">${capitalize(genre)}</span>`).join(`\n`);
   const commentsMarkup = comments.map((comment) => createCommentMarkup(comment)).join(``);
   const userRatingFormMarkup = createUserRatingFormMarkup(movieData);
-  const newCommentMarkup = getNewCommentMarkup();
-  const filmDetailsMarkup = getFilmDetailsMarkup([director, writers, actors, releaseDate, formatTime(duration), country, genresMarkup]);
+  const newCommentMarkup = createNewCommentMarkup();
+  const filmDetailsMarkup = createFilmDetailsMarkup([director, writers, actors, releaseDate, formatTime(duration), country, genresMarkup]);
 
   return (
     `<section class="film-details">
@@ -206,7 +206,7 @@ const createBigCardMarkup = (movieData, commentsData) => {
             <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist"${isOnTheWatchlist ? ` checked` : ``}>
             <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
 
-            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched"${isAlredyWatched ? ` checked` : ``}>
+            <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched"${isAlreadyWatched ? ` checked` : ``}>
             <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
 
             <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite"${isFavorite ? ` checked` : ``}>
@@ -214,7 +214,7 @@ const createBigCardMarkup = (movieData, commentsData) => {
           </section>
         </div>
 
-        ${isAlredyWatched && !personalRating ? userRatingFormMarkup : ``}
+        ${isAlreadyWatched && !personalRating ? userRatingFormMarkup : ``}
 
         <div class="form-details__bottom-container">
           <section class="film-details__comments-wrap">
@@ -292,7 +292,7 @@ export default class BigCard extends AbstractSmartComponent {
       .addEventListener(`click`, (evt) => {
         if (evt.target.tagName === `INPUT`) {
           const emojiContainerElement = this.getElement().querySelector(`.film-details__add-emoji-label`);
-          const emojiMarkup = getNewCommentEmojiMarkup(evt.target.getAttribute(`data-emoji`));
+          const emojiMarkup = createNewCommentEmojiMarkup(evt.target.getAttribute(`data-emoji`));
           emojiContainerElement.innerHTML = emojiMarkup;
         }
       });

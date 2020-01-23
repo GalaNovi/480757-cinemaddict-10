@@ -1,21 +1,37 @@
-export const EXTRA_MOVIES_HEADINGS = [`Top rated`, `Most commented`];
-export const EMOTIONS = [`smile`, `sleeping`, `puke`, `angry`];
-export const DEFAULT_SORT_TYPE = `default`;
-export const FILM_DETAILS_TITLES = [
+const EXTRA_MOVIES_HEADINGS = [`Top rated`, `Most commented`];
+const EMOTIONS = [`smile`, `sleeping`, `puke`, `angry`];
+const DEFAULT_SORT_TYPE = `default`;
+const DESCRIPTION_MAX_LENGTH = 140;
+const HIDDEN_CLASS = `visually-hidden`;
+const FILM_DETAILS_TITLES = [
   `Director`,
   `Writers`,
   `Actors`,
   `Release Date`,
   `Runtime`,
   `Country`,
-  `Genres`,
+  `Genre`,
 ];
 
-export const FilterType = {
+const FilterType = {
   ALL: `all`,
   WATCHLIST: `watchlist`,
   HISTORY: `history`,
   FAVORITES: `favorites`,
 };
 
-export const DESCRIPTION_MAX_LENGTH = 140;
+const UserRank = {
+  20: `Movie Buff`,
+  10: `Fun`,
+  0: `Novice`,
+};
+
+export {
+  EXTRA_MOVIES_HEADINGS,
+  EMOTIONS, DEFAULT_SORT_TYPE,
+  FILM_DETAILS_TITLES,
+  FilterType,
+  DESCRIPTION_MAX_LENGTH,
+  UserRank,
+  HIDDEN_CLASS,
+};
