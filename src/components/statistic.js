@@ -17,7 +17,7 @@ const periodFilter = {
   'year': (item) => Number(moment(new Date(item.userInfo.watchingDate).getTime()).format(`YYYY`)) === Number(moment(new Date()).format(`YYYY`)),
 };
 
-// Global settings for Chart
+// Global settings for the Chart
 Chart.helpers.merge(Chart.defaults, {
   scale: {
     ticks: {
@@ -181,9 +181,11 @@ export default class Statistic extends AbstractSmartComponent {
     this.getElement().querySelector(`.statistic__filters`)
       .addEventListener(`click`, (evt) => {
         if (evt.target.tagName === `INPUT`) {
-          this._currentFilter = evt.target.value;
-          this.rerender();
-          this.renderChart();
+          if (this._currentFilter !== evt.target.value) {
+            this._currentFilter = evt.target.value;
+            this.rerender();
+            this.renderChart();
+          }
         }
       });
   }
@@ -227,13 +229,4 @@ export default class Statistic extends AbstractSmartComponent {
       }
     });
   }
-
-  // _updateChartPeriod(period) {
-  //   const moviesDataForPeriod = this._moviesData.filter(periodFilter[period]);
-  //   const genresStatistic = getGenresStatistic(moviesDataForPeriod);
-  //   this._setChartContainerHeight(genresStatistic.length);
-  //   this._chart.data.labels = genresStatistic.map((item) => item.name);
-  //   this._chart.data.datasets[0].data = genresStatistic.map((item) => item.amount);
-  //   this._chart.update();
-  // }
 }
