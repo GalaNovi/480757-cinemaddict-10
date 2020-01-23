@@ -178,8 +178,7 @@ export class PageController {
     }
 
     instanceOfChangedMovies.forEach(({controller}) => {
-      controller.updateMovieData(newMovie);
-      controller.updateComponents(newMovie, this._moviesModel.comments);
+      controller.update(newMovie, this._moviesModel.comments);
     });
 
     this._menuController.render();
