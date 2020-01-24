@@ -154,6 +154,7 @@ const createBigCardMarkup = (movieData, commentsData) => {
   const {comments: commentsId} = movieData;
 
   const comments = commentsId.map((id) => commentsData.find((comment) => comment.id === id));
+  console.log(commentsData);
   const ratingMarkup = createRatingMarkup(commonRating, isAlreadyWatched, personalRating);
   const writers = movieData.movieInfo.writers.join(`, `);
   const actors = movieData.movieInfo.actors.join(`, `);

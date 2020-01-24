@@ -22,7 +22,7 @@ export default class Api {
   }
 
   getMovies() {
-    this._load({url: `movies`})
+    return this._load({url: `https://htmlacademy-es-10.appspot.com/cinemaddict/movies`})
       .then((response) => response.json())
       .then(Movie.parseMovies);
   }
