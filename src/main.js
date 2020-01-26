@@ -13,7 +13,7 @@ const moviesModel = new MoviesModel();
 api.getMovies()
   .then((movies) => {
     moviesModel.movies = movies;
-    moviesModel.comments = commentsData;
-    const pageController = new PageController(document.body, moviesModel);
-    pageController.render();
-  });
+    return movies;
+  })
+  .then((movies) => Promise.all(movies.map((movie) => api.getComments(movie.id))))
+  .then((comments) => console.log(comments));

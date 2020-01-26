@@ -16,15 +16,20 @@ const checkStatus = (response) => {
 };
 
 export default class Api {
-  constructor(endPoint, authorizationCode) {
-    this._endPoint = endPoint;
+  constructor(url, authorizationCode) {
+    this._url = url;
     this._authorizationCode = authorizationCode;
   }
 
   getMovies() {
-    return this._load({url: `https://htmlacademy-es-10.appspot.com/cinemaddict/movies`})
+    return this._load({url: `${this._url}movies`})
       .then((response) => response.json())
       .then(Movie.parseMovies);
+  }
+
+  getComments(movieId) {
+    return this._load({url: `${this._url}comments/${movieId}`})
+      .then((response) => response.json());
   }
 
   createComment() {
