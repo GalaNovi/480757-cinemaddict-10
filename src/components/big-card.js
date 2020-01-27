@@ -197,7 +197,7 @@ const createBigCardMarkup = (movieData, commentsData) => {
               </table>
 
               <p class="film-details__film-description">
-                ${description}
+                ${capitalize(description)}
               </p>
             </div>
           </div>

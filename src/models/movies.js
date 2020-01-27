@@ -1,7 +1,6 @@
 import {sortMovies} from '../utils/sort';
 import {filterMovies} from '../utils/filter';
 import {DEFAULT_SORT_TYPE, FilterType} from '../const';
-import {COMMENT_AUTHORS} from '../mock/comments';
 import {getRandomArrayItem} from '../utils/common';
 
 export default class Movies {

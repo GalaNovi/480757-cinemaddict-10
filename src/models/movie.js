@@ -1,44 +1,66 @@
 export default class Movie {
   constructor(data) {
-    this._id = data.id;
-    this._comments = data.comments;
-    this._movieInfo = data[`film_info`];
-    this._userInfo = data[`user_details`];
+    this.id = data[`id`];
+    this.comments = data[`comments`];
+    this.movieInfo = {
+      ageLimit: data[`film_info`][`age_rating`],
+      name: data[`film_info`][`title`],
+      originalName: data[`film_info`][`alternative_title`],
+      director: data[`film_info`][`director`],
+      writers: data[`film_info`][`writers`],
+      actors: data[`film_info`][`actors`],
+      release: {
+        date: data[`film_info`][`release`][`date`],
+        country: data[`film_info`][`release`][`release_country`],
+      },
+      poster: data[`film_info`][`poster`],
+      rating: data[`film_info`][`total_rating`],
+      duration: data[`film_info`][`runtime`],
+      genres: data[`film_info`][`genre`],
+      description: data[`film_info`][`description`],
+    };
+    this.userInfo = {
+      personalRating: data[`user_details`][`personal_rating`],
+      isOnTheWatchlist: data[`user_details`][`watchlist`],
+      isAlreadyWatched: data[`user_details`][`already_watched`],
+      watchingDate: data[`user_details`][`watching_date`],
+      isFavorite: data[`user_details`][`favorite`],
+    };
   }
 
   toRAW() {
     return {
-      id: this._id,
-      comments: this._comments,
-      movieInfo: {
-        ageLimit: this._movieInfo[`age_rating`],
-        name: this._movieInfo[`title`],
-        originalName: this._movieInfo[`alternative_title`],
-        director: this._movieInfo[`director`],
-        writers: this._movieInfo[`writers`],
-        actors: this._movieInfo[`actors`],
-        release: {
-          date: this._movieInfo.release[`date`],
-          country: this._movieInfo.release[`release_country`],
+      'id': this._id,
+      'comments': this._comments,
+      'film_info': {
+        'age_rating': this._movieInfo[`age_rating`],
+        'title': this._movieInfo[`title`],
+        'alternative_title': this._movieInfo[`alternative_title`],
+        'director': this._movieInfo[`director`],
+        'writers': this._movieInfo[`writers`],
+        'actors': this._movieInfo[`actors`],
+        'release': {
+          'date': this._movieInfo.release[`date`],
+          'release_country': this._movieInfo.release[`release_country`],
         },
-        poster: this._movieInfo[`poster`],
-        rating: this._movieInfo[`total_rating`],
-        duration: this._movieInfo[`runtime`],
-        genres: this._movieInfo[`genre`],
-        description: this._movieInfo[`description`],
+        'poster': this._movieInfo[`poster`],
+        'total_rating': this._movieInfo[`total_rating`],
+        'runtime': this._movieInfo[`runtime`],
+        'genre': this._movieInfo[`genre`],
+        'description': this._movieInfo[`description`],
       },
-      userInfo: {
-        personalRating: this._userInfo[`personal_rating`],
-        isOnTheWatchlist: this._userInfo[`watchlist`],
-        isAlreadyWatched: this._userInfo[`already_watched`],
-        isFavorite: this._userInfo[`watching_date`],
-        watchingDate: this._userInfo[`favorite`],
+      'user_details': {
+        'personal_rating': this._userInfo[`personal_rating`],
+        'watchlist': this._userInfo[`watchlist`],
+        'already_watched': this._userInfo[`already_watched`],
+        'watching_date': this._userInfo[`watching_date`],
+        'favorite': this._userInfo[`favorite`],
       },
     };
   }
 
   static parseMovie(data) {
-    return new Movie(data).toRAW();
+    return new Movie(data);
   }
 
   static parseMovies(data) {
