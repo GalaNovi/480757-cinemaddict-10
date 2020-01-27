@@ -1,6 +1,5 @@
 export default class Movie {
   constructor(data) {
-    console.log(data);
     this.id = data[`id`];
     this.comments = data[`comments`];
     this.movieInfo = {

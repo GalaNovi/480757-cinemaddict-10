@@ -37,11 +37,9 @@ export class MovieController {
     });
 
     this._bigCardComponent.setOnUserRatingClickCallback((userRating) => {
-      this._onDataChange(this._movieData, Object.assign({}, this._movieData, {
-        userInfo: Object.assign({}, this._movieData.userInfo, {
-          personalRating: userRating
-        })
-      }));
+      const newMovieData = MovieModel.clone(this._movieData);
+      newMovieData.userInfo.personalRating = Number(userRating);
+      this._onDataChange(this._movieData, newMovieData);
     });
 
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
@@ -53,6 +51,7 @@ export class MovieController {
 
       component.setWatchedButtonCallback(() => {
         const newMovieData = MovieModel.clone(this._movieData);
+        newMovieData.userInfo.personalRating = 0;
         newMovieData.userInfo.isAlreadyWatched = !this._movieData.userInfo.isAlreadyWatched;
         newMovieData.userInfo.watchingDate = newMovieData.userInfo.isAlreadyWatched ? new Date().toISOString() : new Date(0).toISOString();
         this._onDataChange(this._movieData, newMovieData);

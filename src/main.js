@@ -3,7 +3,7 @@ import API from './api.js';
 import {PageController} from './controllers/page';
 
 const END_POINT = `https://htmlacademy-es-10.appspot.com/cinemaddict/`;
-const AUTHORIZATION_CODE = `Basic eo0w590ik29889alkj`;
+const AUTHORIZATION_CODE = `Basic eo0w590ik29889alku`;
 
 const api = new API(END_POINT, AUTHORIZATION_CODE);
 const moviesModel = new MoviesModel();

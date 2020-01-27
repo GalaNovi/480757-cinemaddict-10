@@ -235,12 +235,12 @@ const createBigCardMarkup = (movieData, commentsData) => {
 export default class BigCard extends AbstractSmartComponent {
   constructor(movieData, commentsData) {
     super();
-    this._movieData = movieData;
-    this._commentsData = commentsData;
+    this._primaryData = movieData;
+    this._secondaryData = commentsData;
   }
 
   getTemplate() {
-    return createBigCardMarkup(this._movieData, this._commentsData);
+    return createBigCardMarkup(this._primaryData, this._secondaryData);
   }
 
   setCloseCallback(callback) {
