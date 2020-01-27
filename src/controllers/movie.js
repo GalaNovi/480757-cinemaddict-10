@@ -1,5 +1,6 @@
 import BigCard from '../components/big-card';
 import Card from '../components/card';
+import MovieModel from '../models/movie';
 import {render} from '../utils/render';
 
 export class MovieController {
@@ -45,29 +46,22 @@ export class MovieController {
 
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
       component.setWatchlistButtonCallback(() => {
-        this._onDataChange(movieData, Object.assign({}, movieData, {
-          userInfo: Object.assign(movieData.userInfo, {
-            isOnTheWatchlist: !movieData.userInfo.isOnTheWatchlist
-          })
-        }));
+        const newMovieData = MovieModel.clone(this._movieData);
+        newMovieData.userInfo.isOnTheWatchlist = !this._movieData.userInfo.isOnTheWatchlist;
+        this._onDataChange(this._movieData, newMovieData);
       });
 
       component.setWatchedButtonCallback(() => {
-        this._onDataChange(movieData, Object.assign({}, movieData, {
-          userInfo: Object.assign(movieData.userInfo, {
-            personalRating: 0,
-            isAlreadyWatched: !movieData.userInfo.isAlreadyWatched,
-            watchingDate: !movieData.userInfo.isAlreadyWatched ? new Date().toDateString() : null,
-          })
-        }));
+        const newMovieData = MovieModel.clone(this._movieData);
+        newMovieData.userInfo.isAlreadyWatched = !this._movieData.userInfo.isAlreadyWatched;
+        newMovieData.userInfo.watchingDate = newMovieData.userInfo.isAlreadyWatched ? new Date().toISOString() : new Date(0).toISOString();
+        this._onDataChange(this._movieData, newMovieData);
       });
 
       component.setFavoriteButtonCallback(() => {
-        this._onDataChange(movieData, Object.assign({}, movieData, {
-          userInfo: Object.assign(movieData.userInfo, {
-            isFavorite: !movieData.userInfo.isFavorite
-          })
-        }));
+        const newMovieData = MovieModel.clone(this._movieData);
+        newMovieData.userInfo.isFavorite = !this._movieData.userInfo.isFavorite;
+        this._onDataChange(this._movieData, newMovieData);
       });
     });
 
@@ -78,15 +72,6 @@ export class MovieController {
     this._cardComponent.removeElement();
     this._bigCardComponent.removeElement();
   }
-
-  // updateComponents(newMovieData, comments) {
-  //   this._cardComponent.update(newMovieData, comments);
-  //   this._bigCardComponent.update(newMovieData, comments);
-  // }
-
-  // updateMovieData(newMovieData) {
-  //   this._movieData = newMovieData;
-  // }
 
   update(newMovieData, comments) {
     this._movieData = newMovieData;

@@ -57,11 +57,11 @@ const createCardMarkup = (movieData) => {
 export default class Card extends AbstractSmartComponent {
   constructor(movieData) {
     super();
-    this._movieData = movieData;
+    this._primaryData = movieData;
   }
 
   getTemplate() {
-    return createCardMarkup(this._movieData);
+    return createCardMarkup(this._primaryData);
   }
 
   setOpenCallback(callback) {

@@ -16,19 +16,19 @@ const checkStatus = (response) => {
 };
 
 export default class Api {
-  constructor(url, authorizationCode) {
-    this._url = url;
+  constructor(endPoint, authorizationCode) {
+    this._endPoint = endPoint;
     this._authorizationCode = authorizationCode;
   }
 
   getMovies() {
-    return this._load({url: `${this._url}movies`})
+    return this._load({url: `movies`})
       .then((response) => response.json())
       .then(Movie.parseMovies);
   }
 
   getComments(movieId) {
-    return this._load({url: `${this._url}comments/${movieId}`})
+    return this._load({url: `comments/${movieId}`})
       .then((response) => response.json());
   }
 
@@ -36,8 +36,15 @@ export default class Api {
 
   }
 
-  updateComment() {
-
+  updateMovie(id, newMovieData) {
+    return this._load({
+      url: `movies/${id}`,
+      method: Method.PUT,
+      body: JSON.stringify(newMovieData.toRAW()),
+      headers: new Headers({'Content-Type': `application/json`}),
+    })
+    .then((response) => response.json())
+    .then(Movie.parseMovie);
   }
 
   deleteComment() {
@@ -47,10 +54,7 @@ export default class Api {
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorizationCode);
 
-    return fetch(url, {method, body, headers})
-      .then(checkStatus)
-      .catch((error) => {
-        throw error;
-      });
+    return fetch(`${this._endPoint}${url}`, {method, body, headers})
+      .then(checkStatus);
   }
 }

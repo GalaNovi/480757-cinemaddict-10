@@ -2,12 +2,12 @@ import MoviesModel from './models/movies';
 import API from './api.js';
 import {PageController} from './controllers/page';
 
-const URL = `https://htmlacademy-es-10.appspot.com/cinemaddict/`;
-const AUTHORIZATION_CODE = `Basic eo0w590ik29889a`;
+const END_POINT = `https://htmlacademy-es-10.appspot.com/cinemaddict/`;
+const AUTHORIZATION_CODE = `Basic eo0w590ik29889alkj`;
 
-const api = new API(URL, AUTHORIZATION_CODE);
+const api = new API(END_POINT, AUTHORIZATION_CODE);
 const moviesModel = new MoviesModel();
-const pageController = new PageController(document.body, moviesModel);
+const pageController = new PageController(document.body, moviesModel, api);
 
 api.getMovies()
   .then((movies) => {

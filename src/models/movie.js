@@ -1,5 +1,6 @@
 export default class Movie {
   constructor(data) {
+    console.log(data);
     this.id = data[`id`];
     this.comments = data[`comments`];
     this.movieInfo = {
@@ -30,31 +31,31 @@ export default class Movie {
 
   toRAW() {
     return {
-      'id': this._id,
-      'comments': this._comments,
+      'id': this.id,
+      'comments': this.comments,
       'film_info': {
-        'age_rating': this._movieInfo[`age_rating`],
-        'title': this._movieInfo[`title`],
-        'alternative_title': this._movieInfo[`alternative_title`],
-        'director': this._movieInfo[`director`],
-        'writers': this._movieInfo[`writers`],
-        'actors': this._movieInfo[`actors`],
+        'age_rating': this.movieInfo.ageLimit,
+        'title': this.movieInfo.name,
+        'alternative_title': this.movieInfo.originalName,
+        'director': this.movieInfo.director,
+        'writers': this.movieInfo.writers,
+        'actors': this.movieInfo.actors,
         'release': {
-          'date': this._movieInfo.release[`date`],
-          'release_country': this._movieInfo.release[`release_country`],
+          'date': this.movieInfo.release.date,
+          'release_country': this.movieInfo.release.country,
         },
-        'poster': this._movieInfo[`poster`],
-        'total_rating': this._movieInfo[`total_rating`],
-        'runtime': this._movieInfo[`runtime`],
-        'genre': this._movieInfo[`genre`],
-        'description': this._movieInfo[`description`],
+        'poster': this.movieInfo.poster,
+        'total_rating': this.movieInfo.rating,
+        'runtime': this.movieInfo.duration,
+        'genre': this.movieInfo.genres,
+        'description': this.movieInfo.description,
       },
       'user_details': {
-        'personal_rating': this._userInfo[`personal_rating`],
-        'watchlist': this._userInfo[`watchlist`],
-        'already_watched': this._userInfo[`already_watched`],
-        'watching_date': this._userInfo[`watching_date`],
-        'favorite': this._userInfo[`favorite`],
+        'personal_rating': this.userInfo.personalRating,
+        'watchlist': this.userInfo.isOnTheWatchlist,
+        'already_watched': this.userInfo.isAlreadyWatched,
+        'watching_date': this.userInfo.watchingDate,
+        'favorite': this.userInfo.isFavorite,
       },
     };
   }

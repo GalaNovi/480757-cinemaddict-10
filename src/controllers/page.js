@@ -29,9 +29,10 @@ const extraMoviesParameters = {
 };
 
 export class PageController {
-  constructor(container, moviesModel) {
+  constructor(container, moviesModel, api) {
     this._container = container;
     this._moviesModel = moviesModel;
+    this._api = api;
     this._extraMoviesAmount = EXTRA_MOVIES_AMOUNT;
     this._renderedMoviesAmount = START_MOVIES_AMOUNT;
     this._moviesContainerComponent = new MoviesContainer();
@@ -169,21 +170,27 @@ export class PageController {
   }
 
   _onDataChange(oldMovie, newMovie) {
-    const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
-    this._moviesModel.updateMovie(oldMovie.id, newMovie);
-    const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
+    this._api.updateMovie(oldMovie.id, newMovie)
+      .then((newMovieData) => {
+        const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
+        this._moviesModel.updateMovie(oldMovie.id, newMovieData);
+        const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
 
-    if (newMovie.localComment) {
-      newMovie = this._moviesModel.movies.find((movie) => movie.id === newMovie.id);
-    }
+        if (newMovieData.localComment) {
+          newMovie = this._moviesModel.movies.find((movie) => movie.id === newMovieData.id);
+        }
 
-    instanceOfChangedMovies.forEach(({controller}) => {
-      controller.update(newMovie, this._moviesModel.comments);
-    });
+        instanceOfChangedMovies.forEach(({controller}) => {
+          controller.update(newMovieData, this._moviesModel.comments);
+        });
 
-    this._menuController.render();
-    this._statisticController.update(alreadyWatchedMovies);
-    this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
+        this._menuController.render();
+        this._statisticController.update(alreadyWatchedMovies);
+        this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
+      })
+      .catch((error) => {
+        throw error.message;
+      });
   }
 
   _onCloseBigCard() {
