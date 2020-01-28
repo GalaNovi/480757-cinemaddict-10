@@ -169,19 +169,23 @@ export class PageController {
     return currentExtraMoviesIdsString !== newExtraMoviesIdsString;
   }
 
-  _onDataChange(oldMovie, newMovie) {
-    this._api.updateMovie(oldMovie.id, newMovie)
-      .then((newMovieData) => {
+  _onDataChange(oldMovie, newMovie, deletedCommentId = null) {
+    Promise.all([this._api.updateMovie(oldMovie.id, newMovie, deletedCommentId), this._api.deleteComment(deletedCommentId)])
+      .then(() => {
         const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
-        this._moviesModel.updateMovie(oldMovie.id, newMovieData);
+        this._moviesModel.updateMovie(oldMovie.id, newMovie);
         const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
 
-        if (newMovieData.localComment) {
-          newMovie = this._moviesModel.movies.find((movie) => movie.id === newMovieData.id);
+        if (deletedCommentId) {
+          this._moviesModel.comments = this._moviesModel.comments.filter((comment) => Number(comment.id) !== deletedCommentId);
+        }
+
+        if (newMovie.localComment) {
+          newMovie = this._moviesModel.movies.find((movie) => movie.id === newMovie.id);
         }
 
         instanceOfChangedMovies.forEach(({controller}) => {
-          controller.update(newMovieData, this._moviesModel.comments);
+          controller.update(newMovie, this._moviesModel.comments);
         });
 
         this._menuController.render();

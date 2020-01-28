@@ -47,8 +47,15 @@ export default class Api {
     .then(Movie.parseMovie);
   }
 
-  deleteComment() {
-
+  deleteComment(id) {
+    if (id) {
+      return this._load({
+        url: `comments/${id}`,
+        method: Method.DELETE,
+      });
+    } else {
+      return null;
+    }
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

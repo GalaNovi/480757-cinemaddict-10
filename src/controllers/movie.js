@@ -31,9 +31,10 @@ export class MovieController {
     this._bigCardComponent.setOnEmojiListClickHandler();
 
     this._bigCardComponent.setOnDeleteCommentClickCallback((commentId) => {
-      this._onDataChange(this._movieData, Object.assign({}, this._movieData, {
-        comments: this._movieData.comments.filter((id) => id !== commentId)
-      }));
+      const newMovieData = MovieModel.clone(this._movieData);
+      newMovieData.comments = newMovieData.comments.filter((id) => Number(id) !== commentId);
+      console.log(newMovieData.comments);
+      this._onDataChange(this._movieData, newMovieData, commentId);
     });
 
     this._bigCardComponent.setOnUserRatingClickCallback((userRating) => {
