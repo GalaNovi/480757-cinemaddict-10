@@ -1,7 +1,6 @@
 import {sortMovies} from '../utils/sort';
 import {filterMovies} from '../utils/filter';
 import {DEFAULT_SORT_TYPE, FilterType} from '../const';
-import {getRandomArrayItem} from '../utils/common';
 
 export default class Movies {
   constructor() {
@@ -45,16 +44,6 @@ export default class Movies {
   }
 
   updateMovie(oldMovieId, newMovie) {
-    if (newMovie.localComment) {
-      this.addComment(Object.assign(newMovie.localComment, {
-        id: this._comments.length + 1,
-        author: getRandomArrayItem(COMMENT_AUTHORS),
-      }));
-
-      newMovie.comments.unshift(this._comments.length);
-      delete newMovie.localComment;
-    }
-
     this._movies = this._movies.map((movie) => movie.id === oldMovieId ? newMovie : movie);
   }
 

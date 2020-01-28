@@ -53,7 +53,7 @@ export default class Movie {
         'personal_rating': this.userInfo.personalRating,
         'watchlist': this.userInfo.isOnTheWatchlist,
         'already_watched': this.userInfo.isAlreadyWatched,
-        'watching_date': this.userInfo.watchingDate,
+        'watching_date': this.userInfo.watchingDate || new Date(0),
         'favorite': this.userInfo.isFavorite,
       },
     };

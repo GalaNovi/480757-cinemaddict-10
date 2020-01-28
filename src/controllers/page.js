@@ -169,23 +169,39 @@ export class PageController {
     return currentExtraMoviesIdsString !== newExtraMoviesIdsString;
   }
 
-  _onDataChange(oldMovie, newMovie, deletedCommentId = null) {
-    Promise.all([this._api.updateMovie(oldMovie.id, newMovie, deletedCommentId), this._api.deleteComment(deletedCommentId)])
-      .then(() => {
+  _onDataChange(oldMovie, newMovie) {
+    const requests = [this._api.updateMovie(oldMovie.id, newMovie)];
+    let deletedCommentId = null;
+
+    if (oldMovie.comments.length > newMovie.comments.length) {
+      deletedCommentId = oldMovie.comments.find((commentId, index) => commentId !== newMovie.comments[index]);
+      requests.push(this._api.deleteComment(deletedCommentId));
+    }
+
+    if (newMovie.localComment) {
+      requests.push(this._api.createComment(newMovie.id, newMovie.localComment));
+      delete newMovie.localComment;
+    }
+
+    Promise.all(requests)
+      .then(([movieInfo, commentInfo]) => {
         const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
         this._moviesModel.updateMovie(oldMovie.id, newMovie);
         const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
+        let newComments = null;
 
         if (deletedCommentId) {
           this._moviesModel.comments = this._moviesModel.comments.filter((comment) => Number(comment.id) !== deletedCommentId);
         }
 
-        if (newMovie.localComment) {
-          newMovie = this._moviesModel.movies.find((movie) => movie.id === newMovie.id);
+        if (commentInfo) {
+          this._moviesModel.updateMovie(oldMovie.id, commentInfo.movie);
+          newComments = commentInfo.comments;
+          newMovie = commentInfo.movie;
         }
 
         instanceOfChangedMovies.forEach(({controller}) => {
-          controller.update(newMovie, this._moviesModel.comments);
+          controller.update(newMovie, newComments);
         });
 
         this._menuController.render();

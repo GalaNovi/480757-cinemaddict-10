@@ -23,8 +23,9 @@ export class MovieController {
   render(movieData, comments) {
     this._id = movieData.id;
     this._movieData = movieData;
+    this._comments = this._movieData.comments.map((id) => comments.find((comment) => comment.id === id));
     this._cardComponent = new Card(this._movieData);
-    this._bigCardComponent = new BigCard(this._movieData, comments);
+    this._bigCardComponent = new BigCard(this._movieData, this._comments);
 
     this._cardComponent.setOpenCallback(this._openBigCard);
     this._bigCardComponent.setCloseCallback(this._closeBigCard);
@@ -33,8 +34,7 @@ export class MovieController {
     this._bigCardComponent.setOnDeleteCommentClickCallback((commentId) => {
       const newMovieData = MovieModel.clone(this._movieData);
       newMovieData.comments = newMovieData.comments.filter((id) => Number(id) !== commentId);
-      console.log(newMovieData.comments);
-      this._onDataChange(this._movieData, newMovieData, commentId);
+      this._onDataChange(this._movieData, newMovieData);
     });
 
     this._bigCardComponent.setOnUserRatingClickCallback((userRating) => {
@@ -75,6 +75,11 @@ export class MovieController {
 
   update(newMovieData, comments) {
     this._movieData = newMovieData;
+
+    if (comments) {
+      this._comments = comments;
+    }
+
     this._cardComponent.update(newMovieData, comments);
     this._bigCardComponent.update(newMovieData, comments);
   }
@@ -98,13 +103,13 @@ export class MovieController {
       const emotionImageElement = this._bigCardComponent.getElement().querySelector(`.film-details__add-emoji-label img`);
 
       if (commentFieldElement.value && emotionImageElement) {
-        this._onDataChange(this._movieData, Object.assign({}, this._movieData, {
-          localComment: {
-            comment: commentFieldElement.value,
-            date: dateValue,
-            emotion: emotionImageElement.getAttribute(`data-emoji`),
-          }
-        }));
+        const newMovieData = MovieModel.clone(this._movieData);
+        newMovieData.localComment = {
+          comment: commentFieldElement.value,
+          date: dateValue,
+          emotion: emotionImageElement.getAttribute(`data-emoji`),
+        };
+        this._onDataChange(this._movieData, newMovieData);
       }
     }
   }
