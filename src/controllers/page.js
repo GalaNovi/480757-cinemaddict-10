@@ -195,7 +195,7 @@ export class PageController {
           this._moviesModel.comments = this._moviesModel.comments.filter((comment) => Number(comment.id) !== deletedCommentId);
         }
 
-        if (commentInfo.movie) {
+        if (commentInfo && commentInfo.movie) {
           this._moviesModel.updateMovie(oldMovie.id, commentInfo.movie);
           newComments = commentInfo.comments;
           newMovie = commentInfo.movie;

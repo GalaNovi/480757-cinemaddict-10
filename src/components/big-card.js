@@ -4,6 +4,7 @@ import {FILM_DETAILS_TITLES} from '../const';
 import moment from 'moment';
 
 const USER_RATING_SCORES_AMOUNT = 9;
+const UNDEFINED_COMMENTS_MESSAGE = `Sorry, comments data are missing. Please reboot the app.`;
 
 const formatReleaseDate = (timestamp) => {
   return moment(timestamp).format(`DD MMMM YYYY`);
@@ -17,6 +18,13 @@ const createRatingMarkup = (commonRating, isAlreadyWatched, personalRating) => {
 };
 
 const createCommentMarkup = (commentData) => {
+  // The server does not always give the correct data.
+  if (!commentData) {
+    return (
+      `<li class="film-details__comment">${UNDEFINED_COMMENTS_MESSAGE}</li>`
+    );
+  }
+
   const {id, author, comment, date, emotion} = commentData;
   const commentDate = moment(date).format(`YYYY/MM/DD HH:mm`);
 
@@ -153,7 +161,7 @@ const createBigCardMarkup = (movieData, commentsData) => {
 
   const {comments: commentsId} = movieData;
 
-  const comments = commentsId.map((id) => commentsData.find((comment) => comment.id === id));
+  const comments = commentsId.map((id) => commentsData.find((comment) => comment ? comment.id === id : false));
   const ratingMarkup = createRatingMarkup(commonRating, isAlreadyWatched, personalRating);
   const writers = movieData.movieInfo.writers.join(`, `);
   const actors = movieData.movieInfo.actors.join(`, `);
