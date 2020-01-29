@@ -184,7 +184,8 @@ export class PageController {
     }
 
     Promise.all(requests)
-      .then(([movieInfo, commentInfo]) => {
+      .then((response) => {
+        const commentInfo = response[1];
         const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
         this._moviesModel.updateMovie(oldMovie.id, newMovie);
         const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
@@ -194,7 +195,7 @@ export class PageController {
           this._moviesModel.comments = this._moviesModel.comments.filter((comment) => Number(comment.id) !== deletedCommentId);
         }
 
-        if (commentInfo) {
+        if (commentInfo.movie) {
           this._moviesModel.updateMovie(oldMovie.id, commentInfo.movie);
           newComments = commentInfo.comments;
           newMovie = commentInfo.movie;
