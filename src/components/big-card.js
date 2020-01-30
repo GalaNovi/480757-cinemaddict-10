@@ -351,6 +351,17 @@ export default class BigCard extends AbstractSmartComponent {
     this.setOnUserRatingClickCallback();
   }
 
+  resetForms() {
+    const commentField = this.getElement().querySelector(`.film-details__comment-input`);
+    const ratingBlock = this.getElement().querySelector(`.form-details__middle-container`);
+
+    commentField.style.borderColor = ``;
+
+    if (ratingBlock) {
+      ratingBlock.style.backgroundColor = ``;
+    };
+  }
+
   highlightCommentField() {
     const commentBlock = this.getElement().querySelector(`.film-details__new-comment`);
     const commentField = this.getElement().querySelector(`.film-details__comment-input`);
@@ -360,7 +371,27 @@ export default class BigCard extends AbstractSmartComponent {
     
     setTimeout(() => {
       commentBlock.classList.remove(`shake`);
-      commentField.style.borderColor = ``;
-    }, 600)
+    }, 600);
+  }
+
+  highlightComments() {
+    const commentBlock = this.getElement().querySelector(`.film-details__comments-list`);
+
+    commentBlock.classList.add(`shake`);
+    
+    setTimeout(() => {
+      commentBlock.classList.remove(`shake`);
+    }, 600);
+  }
+
+  highlightRatingForm() {
+    const ratingBlock = this.getElement().querySelector(`.form-details__middle-container`);
+
+    ratingBlock.classList.add(`shake`);
+    ratingBlock.style.backgroundColor = `#380101`;
+    
+    setTimeout(() => {
+      ratingBlock.classList.remove(`shake`);
+    }, 600);
   }
 }

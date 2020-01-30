@@ -36,20 +36,22 @@ export class MovieController {
     this._bigCardComponent.setOnDeleteCommentClickCallback((commentId) => {
       const newMovieData = MovieModel.clone(this._movieData);
       newMovieData.comments = newMovieData.comments.filter((id) => Number(id) !== commentId);
-      this._onDataChange(this._movieData, newMovieData);
+      this._onDataChange(this._movieData, newMovieData, this);
     });
 
     this._bigCardComponent.setOnUserRatingClickCallback((userRating) => {
-      const newMovieData = MovieModel.clone(this._movieData);
-      newMovieData.userInfo.personalRating = Number(userRating);
-      this._onDataChange(this._movieData, newMovieData);
+      if (!this._isDataExchange()) {
+        const newMovieData = MovieModel.clone(this._movieData);
+        newMovieData.userInfo.personalRating = Number(userRating);
+        this._onDataChange(this._movieData, newMovieData, this);
+      }
     });
 
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
       component.setWatchlistButtonCallback(() => {
         const newMovieData = MovieModel.clone(this._movieData);
         newMovieData.userInfo.isOnTheWatchlist = !this._movieData.userInfo.isOnTheWatchlist;
-        this._onDataChange(this._movieData, newMovieData);
+        this._onDataChange(this._movieData, newMovieData, this);
       });
 
       component.setWatchedButtonCallback(() => {
@@ -57,13 +59,13 @@ export class MovieController {
         newMovieData.userInfo.personalRating = 0;
         newMovieData.userInfo.isAlreadyWatched = !this._movieData.userInfo.isAlreadyWatched;
         newMovieData.userInfo.watchingDate = newMovieData.userInfo.isAlreadyWatched ? new Date().toISOString() : new Date(0).toISOString();
-        this._onDataChange(this._movieData, newMovieData);
+        this._onDataChange(this._movieData, newMovieData, this);
       });
 
       component.setFavoriteButtonCallback(() => {
         const newMovieData = MovieModel.clone(this._movieData);
         newMovieData.userInfo.isFavorite = !this._movieData.userInfo.isFavorite;
-        this._onDataChange(this._movieData, newMovieData);
+        this._onDataChange(this._movieData, newMovieData, this);
       });
     });
 
@@ -90,10 +92,21 @@ export class MovieController {
     this._closeBigCard();
   }
 
+  resetForms() {
+    this._bigCardComponent.resetForms();
+  }
+
   shake(requestType) {
     switch (requestType) {
       case RequestType.CREATING_COMMENT:
         this._bigCardComponent.highlightCommentField();
+        break;
+      case RequestType.DELETING_COMMENT:
+        this._bigCardComponent.highlightComments();
+        break;
+      case RequestType.SETTING_RATING:
+        this._bigCardComponent.highlightRatingForm();
+        break;
     }
   }
 

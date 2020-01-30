@@ -171,11 +171,13 @@ export class PageController {
   }
 
   _onDataChange(oldMovie, newMovie, movieController) {
+    movieController.resetForms();
     this._isDataExchange = true;
     let requestType = null;
     const requests = [this._moviesModel.updateMovie(oldMovie.id, newMovie)];
 
     if (oldMovie.comments.length > newMovie.comments.length) {
+      requestType = RequestType.DELETING_COMMENT;
       const deletedCommentId = oldMovie.comments.find((commentId, index) => commentId !== newMovie.comments[index]);
       requests.push(this._moviesModel.deleteComment(deletedCommentId));
     }
@@ -184,6 +186,10 @@ export class PageController {
       requestType = RequestType.CREATING_COMMENT;
       requests.push(this._moviesModel.createComment(newMovie, newMovie.localComment));
       delete newMovie.localComment;
+    }
+
+    if (!oldMovie.userInfo.personalRating && newMovie.userInfo.personalRating) {
+      requestType = RequestType.SETTING_RATING;
     }
 
     Promise.all(requests)

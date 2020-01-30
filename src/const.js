@@ -34,6 +34,8 @@ const Timestamp = {
 
 const RequestType = {
   CREATING_COMMENT: `create comment`,
+  DELETING_COMMENT: `deleting comment`,
+  SETTING_RATING: `setting rating`,
 };
 
 export {
