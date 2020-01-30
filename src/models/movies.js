@@ -1,16 +1,14 @@
 import {sortMovies} from '../utils/sort';
 import {filterMovies} from '../utils/filter';
 import {DEFAULT_SORT_TYPE, FilterType} from '../const';
-import {COMMENT_AUTHORS} from '../mock/comments';
-import {getRandomArrayItem} from '../utils/common';
 
 export default class Movies {
-  constructor() {
+  constructor(api) {
+    this._api = api;
     this._movies = null;
-    this._comments = null;
+    this._comments = [];
     this._filterType = FilterType.ALL;
     this._sortType = DEFAULT_SORT_TYPE;
-    this._sortChangeHandlers = null;
     this._filterChangeHandler = null;
   }
 
@@ -19,7 +17,7 @@ export default class Movies {
   }
 
   get comments() {
-    return this._comments;
+    return Array.from(this._comments);
   }
 
   get filterType() {
@@ -34,8 +32,26 @@ export default class Movies {
     this._movies = Array.from(movies);
   }
 
-  set comments(comments) {
-    this._comments = comments;
+  getMovies() {
+    return this._api.getMovies()
+      .then((movies) => {
+        this.movies = movies;
+        return movies;
+      });
+  }
+
+  getMovie(id) {
+    return this._movies.find((movie) => movie.id === id);
+  }
+
+  getComments(movieId) {
+    return this._api.getComments(movieId)
+      .then((comments) => this._comments.push(...comments));
+  }
+
+  getMovieComments(movieId) {
+    const movieCommentIds = this._movies.find((movie) => movie.id === movieId).comments;
+    return movieCommentIds.map((id) => this._comments.find((comment) => comment.id === id));
   }
 
   getMoviesForRender() {
@@ -46,17 +62,26 @@ export default class Movies {
   }
 
   updateMovie(oldMovieId, newMovie) {
-    if (newMovie.localComment) {
-      this.addComment(Object.assign(newMovie.localComment, {
-        id: this._comments.length + 1,
-        author: getRandomArrayItem(COMMENT_AUTHORS),
-      }));
+    return this._api.updateMovie(oldMovieId, newMovie)
+      .then(() => {
+        this._movies = this._movies.map((movie) => movie.id === oldMovieId ? newMovie : movie);
+      });
+  }
 
-      newMovie.comments.unshift(this._comments.length);
-      delete newMovie.localComment;
-    }
+  deleteComment(commentId) {
+    this._api.deleteComment(commentId)
+      .then(() => {
+        this._comments = this._comments.filter((comment) => Number(comment.id) !== commentId);
+      });
+  }
 
-    this._movies = this._movies.map((movie) => movie.id === oldMovieId ? newMovie : movie);
+  createComment(movie, newComment) {
+    return this._api.createComment(movie.id, newComment)
+      .then(({movie: newMovie, comments}) => {
+        const newCommentData = comments.find((comment) => !movie.comments.find((id) => id === comment.id));
+        this._comments.push(newCommentData);
+        this._movies = this._movies.map((oldMovie) => oldMovie.id === newMovie.id ? newMovie : oldMovie);
+      });
   }
 
   setSortChangeHandler(handler) {
@@ -75,9 +100,5 @@ export default class Movies {
   setFilter(filterType) {
     this._filterType = filterType;
     this._filterChangeHandler();
-  }
-
-  addComment(comment) {
-    this._comments.unshift(comment);
   }
 }

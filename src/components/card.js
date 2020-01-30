@@ -43,7 +43,7 @@ const createCardMarkup = (movieData) => {
         <span class="film-card__genre">${genres}</span>
       </p>
       <img src="${poster}" alt="${name}" class="film-card__poster">
-      <p class="film-card__description">${shortenText(description, DESCRIPTION_MAX_LENGTH)}</p>
+      <p class="film-card__description">${shortenText(capitalize(description), DESCRIPTION_MAX_LENGTH)}</p>
       <a class="film-card__comments">${commentsNumber} comments</a>
       <form class="film-card__controls">
         <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist${isOnTheWatchlist ? ` film-card__controls-item--active` : ``}">Add to watchlist</button>
@@ -57,11 +57,11 @@ const createCardMarkup = (movieData) => {
 export default class Card extends AbstractSmartComponent {
   constructor(movieData) {
     super();
-    this._movieData = movieData;
+    this._primaryData = movieData;
   }
 
   getTemplate() {
-    return createCardMarkup(this._movieData);
+    return createCardMarkup(this._primaryData);
   }
 
   setOpenCallback(callback) {

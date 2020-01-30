@@ -169,21 +169,36 @@ export class PageController {
   }
 
   _onDataChange(oldMovie, newMovie) {
-    const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
-    this._moviesModel.updateMovie(oldMovie.id, newMovie);
-    const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
+    const requests = [this._moviesModel.updateMovie(oldMovie.id, newMovie)];
 
-    if (newMovie.localComment) {
-      newMovie = this._moviesModel.movies.find((movie) => movie.id === newMovie.id);
+    if (oldMovie.comments.length > newMovie.comments.length) {
+      const deletedCommentId = oldMovie.comments.find((commentId, index) => commentId !== newMovie.comments[index]);
+      requests.push(this._moviesModel.deleteComment(deletedCommentId));
     }
 
-    instanceOfChangedMovies.forEach(({controller}) => {
-      controller.update(newMovie, this._moviesModel.comments);
-    });
+    if (newMovie.localComment) {
+      requests.push(this._moviesModel.createComment(newMovie, newMovie.localComment));
+      delete newMovie.localComment;
+    }
 
-    this._menuController.render();
-    this._statisticController.update(alreadyWatchedMovies);
-    this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
+    Promise.all(requests)
+      .then(() => {
+        const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
+        const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
+
+        instanceOfChangedMovies.forEach(({controller}) => {
+          const updatedMovie = this._moviesModel.getMovie(newMovie.id);
+          const updatedComments = this._moviesModel.getMovieComments(newMovie.id);
+          controller.update(updatedMovie, updatedComments);
+        });
+
+        this._menuController.render();
+        this._statisticController.update(alreadyWatchedMovies);
+        this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
+      })
+      .catch((error) => {
+        throw error;
+      });
   }
 
   _onCloseBigCard() {

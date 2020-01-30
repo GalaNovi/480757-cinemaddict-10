@@ -26,12 +26,19 @@ const UserRank = {
   0: `Novice`,
 };
 
+const Timestamp = {
+  WEEK: 7 * 24 * 60 * 60 * 1000,
+  MONTH: 30 * 24 * 60 * 60 * 1000,
+  YEAR: 365 * 24 * 60 * 60 * 1000,
+};
+
 export {
   EXTRA_MOVIES_HEADINGS,
   EMOTIONS, DEFAULT_SORT_TYPE,
   FILM_DETAILS_TITLES,
-  FilterType,
   DESCRIPTION_MAX_LENGTH,
-  UserRank,
   HIDDEN_CLASS,
+  UserRank,
+  FilterType,
+  Timestamp,
 };

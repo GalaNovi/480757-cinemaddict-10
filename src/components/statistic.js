@@ -1,7 +1,7 @@
 import AbstractSmartComponent from './abstract-smart-component';
 import {getUserRank} from '../utils/common';
 import {capitalize} from '../utils/common';
-import {HIDDEN_CLASS} from '../const';
+import {HIDDEN_CLASS, Timestamp} from '../const';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import moment from 'moment';
@@ -12,9 +12,9 @@ const HEIGHT_FOR_CHART_BAR = 60;
 const periodFilter = {
   'all-time': (item) => item,
   'today': (item) => Number(moment(new Date(item.userInfo.watchingDate).getTime()).format(`YYYYMMDD`)) === Number(moment(new Date()).format(`YYYYMMDD`)),
-  'week': (item) => Number(moment(new Date(item.userInfo.watchingDate).getTime()).format(`YYYYMMDD`)) >= Number(moment(new Date()).format(`YYYYMMDD`) - 7),
-  'month': (item) => Number(moment(new Date(item.userInfo.watchingDate).getTime()).format(`YYYYMM`)) === Number(moment(new Date()).format(`YYYYMM`)),
-  'year': (item) => Number(moment(new Date(item.userInfo.watchingDate).getTime()).format(`YYYY`)) === Number(moment(new Date()).format(`YYYY`)),
+  'week': (item) => new Date(item.userInfo.watchingDate).getTime() >= Date.now() - Timestamp.WEEK,
+  'month': (item) => new Date(item.userInfo.watchingDate).getTime() >= Date.now() - Timestamp.MONTH,
+  'year': (item) => new Date(item.userInfo.watchingDate).getTime() >= Date.now() - Timestamp.YEAR,
 };
 
 // Global settings for the Chart
@@ -138,7 +138,7 @@ const getGenresStatistic = (moviesData) => {
     return {name: genre};
   });
   genresStatistic.forEach((item) => {
-    item.amount = moviesData.filter(({movieInfo}) => movieInfo.genres.find((genre) => genre === item.name.toLowerCase())).length;
+    item.amount = moviesData.filter(({movieInfo}) => movieInfo.genres.find((genre) => genre.toLowerCase() === item.name.toLowerCase())).length;
   });
   return genresStatistic.sort((a, b) => b.amount - a.amount);
 };

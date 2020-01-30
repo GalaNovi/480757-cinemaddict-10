@@ -1,14 +1,14 @@
 import MoviesModel from './models/movies';
-import {generateMovies} from './mock/movie';
-import {generateComments} from './mock/comments';
+import API from './api.js';
 import {PageController} from './controllers/page';
 
-const MOVIES_AMOUNT = 23;
-const moviesData = generateMovies(MOVIES_AMOUNT);
-const commentsData = generateComments();
-const moviesModel = new MoviesModel();
-moviesModel.movies = moviesData;
-moviesModel.comments = commentsData;
+const END_POINT = `https://htmlacademy-es-10.appspot.com/cinemaddict/`;
+const AUTHORIZATION_CODE = `Basic lijarlbjndprasraeojgpoerfjig`;
+
+const api = new API(END_POINT, AUTHORIZATION_CODE);
+const moviesModel = new MoviesModel(api);
 const pageController = new PageController(document.body, moviesModel);
 
-pageController.render();
+moviesModel.getMovies()
+  .then((movies) => Promise.all(movies.map((movie) => moviesModel.getComments(movie.id))))
+  .then(() => pageController.render());

@@ -1,5 +1,6 @@
 import BigCard from '../components/big-card';
 import Card from '../components/card';
+import MovieModel from '../models/movie';
 import {render} from '../utils/render';
 
 export class MovieController {
@@ -22,52 +23,45 @@ export class MovieController {
   render(movieData, comments) {
     this._id = movieData.id;
     this._movieData = movieData;
+    this._comments = this._movieData.comments.map((id) => comments.find((comment) => comment.id === id));
     this._cardComponent = new Card(this._movieData);
-    this._bigCardComponent = new BigCard(this._movieData, comments);
+    this._bigCardComponent = new BigCard(this._movieData, this._comments);
 
     this._cardComponent.setOpenCallback(this._openBigCard);
     this._bigCardComponent.setCloseCallback(this._closeBigCard);
     this._bigCardComponent.setOnEmojiListClickHandler();
 
     this._bigCardComponent.setOnDeleteCommentClickCallback((commentId) => {
-      this._onDataChange(this._movieData, Object.assign({}, this._movieData, {
-        comments: this._movieData.comments.filter((id) => id !== commentId)
-      }));
+      const newMovieData = MovieModel.clone(this._movieData);
+      newMovieData.comments = newMovieData.comments.filter((id) => Number(id) !== commentId);
+      this._onDataChange(this._movieData, newMovieData);
     });
 
     this._bigCardComponent.setOnUserRatingClickCallback((userRating) => {
-      this._onDataChange(this._movieData, Object.assign({}, this._movieData, {
-        userInfo: Object.assign({}, this._movieData.userInfo, {
-          personalRating: userRating
-        })
-      }));
+      const newMovieData = MovieModel.clone(this._movieData);
+      newMovieData.userInfo.personalRating = Number(userRating);
+      this._onDataChange(this._movieData, newMovieData);
     });
 
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
       component.setWatchlistButtonCallback(() => {
-        this._onDataChange(movieData, Object.assign({}, movieData, {
-          userInfo: Object.assign(movieData.userInfo, {
-            isOnTheWatchlist: !movieData.userInfo.isOnTheWatchlist
-          })
-        }));
+        const newMovieData = MovieModel.clone(this._movieData);
+        newMovieData.userInfo.isOnTheWatchlist = !this._movieData.userInfo.isOnTheWatchlist;
+        this._onDataChange(this._movieData, newMovieData);
       });
 
       component.setWatchedButtonCallback(() => {
-        this._onDataChange(movieData, Object.assign({}, movieData, {
-          userInfo: Object.assign(movieData.userInfo, {
-            personalRating: 0,
-            isAlreadyWatched: !movieData.userInfo.isAlreadyWatched,
-            watchingDate: !movieData.userInfo.isAlreadyWatched ? new Date().toDateString() : null,
-          })
-        }));
+        const newMovieData = MovieModel.clone(this._movieData);
+        newMovieData.userInfo.personalRating = 0;
+        newMovieData.userInfo.isAlreadyWatched = !this._movieData.userInfo.isAlreadyWatched;
+        newMovieData.userInfo.watchingDate = newMovieData.userInfo.isAlreadyWatched ? new Date().toISOString() : new Date(0).toISOString();
+        this._onDataChange(this._movieData, newMovieData);
       });
 
       component.setFavoriteButtonCallback(() => {
-        this._onDataChange(movieData, Object.assign({}, movieData, {
-          userInfo: Object.assign(movieData.userInfo, {
-            isFavorite: !movieData.userInfo.isFavorite
-          })
-        }));
+        const newMovieData = MovieModel.clone(this._movieData);
+        newMovieData.userInfo.isFavorite = !this._movieData.userInfo.isFavorite;
+        this._onDataChange(this._movieData, newMovieData);
       });
     });
 
@@ -79,17 +73,13 @@ export class MovieController {
     this._bigCardComponent.removeElement();
   }
 
-  // updateComponents(newMovieData, comments) {
-  //   this._cardComponent.update(newMovieData, comments);
-  //   this._bigCardComponent.update(newMovieData, comments);
-  // }
-
-  // updateMovieData(newMovieData) {
-  //   this._movieData = newMovieData;
-  // }
-
   update(newMovieData, comments) {
     this._movieData = newMovieData;
+
+    if (comments) {
+      this._comments = comments;
+    }
+
     this._cardComponent.update(newMovieData, comments);
     this._bigCardComponent.update(newMovieData, comments);
   }
@@ -113,13 +103,13 @@ export class MovieController {
       const emotionImageElement = this._bigCardComponent.getElement().querySelector(`.film-details__add-emoji-label img`);
 
       if (commentFieldElement.value && emotionImageElement) {
-        this._onDataChange(this._movieData, Object.assign({}, this._movieData, {
-          localComment: {
-            comment: commentFieldElement.value,
-            date: dateValue,
-            emotion: emotionImageElement.getAttribute(`data-emoji`),
-          }
-        }));
+        const newMovieData = MovieModel.clone(this._movieData);
+        newMovieData.localComment = {
+          comment: commentFieldElement.value,
+          date: dateValue,
+          emotion: emotionImageElement.getAttribute(`data-emoji`),
+        };
+        this._onDataChange(this._movieData, newMovieData);
       }
     }
   }
