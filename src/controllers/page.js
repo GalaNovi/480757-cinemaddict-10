@@ -9,7 +9,7 @@ import {MenuController} from './menu';
 import {StatisticController} from '../controllers/statistic';
 import {getNextItemsIterator, getUserRank} from '../utils/common';
 import {render} from '../utils/render';
-import {EXTRA_MOVIES_HEADINGS} from '../const';
+import {EXTRA_MOVIES_HEADINGS, RequestType} from '../const';
 
 const START_MOVIES_AMOUNT = 5;
 const ADD_MOVIES_AMOUNT = 5;
@@ -39,6 +39,7 @@ export class PageController {
     this._shownMoviesInstances = [];
     this._moviesData = [];
     this._extraMoviesComponents = [];
+    this._isDataExchange = false;
 
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
@@ -47,6 +48,7 @@ export class PageController {
     this._onCloseBigCard = this._onCloseBigCard.bind(this);
     this._showMovies = this._showMovies.bind(this);
     this._showStatistic = this._showStatistic.bind(this);
+    this._getDataExchangeStatus = this._getDataExchangeStatus.bind(this);
 
     this._moviesModel.setSortChangeHandler(this._onSortChange);
     this._moviesModel.setFilterChangeHandler(this._onFilterChange);
@@ -82,7 +84,7 @@ export class PageController {
 
   _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
     const comments = this._moviesModel.comments;
-    const movieController = new MovieController(container, this._onDataChange, this._onViewChange, this._onCloseBigCard);
+    const movieController = new MovieController(container, this._onDataChange, this._onViewChange, this._onCloseBigCard, this._getDataExchangeStatus);
     const movieInstance = {
       type: MAIN_MOVIES_TYPE,
       controller: movieController,
@@ -168,7 +170,9 @@ export class PageController {
     return currentExtraMoviesIdsString !== newExtraMoviesIdsString;
   }
 
-  _onDataChange(oldMovie, newMovie) {
+  _onDataChange(oldMovie, newMovie, movieController) {
+    this._isDataExchange = true;
+    let requestType = null;
     const requests = [this._moviesModel.updateMovie(oldMovie.id, newMovie)];
 
     if (oldMovie.comments.length > newMovie.comments.length) {
@@ -177,6 +181,7 @@ export class PageController {
     }
 
     if (newMovie.localComment) {
+      requestType = RequestType.CREATING_COMMENT;
       requests.push(this._moviesModel.createComment(newMovie, newMovie.localComment));
       delete newMovie.localComment;
     }
@@ -195,10 +200,16 @@ export class PageController {
         this._menuController.render();
         this._statisticController.update(alreadyWatchedMovies);
         this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
+        this._isDataExchange = false;
       })
-      .catch((error) => {
-        throw error;
+      .catch(() => {
+        this._isDataExchange = false;
+        movieController.shake(requestType);
       });
+  }
+
+  _getDataExchangeStatus() {
+    return this._isDataExchange;
   }
 
   _onCloseBigCard() {

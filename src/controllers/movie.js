@@ -2,13 +2,15 @@ import BigCard from '../components/big-card';
 import Card from '../components/card';
 import MovieModel from '../models/movie';
 import {render} from '../utils/render';
+import {RequestType} from '../const';
 
 export class MovieController {
-  constructor(container, onDataChange, onViewChange, onCloseBigCard) {
+  constructor(container, onDataChange, onViewChange, onCloseBigCard, getDataExchangeStatus) {
     this._container = container;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
     this._onCloseBigCard = onCloseBigCard;
+    this._isDataExchange = getDataExchangeStatus;
 
     this._onEsqKeyDown = this._onEsqKeyDown.bind(this);
     this._openBigCard = this._openBigCard.bind(this);
@@ -88,6 +90,13 @@ export class MovieController {
     this._closeBigCard();
   }
 
+  shake(requestType) {
+    switch (requestType) {
+      case RequestType.CREATING_COMMENT:
+        this._bigCardComponent.highlightCommentField();
+    }
+  }
+
   _onEsqKeyDown(evt) {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
@@ -102,14 +111,14 @@ export class MovieController {
       const dateValue = new Date().toISOString();
       const emotionImageElement = this._bigCardComponent.getElement().querySelector(`.film-details__add-emoji-label img`);
 
-      if (commentFieldElement.value && emotionImageElement) {
+      if (commentFieldElement.value && emotionImageElement && !this._isDataExchange()) {
         const newMovieData = MovieModel.clone(this._movieData);
         newMovieData.localComment = {
           comment: commentFieldElement.value,
           date: dateValue,
           emotion: emotionImageElement.getAttribute(`data-emoji`),
         };
-        this._onDataChange(this._movieData, newMovieData);
+        this._onDataChange(this._movieData, newMovieData, this);
       }
     }
   }

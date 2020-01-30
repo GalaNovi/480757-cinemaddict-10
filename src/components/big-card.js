@@ -350,4 +350,17 @@ export default class BigCard extends AbstractSmartComponent {
     this.setOnDeleteCommentClickCallback();
     this.setOnUserRatingClickCallback();
   }
+
+  highlightCommentField() {
+    const commentBlock = this.getElement().querySelector(`.film-details__new-comment`);
+    const commentField = this.getElement().querySelector(`.film-details__comment-input`);
+
+    commentBlock.classList.add(`shake`);
+    commentField.style.borderColor = `#ff0000`;
+    
+    setTimeout(() => {
+      commentBlock.classList.remove(`shake`);
+      commentField.style.borderColor = ``;
+    }, 600)
+  }
 }

@@ -32,6 +32,10 @@ const Timestamp = {
   YEAR: 365 * 24 * 60 * 60 * 1000,
 };
 
+const RequestType = {
+  CREATING_COMMENT: `create comment`,
+};
+
 export {
   EXTRA_MOVIES_HEADINGS,
   EMOTIONS, DEFAULT_SORT_TYPE,
@@ -41,4 +45,5 @@ export {
   UserRank,
   FilterType,
   Timestamp,
+  RequestType,
 };
