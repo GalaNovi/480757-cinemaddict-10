@@ -177,25 +177,19 @@ export class PageController {
     }
 
     if (newMovie.localComment) {
-      requests.push(this._moviesModel.createComment(newMovie.id, newMovie.localComment));
+      requests.push(this._moviesModel.createComment(newMovie, newMovie.localComment));
       delete newMovie.localComment;
     }
 
     Promise.all(requests)
-      .then((response) => {
-        const commentInfo = response[1];
+      .then(() => {
         const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
         const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
-        let newComments = null;
-
-        // if (commentInfo && commentInfo.movie) {
-        //   this._moviesModel.updateMovie(oldMovie.id, commentInfo.movie);
-        //   newComments = commentInfo.comments;
-        //   newMovie = commentInfo.movie;
-        // }
 
         instanceOfChangedMovies.forEach(({controller}) => {
-          controller.update(newMovie, newComments);
+          const updatedMovie = this._moviesModel.getMovie(newMovie.id);
+          const updatedComments = this._moviesModel.getMovieComments(newMovie.id);
+          controller.update(updatedMovie, updatedComments);
         });
 
         this._menuController.render();

@@ -6,7 +6,7 @@ export default class Movies {
   constructor(api) {
     this._api = api;
     this._movies = null;
-    this._comments = new Set();
+    this._comments = [];
     this._filterType = FilterType.ALL;
     this._sortType = DEFAULT_SORT_TYPE;
     this._filterChangeHandler = null;
@@ -40,11 +40,18 @@ export default class Movies {
       });
   }
 
+  getMovie(id) {
+    return this._movies.find((movie) => movie.id === id);
+  }
+
   getComments(movieId) {
     return this._api.getComments(movieId)
-      .then((comments) => {
-        comments.forEach((comment) => this._comments.add(comment))
-      });
+      .then((comments) => this._comments.push(...comments));
+  }
+
+  getMovieComments(movieId) {
+    const movieCommentIds = this._movies.find((movie) => movie.id === movieId).comments;
+    return movieCommentIds.map((id) => this._comments.find((comment) => comment.id === id));
   }
 
   getMoviesForRender() {
@@ -68,10 +75,12 @@ export default class Movies {
       });
   }
 
-  createComment(movieId, comment) {
-    return this._api.createComment(movieId, comment)
-      .then(({newMovie, comments}) => {
-        this._movies = this._movies.map((movie) => movie.id === newMovie.id ? newMovie : movie);
+  createComment(movie, newComment) {
+    return this._api.createComment(movie.id, newComment)
+      .then(({movie: newMovie, comments}) => {
+        const newCommentData = comments.find((comment) => !movie.comments.find((id) => id === comment.id));
+        this._comments.push(newCommentData);
+        this._movies = this._movies.map((oldMovie) => oldMovie.id === newMovie.id ? newMovie : oldMovie);
       });
   }
 
