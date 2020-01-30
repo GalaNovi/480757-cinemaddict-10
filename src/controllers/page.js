@@ -29,10 +29,9 @@ const extraMoviesParameters = {
 };
 
 export class PageController {
-  constructor(container, moviesModel, api) {
+  constructor(container, moviesModel) {
     this._container = container;
     this._moviesModel = moviesModel;
-    this._api = api;
     this._extraMoviesAmount = EXTRA_MOVIES_AMOUNT;
     this._renderedMoviesAmount = START_MOVIES_AMOUNT;
     this._moviesContainerComponent = new MoviesContainer();
@@ -170,16 +169,15 @@ export class PageController {
   }
 
   _onDataChange(oldMovie, newMovie) {
-    const requests = [this._api.updateMovie(oldMovie.id, newMovie)];
-    let deletedCommentId = null;
+    const requests = [this._moviesModel.updateMovie(oldMovie.id, newMovie)];
 
     if (oldMovie.comments.length > newMovie.comments.length) {
-      deletedCommentId = oldMovie.comments.find((commentId, index) => commentId !== newMovie.comments[index]);
-      requests.push(this._api.deleteComment(deletedCommentId));
+      const deletedCommentId = oldMovie.comments.find((commentId, index) => commentId !== newMovie.comments[index]);
+      requests.push(this._moviesModel.deleteComment(deletedCommentId));
     }
 
     if (newMovie.localComment) {
-      requests.push(this._api.createComment(newMovie.id, newMovie.localComment));
+      requests.push(this._moviesModel.createComment(newMovie.id, newMovie.localComment));
       delete newMovie.localComment;
     }
 
@@ -187,19 +185,14 @@ export class PageController {
       .then((response) => {
         const commentInfo = response[1];
         const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
-        this._moviesModel.updateMovie(oldMovie.id, newMovie);
         const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
         let newComments = null;
 
-        if (deletedCommentId) {
-          this._moviesModel.comments = this._moviesModel.comments.filter((comment) => Number(comment.id) !== deletedCommentId);
-        }
-
-        if (commentInfo && commentInfo.movie) {
-          this._moviesModel.updateMovie(oldMovie.id, commentInfo.movie);
-          newComments = commentInfo.comments;
-          newMovie = commentInfo.movie;
-        }
+        // if (commentInfo && commentInfo.movie) {
+        //   this._moviesModel.updateMovie(oldMovie.id, commentInfo.movie);
+        //   newComments = commentInfo.comments;
+        //   newMovie = commentInfo.movie;
+        // }
 
         instanceOfChangedMovies.forEach(({controller}) => {
           controller.update(newMovie, newComments);
@@ -210,7 +203,7 @@ export class PageController {
         this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
       })
       .catch((error) => {
-        throw error.message;
+        throw error;
       });
   }
 

@@ -3,12 +3,12 @@ import {filterMovies} from '../utils/filter';
 import {DEFAULT_SORT_TYPE, FilterType} from '../const';
 
 export default class Movies {
-  constructor() {
+  constructor(api) {
+    this._api = api;
     this._movies = null;
-    this._comments = null;
+    this._comments = new Set();
     this._filterType = FilterType.ALL;
     this._sortType = DEFAULT_SORT_TYPE;
-    this._sortChangeHandlers = null;
     this._filterChangeHandler = null;
   }
 
@@ -17,7 +17,7 @@ export default class Movies {
   }
 
   get comments() {
-    return this._comments;
+    return Array.from(this._comments);
   }
 
   get filterType() {
@@ -32,8 +32,19 @@ export default class Movies {
     this._movies = Array.from(movies);
   }
 
-  set comments(comments) {
-    this._comments = comments;
+  getMovies() {
+    return this._api.getMovies()
+      .then((movies) => {
+        this.movies = movies;
+        return movies;
+      });
+  }
+
+  getComments(movieId) {
+    return this._api.getComments(movieId)
+      .then((comments) => {
+        comments.forEach((comment) => this._comments.add(comment))
+      });
   }
 
   getMoviesForRender() {
@@ -44,7 +55,24 @@ export default class Movies {
   }
 
   updateMovie(oldMovieId, newMovie) {
-    this._movies = this._movies.map((movie) => movie.id === oldMovieId ? newMovie : movie);
+    return this._api.updateMovie(oldMovieId, newMovie)
+      .then(() => {
+        this._movies = this._movies.map((movie) => movie.id === oldMovieId ? newMovie : movie);
+      });
+  }
+
+  deleteComment(commentId) {
+    this._api.deleteComment(commentId)
+      .then(() => {
+        this._comments = this._comments.filter((comment) => Number(comment.id) !== commentId);
+      });
+  }
+
+  createComment(movieId, comment) {
+    return this._api.createComment(movieId, comment)
+      .then(({newMovie, comments}) => {
+        this._movies = this._movies.map((movie) => movie.id === newMovie.id ? newMovie : movie);
+      });
   }
 
   setSortChangeHandler(handler) {
@@ -63,9 +91,5 @@ export default class Movies {
   setFilter(filterType) {
     this._filterType = filterType;
     this._filterChangeHandler();
-  }
-
-  addComment(comment) {
-    this._comments.unshift(comment);
   }
 }

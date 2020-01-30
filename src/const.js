@@ -36,9 +36,9 @@ export {
   EXTRA_MOVIES_HEADINGS,
   EMOTIONS, DEFAULT_SORT_TYPE,
   FILM_DETAILS_TITLES,
-  FilterType,
   DESCRIPTION_MAX_LENGTH,
-  UserRank,
   HIDDEN_CLASS,
+  UserRank,
+  FilterType,
   Timestamp,
 };

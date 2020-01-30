@@ -32,20 +32,6 @@ export default class Api {
       .then((response) => response.json());
   }
 
-  createComment(movieId, comment) {
-    return this._load({
-      url: `comments/${movieId}`,
-      method: Method.POST,
-      body: JSON.stringify(comment),
-      headers: new Headers({'Content-Type': `application/json`}),
-    })
-    .then((response) => response.json())
-    .then((response) => {
-      response.movie = Movie.parseMovie(response.movie);
-      return response;
-    });
-  }
-
   updateMovie(id, newMovieData) {
     return this._load({
       url: `movies/${id}`,
@@ -61,6 +47,20 @@ export default class Api {
     return this._load({
       url: `comments/${id}`,
       method: Method.DELETE,
+    });
+  }
+
+  createComment(movieId, comment) {
+    return this._load({
+      url: `comments/${movieId}`,
+      method: Method.POST,
+      body: JSON.stringify(comment),
+      headers: new Headers({'Content-Type': `application/json`}),
+    })
+    .then((response) => response.json())
+    .then((response) => {
+      response.movie = Movie.parseMovie(response.movie);
+      return response;
     });
   }
 
