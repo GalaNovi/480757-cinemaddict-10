@@ -1,5 +1,4 @@
 const EXTRA_MOVIES_HEADINGS = [`Top rated`, `Most commented`];
-const EMOTIONS = [`smile`, `sleeping`, `puke`, `angry`];
 const DEFAULT_SORT_TYPE = `default`;
 const DESCRIPTION_MAX_LENGTH = 140;
 const HIDDEN_CLASS = `visually-hidden`;
@@ -20,7 +19,7 @@ const FilterType = {
   FAVORITES: `favorites`,
 };
 
-const UserRank = {
+const userRank = {
   20: `Movie Buff`,
   10: `Fun`,
   0: `Novice`,
@@ -43,11 +42,11 @@ const RequestType = {
 
 export {
   EXTRA_MOVIES_HEADINGS,
-  EMOTIONS, DEFAULT_SORT_TYPE,
+  DEFAULT_SORT_TYPE,
   FILM_DETAILS_TITLES,
   DESCRIPTION_MAX_LENGTH,
   HIDDEN_CLASS,
-  UserRank,
+  userRank,
   FilterType,
   Timestamp,
   RequestType,

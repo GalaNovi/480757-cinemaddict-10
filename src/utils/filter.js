@@ -1,6 +1,6 @@
 import {FilterType} from '../const';
 
-const filterParametens = {
+const filterParameters = {
   watchlist: ({userInfo}) => userInfo.isOnTheWatchlist,
   history: ({userInfo}) => userInfo.isAlreadyWatched,
   favorites: ({userInfo}) => userInfo.isFavorite,
@@ -10,6 +10,6 @@ export const filterMovies = (moviesData, filterType) => {
   if (filterType === FilterType.ALL) {
     return moviesData;
   } else {
-    return moviesData.filter(filterParametens[filterType]);
+    return moviesData.filter(filterParameters[filterType]);
   }
 };

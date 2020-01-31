@@ -62,7 +62,7 @@ export default class Movies {
   }
 
   updateMovie(oldMovieId, newMovie) {
-    return this._api.updateMovie(oldMovieId, newMovie)
+    return this._api.updateMovie(oldMovieId, newMovie.toRAW())
       .then(() => {
         this._movies = this._movies.map((movie) => movie.id === oldMovieId ? newMovie : movie);
       });

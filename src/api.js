@@ -36,11 +36,10 @@ export default class Api {
     return this._load({
       url: `movies/${id}`,
       method: Method.PUT,
-      body: JSON.stringify(newMovieData.toRAW()),
+      body: JSON.stringify(newMovieData),
       headers: new Headers({'Content-Type': `application/json`}),
     })
-    .then((response) => response.json())
-    .then(Movie.parseMovie);
+    .then((response) => response.json());
   }
 
   deleteComment(id) {
