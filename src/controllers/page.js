@@ -174,44 +174,29 @@ export class PageController {
     movieController.resetForms();
     this._isDataExchange = true;
     let requestType = null;
-    const requests = [this._moviesModel.updateMovie(oldMovie.id, newMovie)];
 
     if (oldMovie.comments.length > newMovie.comments.length) {
       requestType = RequestType.DELETING_COMMENT;
       const deletedCommentId = oldMovie.comments.find((commentId, index) => commentId !== newMovie.comments[index]);
-      requests.push(this._moviesModel.deleteComment(deletedCommentId));
-    }
 
-    if (newMovie.localComment) {
+      this._moviesModel.deleteComment(newMovie, deletedCommentId)
+        .then(() => this._updatePage(oldMovie, newMovie))
+        .catch(() => this._onRequestError(movieController, requestType));
+    } else if (newMovie.localComment) {
       requestType = RequestType.CREATING_COMMENT;
-      requests.push(this._moviesModel.createComment(newMovie, newMovie.localComment));
-      delete newMovie.localComment;
+
+      this._moviesModel.createComment(newMovie, newMovie.localComment)
+        .then(() => this._updatePage(oldMovie, newMovie))
+        .catch(() => this._onRequestError(movieController, requestType));
+    } else {
+      if (!oldMovie.userInfo.personalRating && newMovie.userInfo.personalRating) {
+        requestType = RequestType.SETTING_RATING;
+      }
+
+      this._moviesModel.updateMovie(oldMovie.id, newMovie)
+        .then(() => this._updatePage(oldMovie, newMovie))
+        .catch(() => this._onRequestError(movieController, requestType));
     }
-
-    if (!oldMovie.userInfo.personalRating && newMovie.userInfo.personalRating) {
-      requestType = RequestType.SETTING_RATING;
-    }
-
-    Promise.all(requests)
-      .then(() => {
-        const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
-        const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
-
-        instanceOfChangedMovies.forEach(({controller}) => {
-          const updatedMovie = this._moviesModel.getMovie(newMovie.id);
-          const updatedComments = this._moviesModel.getMovieComments(newMovie.id);
-          controller.update(updatedMovie, updatedComments);
-        });
-
-        this._menuController.render();
-        this._statisticController.update(alreadyWatchedMovies);
-        this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
-        this._isDataExchange = false;
-      })
-      .catch(() => {
-        this._isDataExchange = false;
-        movieController.shake(requestType);
-      });
   }
 
   _getDataExchangeStatus() {
@@ -248,5 +233,29 @@ export class PageController {
     this._statisticController.showStatistic();
     this._sortController.hideSort();
     this._mainMoviesListInit();
+  }
+
+  _onRequestError(movieController, requestType) {
+    this._isDataExchange = false;
+    movieController.shake(requestType);
+  }
+
+  _updateInstanses(oldMovie, newMovie) {
+    const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
+    instanceOfChangedMovies.forEach(({controller}) => {
+      const updatedMovie = this._moviesModel.getMovie(newMovie.id);
+      const updatedComments = this._moviesModel.getMovieComments(newMovie.id);
+      controller.update(updatedMovie, updatedComments);
+    });
+    this._isDataExchange = false;
+  }
+
+  _updatePage(oldMovie, newMovie) {
+    const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
+
+    this._menuController.render();
+    this._statisticController.update(alreadyWatchedMovies);
+    this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
+    this._updateInstanses(oldMovie, newMovie);
   }
 }

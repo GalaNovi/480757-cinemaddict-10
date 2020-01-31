@@ -68,9 +68,10 @@ export default class Movies {
       });
   }
 
-  deleteComment(commentId) {
-    this._api.deleteComment(commentId)
+  deleteComment(newMovie, commentId) {
+    return this._api.deleteComment(commentId)
       .then(() => {
+        this._movies = this._movies.map((movie) => movie.id === newMovie.id ? newMovie : movie);
         this._comments = this._comments.filter((comment) => Number(comment.id) !== commentId);
       });
   }
