@@ -360,7 +360,7 @@ export default class BigCard extends AbstractSmartComponent {
 
     if (ratingBlock) {
       ratingBlock.style.backgroundColor = ``;
-    };
+    }
   }
 
   highlightCommentField() {
