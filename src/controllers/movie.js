@@ -107,6 +107,18 @@ export class MovieController {
       case RequestType.SETTING_RATING:
         this._bigCardComponent.highlightRatingForm();
         break;
+      case RequestType.WATCHLIST:
+        this._cardComponent.highlightWatchlistButton();
+        this._bigCardComponent.highlightWatchlistButton();
+        break;
+      case RequestType.WATCHED:
+        this._cardComponent.highlightWatchedButton();
+        this._bigCardComponent.highlightWatchedButton();
+        break;
+      case RequestType.FAVORITE:
+        this._cardComponent.highlightFavoriteButton();
+        this._bigCardComponent.highlightFavoriteButton();
+        break;
     }
   }
 

@@ -5,6 +5,7 @@ import moment from 'moment';
 
 const USER_RATING_SCORES_AMOUNT = 9;
 const UNDEFINED_COMMENTS_MESSAGE = `Sorry, comments data are missing. Please reboot the app.`;
+const ERROR_COLOR = `#380101`;
 
 const formatReleaseDate = (timestamp) => {
   return moment(timestamp).format(`DD MMMM YYYY`);
@@ -365,33 +366,33 @@ export default class BigCard extends AbstractSmartComponent {
   highlightCommentField() {
     const commentBlock = this.getElement().querySelector(`.film-details__new-comment`);
     const commentField = this.getElement().querySelector(`.film-details__comment-input`);
-
-    commentBlock.classList.add(`shake`);
-    commentField.style.borderColor = `#ff0000`;
-    
-    setTimeout(() => {
-      commentBlock.classList.remove(`shake`);
-    }, 600);
+    commentField.style.borderColor = ERROR_COLOR;
+    this._shakeElement(commentBlock);
   }
 
   highlightComments() {
     const commentBlock = this.getElement().querySelector(`.film-details__comments-list`);
-
-    commentBlock.classList.add(`shake`);
-    
-    setTimeout(() => {
-      commentBlock.classList.remove(`shake`);
-    }, 600);
+    this._shakeElement(commentBlock);
   }
 
   highlightRatingForm() {
-    const ratingBlock = this.getElement().querySelector(`.form-details__middle-container`);
+    const ratingBlockElement = this.getElement().querySelector(`.form-details__middle-container`);
+    ratingBlockElement.style.backgroundColor = ERROR_COLOR;
+    this._shakeElement(ratingBlockElement);
+  }
 
-    ratingBlock.classList.add(`shake`);
-    ratingBlock.style.backgroundColor = `#380101`;
-    
-    setTimeout(() => {
-      ratingBlock.classList.remove(`shake`);
-    }, 600);
+  highlightWatchlistButton() {
+    const watchlistButtonElement = this.getElement().querySelector(`.film-details__control-label--watchlist`);
+    this._shakeElement(watchlistButtonElement);
+  }
+
+  highlightWatchedButton() {
+    const watchedButtonElement = this.getElement().querySelector(`.film-details__control-label--watched`);
+    this._shakeElement(watchedButtonElement);
+  }
+
+  highlightFavoriteButton() {
+    const favoriteButtonElement = this.getElement().querySelector(`.film-details__control-label--favorite`);
+    this._shakeElement(favoriteButtonElement);
   }
 }

@@ -191,6 +191,12 @@ export class PageController {
     } else {
       if (!oldMovie.userInfo.personalRating && newMovie.userInfo.personalRating) {
         requestType = RequestType.SETTING_RATING;
+      } else if (oldMovie.userInfo.isOnTheWatchlist !== newMovie.userInfo.isOnTheWatchlist) {
+        requestType = RequestType.WATCHLIST;
+      } else if (oldMovie.userInfo.isAlreadyWatched !== newMovie.userInfo.isAlreadyWatched) {
+        requestType = RequestType.WATCHED;
+      } else if (oldMovie.userInfo.isFavorite !== newMovie.userInfo.isFavorite) {
+        requestType = RequestType.FAVORITE;
       }
 
       this._moviesModel.updateMovie(oldMovie.id, newMovie)

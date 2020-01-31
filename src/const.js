@@ -36,6 +36,9 @@ const RequestType = {
   CREATING_COMMENT: `create comment`,
   DELETING_COMMENT: `deleting comment`,
   SETTING_RATING: `setting rating`,
+  WATCHLIST: `watchlist`,
+  WATCHED: `watched`,
+  FAVORITE: `favirite`,
 };
 
 export {
