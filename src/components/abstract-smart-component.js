@@ -26,4 +26,9 @@ export default class AbstractSmartComponent extends AbstractComponent {
 
     this.rerender();
   }
+
+  _shakeElement(element) {
+    element.classList.add(`shake`);
+    setTimeout(() => element.classList.remove(`shake`), 600);
+  }
 }

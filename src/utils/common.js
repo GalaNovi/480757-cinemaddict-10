@@ -1,16 +1,7 @@
 import moment from 'moment';
-import {UserRank} from '../const';
+import {userRank} from '../const';
 
 const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
-
-const shuffleArray = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-
-  return array;
-};
 
 const getNextItemsIterator = (items, itemsPartAmount, startItemsAmount) => {
   const itemsAmount = items.length;
@@ -32,13 +23,12 @@ const formatTime = (duration) => {
   return `${time.hours()}h ${time.minutes()}m`;
 };
 
-const getRandomBetween = (min, max, demicalPlacesCount = 0) => Number(parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(demicalPlacesCount));
-const getRandomArrayItem = (array) => array[getRandomBetween(0, array.length - 1)];
+const getRandomBetween = (min, max, decimalPlacesCount = 0) => Number(parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(decimalPlacesCount));
 
 const getUserRank = (moviesAmount) => {
   return moviesAmount ?
-    UserRank[Object.keys(UserRank).reverse().find((key) => moviesAmount > key || moviesAmount === 0)] :
-    UserRank[0];
+    userRank[Object.keys(userRank).reverse().find((key) => moviesAmount > key || moviesAmount === 0)] :
+    userRank[0];
 };
 
-export {capitalize, shuffleArray, getNextItemsIterator, formatTime, getRandomBetween, getRandomArrayItem, getUserRank};
+export {capitalize, getNextItemsIterator, formatTime, getRandomBetween, getUserRank};

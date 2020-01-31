@@ -5,6 +5,7 @@ import moment from 'moment';
 
 const USER_RATING_SCORES_AMOUNT = 9;
 const UNDEFINED_COMMENTS_MESSAGE = `Sorry, comments data are missing. Please reboot the app.`;
+const ERROR_COLOR = `#380101`;
 
 const formatReleaseDate = (timestamp) => {
   return moment(timestamp).format(`DD MMMM YYYY`);
@@ -349,5 +350,49 @@ export default class BigCard extends AbstractSmartComponent {
     this.setOnEmojiListClickHandler();
     this.setOnDeleteCommentClickCallback();
     this.setOnUserRatingClickCallback();
+  }
+
+  resetForms() {
+    const commentField = this.getElement().querySelector(`.film-details__comment-input`);
+    const ratingBlock = this.getElement().querySelector(`.form-details__middle-container`);
+
+    commentField.style.borderColor = ``;
+
+    if (ratingBlock) {
+      ratingBlock.style.backgroundColor = ``;
+    }
+  }
+
+  highlightCommentField() {
+    const commentBlock = this.getElement().querySelector(`.film-details__new-comment`);
+    const commentField = this.getElement().querySelector(`.film-details__comment-input`);
+    commentField.style.borderColor = ERROR_COLOR;
+    this._shakeElement(commentBlock);
+  }
+
+  highlightComments() {
+    const commentBlock = this.getElement().querySelector(`.film-details__comments-list`);
+    this._shakeElement(commentBlock);
+  }
+
+  highlightRatingForm() {
+    const ratingBlockElement = this.getElement().querySelector(`.form-details__middle-container`);
+    ratingBlockElement.style.backgroundColor = ERROR_COLOR;
+    this._shakeElement(ratingBlockElement);
+  }
+
+  highlightWatchlistButton() {
+    const watchlistButtonElement = this.getElement().querySelector(`.film-details__control-label--watchlist`);
+    this._shakeElement(watchlistButtonElement);
+  }
+
+  highlightWatchedButton() {
+    const watchedButtonElement = this.getElement().querySelector(`.film-details__control-label--watched`);
+    this._shakeElement(watchedButtonElement);
+  }
+
+  highlightFavoriteButton() {
+    const favoriteButtonElement = this.getElement().querySelector(`.film-details__control-label--favorite`);
+    this._shakeElement(favoriteButtonElement);
   }
 }

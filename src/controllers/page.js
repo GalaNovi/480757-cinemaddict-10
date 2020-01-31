@@ -9,7 +9,7 @@ import {MenuController} from './menu';
 import {StatisticController} from '../controllers/statistic';
 import {getNextItemsIterator, getUserRank} from '../utils/common';
 import {render} from '../utils/render';
-import {EXTRA_MOVIES_HEADINGS} from '../const';
+import {EXTRA_MOVIES_HEADINGS, RequestType} from '../const';
 
 const START_MOVIES_AMOUNT = 5;
 const ADD_MOVIES_AMOUNT = 5;
@@ -39,6 +39,7 @@ export class PageController {
     this._shownMoviesInstances = [];
     this._moviesData = [];
     this._extraMoviesComponents = [];
+    this._isDataExchange = false;
 
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
@@ -47,6 +48,7 @@ export class PageController {
     this._onCloseBigCard = this._onCloseBigCard.bind(this);
     this._showMovies = this._showMovies.bind(this);
     this._showStatistic = this._showStatistic.bind(this);
+    this._getDataExchangeStatus = this._getDataExchangeStatus.bind(this);
 
     this._moviesModel.setSortChangeHandler(this._onSortChange);
     this._moviesModel.setFilterChangeHandler(this._onFilterChange);
@@ -82,7 +84,7 @@ export class PageController {
 
   _renderMovieCard(movieData, container = this._mainMoviesComponent.getMoviesList()) {
     const comments = this._moviesModel.comments;
-    const movieController = new MovieController(container, this._onDataChange, this._onViewChange, this._onCloseBigCard);
+    const movieController = new MovieController(container, this._onDataChange, this._onViewChange, this._onCloseBigCard, this._getDataExchangeStatus);
     const movieInstance = {
       type: MAIN_MOVIES_TYPE,
       controller: movieController,
@@ -168,37 +170,43 @@ export class PageController {
     return currentExtraMoviesIdsString !== newExtraMoviesIdsString;
   }
 
-  _onDataChange(oldMovie, newMovie) {
-    const requests = [this._moviesModel.updateMovie(oldMovie.id, newMovie)];
+  _onDataChange(oldMovie, newMovie, movieController) {
+    movieController.resetForms();
+    this._isDataExchange = true;
+    let requestType = null;
 
     if (oldMovie.comments.length > newMovie.comments.length) {
+      requestType = RequestType.DELETING_COMMENT;
       const deletedCommentId = oldMovie.comments.find((commentId, index) => commentId !== newMovie.comments[index]);
-      requests.push(this._moviesModel.deleteComment(deletedCommentId));
+
+      this._moviesModel.deleteComment(newMovie, deletedCommentId)
+        .then(() => this._updatePage(oldMovie, newMovie))
+        .catch(() => this._onRequestError(movieController, requestType));
+    } else if (newMovie.localComment) {
+      requestType = RequestType.CREATING_COMMENT;
+
+      this._moviesModel.createComment(newMovie, newMovie.localComment)
+        .then(() => this._updatePage(oldMovie, newMovie))
+        .catch(() => this._onRequestError(movieController, requestType));
+    } else {
+      if (!oldMovie.userInfo.personalRating && newMovie.userInfo.personalRating) {
+        requestType = RequestType.SETTING_RATING;
+      } else if (oldMovie.userInfo.isOnTheWatchlist !== newMovie.userInfo.isOnTheWatchlist) {
+        requestType = RequestType.WATCHLIST;
+      } else if (oldMovie.userInfo.isAlreadyWatched !== newMovie.userInfo.isAlreadyWatched) {
+        requestType = RequestType.WATCHED;
+      } else if (oldMovie.userInfo.isFavorite !== newMovie.userInfo.isFavorite) {
+        requestType = RequestType.FAVORITE;
+      }
+
+      this._moviesModel.updateMovie(oldMovie.id, newMovie)
+        .then(() => this._updatePage(oldMovie, newMovie))
+        .catch(() => this._onRequestError(movieController, requestType));
     }
+  }
 
-    if (newMovie.localComment) {
-      requests.push(this._moviesModel.createComment(newMovie, newMovie.localComment));
-      delete newMovie.localComment;
-    }
-
-    Promise.all(requests)
-      .then(() => {
-        const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
-        const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
-
-        instanceOfChangedMovies.forEach(({controller}) => {
-          const updatedMovie = this._moviesModel.getMovie(newMovie.id);
-          const updatedComments = this._moviesModel.getMovieComments(newMovie.id);
-          controller.update(updatedMovie, updatedComments);
-        });
-
-        this._menuController.render();
-        this._statisticController.update(alreadyWatchedMovies);
-        this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
-      })
-      .catch((error) => {
-        throw error;
-      });
+  _getDataExchangeStatus() {
+    return this._isDataExchange;
   }
 
   _onCloseBigCard() {
@@ -231,5 +239,29 @@ export class PageController {
     this._statisticController.showStatistic();
     this._sortController.hideSort();
     this._mainMoviesListInit();
+  }
+
+  _onRequestError(movieController, requestType) {
+    this._isDataExchange = false;
+    movieController.shake(requestType);
+  }
+
+  _updateInstanses(oldMovie, newMovie) {
+    const instanceOfChangedMovies = this._shownMoviesInstances.filter(({controller}) => controller.id === oldMovie.id);
+    instanceOfChangedMovies.forEach(({controller}) => {
+      const updatedMovie = this._moviesModel.getMovie(newMovie.id);
+      const updatedComments = this._moviesModel.getMovieComments(newMovie.id);
+      controller.update(updatedMovie, updatedComments);
+    });
+    this._isDataExchange = false;
+  }
+
+  _updatePage(oldMovie, newMovie) {
+    const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
+
+    this._menuController.render();
+    this._statisticController.update(alreadyWatchedMovies);
+    this._profileComponent.updateRating(getUserRank(alreadyWatchedMovies.length));
+    this._updateInstanses(oldMovie, newMovie);
   }
 }

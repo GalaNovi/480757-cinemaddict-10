@@ -1,30 +1,30 @@
 export default class Movie {
-  constructor(data) {
-    this.id = data[`id`];
-    this.comments = data[`comments`];
+  constructor(movieData) {
+    this.id = movieData[`id`];
+    this.comments = movieData[`comments`];
     this.movieInfo = {
-      ageLimit: data[`film_info`][`age_rating`],
-      name: data[`film_info`][`title`],
-      originalName: data[`film_info`][`alternative_title`],
-      director: data[`film_info`][`director`],
-      writers: data[`film_info`][`writers`],
-      actors: data[`film_info`][`actors`],
+      ageLimit: movieData[`film_info`][`age_rating`],
+      name: movieData[`film_info`][`title`],
+      originalName: movieData[`film_info`][`alternative_title`],
+      director: movieData[`film_info`][`director`],
+      writers: movieData[`film_info`][`writers`],
+      actors: movieData[`film_info`][`actors`],
       release: {
-        date: data[`film_info`][`release`][`date`],
-        country: data[`film_info`][`release`][`release_country`],
+        date: movieData[`film_info`][`release`][`date`],
+        country: movieData[`film_info`][`release`][`release_country`],
       },
-      poster: data[`film_info`][`poster`],
-      rating: data[`film_info`][`total_rating`],
-      duration: data[`film_info`][`runtime`],
-      genres: data[`film_info`][`genre`],
-      description: data[`film_info`][`description`],
+      poster: movieData[`film_info`][`poster`],
+      rating: movieData[`film_info`][`total_rating`],
+      duration: movieData[`film_info`][`runtime`],
+      genres: movieData[`film_info`][`genre`],
+      description: movieData[`film_info`][`description`],
     };
     this.userInfo = {
-      personalRating: data[`user_details`][`personal_rating`],
-      isOnTheWatchlist: data[`user_details`][`watchlist`],
-      isAlreadyWatched: data[`user_details`][`already_watched`],
-      watchingDate: data[`user_details`][`watching_date`],
-      isFavorite: data[`user_details`][`favorite`],
+      personalRating: movieData[`user_details`][`personal_rating`],
+      isOnTheWatchlist: movieData[`user_details`][`watchlist`],
+      isAlreadyWatched: movieData[`user_details`][`already_watched`],
+      watchingDate: movieData[`user_details`][`watching_date`],
+      isFavorite: movieData[`user_details`][`favorite`],
     };
   }
 
@@ -59,15 +59,15 @@ export default class Movie {
     };
   }
 
-  static parseMovie(data) {
-    return new Movie(data);
+  static parseMovie(movieData) {
+    return new Movie(movieData);
   }
 
-  static parseMovies(data) {
-    return data.map(Movie.parseMovie);
+  static parseMovies(moviesData) {
+    return moviesData.map(Movie.parseMovie);
   }
 
-  static clone(data) {
-    return new Movie(data.toRAW());
+  static clone(movieData) {
+    return new Movie(movieData.toRAW());
   }
 }
