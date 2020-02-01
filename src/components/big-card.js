@@ -5,8 +5,10 @@ import moment from 'moment';
 
 const USER_RATING_SCORES_AMOUNT = 9;
 const UNDEFINED_COMMENTS_MESSAGE = `Sorry, comments data are missing. Please reboot the app.`;
-const ERROR_COLOR = `#380101`;
-const BORDER_ERROR_COLOR = `#ff0000`;
+const Colors = {
+  ERROR_BACKGROUND: `#380101`,
+  ERROR_BORDER: `#ff0000`,
+};
 
 const formatReleaseDate = (timestamp) => {
   return moment(timestamp).format(`DD MMMM YYYY`);
@@ -367,7 +369,7 @@ export default class BigCard extends AbstractSmartComponent {
   highlightCommentField() {
     const commentBlock = this.getElement().querySelector(`.film-details__new-comment`);
     const commentField = this.getElement().querySelector(`.film-details__comment-input`);
-    commentField.style.borderColor = BORDER_ERROR_COLOR;
+    commentField.style.borderColor = Colors.ERROR_BORDER;
     this._shakeElement(commentBlock);
   }
 
@@ -378,7 +380,7 @@ export default class BigCard extends AbstractSmartComponent {
 
   highlightRatingForm() {
     const ratingBlockElement = this.getElement().querySelector(`.form-details__middle-container`);
-    ratingBlockElement.style.backgroundColor = ERROR_COLOR;
+    ratingBlockElement.style.backgroundColor = Colors.ERROR_BACKGROUND;
     this._shakeElement(ratingBlockElement);
   }
 
