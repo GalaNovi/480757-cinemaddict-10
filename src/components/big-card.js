@@ -2,6 +2,7 @@ import AbstractSmartComponent from './abstract-smart-component';
 import {capitalize, formatTime} from '../utils/common';
 import {FILM_DETAILS_TITLES} from '../const';
 import moment from 'moment';
+import he from 'he';
 
 const USER_RATING_SCORES_AMOUNT = 9;
 const UNDEFINED_COMMENTS_MESSAGE = `Sorry, comments data are missing. Please reboot the app.`;
@@ -29,8 +30,9 @@ const createCommentMarkup = (commentData) => {
     );
   }
 
-  const {id, author, comment, date, emotion} = commentData;
+  const {id, author, comment: notSanitizedComment, date, emotion} = commentData;
   const commentDate = moment(date).format(`YYYY/MM/DD HH:mm`);
+  const comment = he.encode(notSanitizedComment);
 
   return (
     `<li class="film-details__comment">
@@ -49,12 +51,12 @@ const createCommentMarkup = (commentData) => {
   );
 };
 
-const createUserRatingScoresMarkup = () => {
+const createUserRatingScoresMarkup = (rating) => {
   let allMarkup = ``;
 
   for (let i = 1; i <= USER_RATING_SCORES_AMOUNT; i++) {
     const itemMarkup = (
-      `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}">
+      `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}"${rating === i ? ` checked` : ``}>
       <label class="film-details__user-rating-label" for="rating-${i}">${i}</label>\n`
     );
     allMarkup += itemMarkup;
@@ -65,6 +67,8 @@ const createUserRatingScoresMarkup = () => {
 
 const createUserRatingFormMarkup = (movieData) => {
   const {poster, name} = movieData.movieInfo;
+  const personalRating = movieData.userInfo.personalRating;
+  const userRatingScoresMarkup = createUserRatingScoresMarkup(personalRating);
 
   return (
     `<div class="form-details__middle-container">
@@ -84,7 +88,7 @@ const createUserRatingFormMarkup = (movieData) => {
             <p class="film-details__user-rating-feelings">How you feel it?</p>
 
             <div class="film-details__user-rating-score">
-              ${createUserRatingScoresMarkup()}
+              ${userRatingScoresMarkup}
             </div>
           </section>
         </div>
@@ -226,7 +230,7 @@ const createBigCardMarkup = (movieData, commentsData) => {
           </section>
         </div>
 
-        ${isAlreadyWatched && !personalRating ? userRatingFormMarkup : ``}
+        ${isAlreadyWatched ? userRatingFormMarkup : ``}
 
         <div class="form-details__bottom-container">
           <section class="film-details__comments-wrap">
@@ -336,6 +340,18 @@ export default class BigCard extends AbstractSmartComponent {
     });
   }
 
+  setOnWatchedResetButtonCallback(callback) {
+    if (callback) {
+      this._onWatchedResetButtonCallback = callback;
+    }
+
+    this.getElement().addEventListener(`click`, (evt) => {
+      if (evt.target.classList.contains(`film-details__watched-reset`)) {
+        this._onWatchedResetButtonCallback();
+      }
+    });
+  }
+
   resetNewComment() {
     this.getElement().querySelector(`.film-details__add-emoji-label`).innerHTML = ``;
     this.getElement().querySelector(`.film-details__comment-input`).value = ``;
@@ -353,6 +369,7 @@ export default class BigCard extends AbstractSmartComponent {
     this.setOnEmojiListClickHandler();
     this.setOnDeleteCommentClickCallback();
     this.setOnUserRatingClickCallback();
+    this.setOnWatchedResetButtonCallback();
   }
 
   resetForms() {
@@ -364,6 +381,10 @@ export default class BigCard extends AbstractSmartComponent {
     if (ratingBlock) {
       ratingBlock.style.backgroundColor = ``;
     }
+  }
+
+  getCommentField() {
+    return this.getElement().querySelector(`.film-details__comment-input`);
   }
 
   highlightCommentField() {

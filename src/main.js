@@ -4,9 +4,9 @@ import {PageController} from './controllers/page';
 
 const randomString = Math.random().toString(36).substring(2, 10);
 const END_POINT = `https://htmlacademy-es-10.appspot.com/cinemaddict/`;
-const AUTHORIZATION_CODE = `Basic ${randomString}`;
+const authorizationCode = `Basic ${randomString}`;
 
-const api = new API(END_POINT, AUTHORIZATION_CODE);
+const api = new API(END_POINT, authorizationCode);
 const moviesModel = new MoviesModel(api);
 const pageController = new PageController(document.body, moviesModel);
 

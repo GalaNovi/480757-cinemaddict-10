@@ -1,14 +1,14 @@
 import {DEFAULT_SORT_TYPE} from '../const';
 
 const sortParameters = {
-  date: (a, b) => b.movieInfo.release.date - a.movieInfo.release.date,
+  date: (a, b) => new Date(b.movieInfo.release.date).getTime() - new Date(a.movieInfo.release.date).getTime(),
   rating: (a, b) => b.movieInfo.rating - a.movieInfo.rating,
 };
 
 export const sortMovies = (moviesData, sortType) => {
   if (sortType === DEFAULT_SORT_TYPE) {
     return moviesData;
-  } else {
-    return moviesData.sort(sortParameters[sortType]);
   }
+
+  return moviesData.sort(sortParameters[sortType]);
 };

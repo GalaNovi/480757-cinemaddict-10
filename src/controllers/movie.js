@@ -4,6 +4,8 @@ import MovieModel from '../models/movie';
 import {render} from '../utils/render';
 import {RequestType} from '../const';
 
+const BLOCKED_FIELD_OPACITY = 0.5;
+
 export class MovieController {
   constructor(container, onDataChange, onViewChange, onCloseBigCard, getDataExchangeStatus) {
     this._container = container;
@@ -45,6 +47,12 @@ export class MovieController {
         newMovieData.userInfo.personalRating = Number(userRating);
         this._onDataChange(this._movieData, newMovieData, this);
       }
+    });
+
+    this._bigCardComponent.setOnWatchedResetButtonCallback(() => {
+      const newMovieData = MovieModel.clone(this._movieData);
+      newMovieData.userInfo.personalRating = 0;
+      this._onDataChange(this._movieData, newMovieData, this);
     });
 
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
@@ -162,5 +170,17 @@ export class MovieController {
     document.removeEventListener(`keydown`, this._onEsqKeyDown);
     document.removeEventListener(`keydown`, this._onCtrlEnterDown);
     this._onCloseBigCard();
+  }
+
+  blockCommentField() {
+    const commentFieldElement = this._bigCardComponent.getCommentField();
+    commentFieldElement.disabled = true;
+    commentFieldElement.style.opacity = BLOCKED_FIELD_OPACITY;
+  }
+
+  unBlockCommentField() {
+    const commentFieldElement = this._bigCardComponent.getCommentField();
+    commentFieldElement.disabled = false;
+    commentFieldElement.style.opacity = ``;
   }
 }
