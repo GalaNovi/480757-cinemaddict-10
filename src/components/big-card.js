@@ -338,6 +338,18 @@ export default class BigCard extends AbstractSmartComponent {
     });
   }
 
+  setOnWatchedResetButtonCallback(callback) {
+    if (callback) {
+      this._onWatchedResetButtonCallback = callback;
+    }
+
+    this.getElement().addEventListener(`click`, (evt) => {
+      if (evt.target.classList.contains(`film-details__watched-reset`)) {
+        this._onWatchedResetButtonCallback();
+      }
+    });
+  }
+
   resetNewComment() {
     this.getElement().querySelector(`.film-details__add-emoji-label`).innerHTML = ``;
     this.getElement().querySelector(`.film-details__comment-input`).value = ``;
@@ -355,6 +367,7 @@ export default class BigCard extends AbstractSmartComponent {
     this.setOnEmojiListClickHandler();
     this.setOnDeleteCommentClickCallback();
     this.setOnUserRatingClickCallback();
+    this.setOnWatchedResetButtonCallback();
   }
 
   resetForms() {

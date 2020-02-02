@@ -47,6 +47,12 @@ export class MovieController {
       }
     });
 
+    this._bigCardComponent.setOnWatchedResetButtonCallback(() => {
+      const newMovieData = MovieModel.clone(this._movieData);
+      newMovieData.userInfo.personalRating = 0;
+      this._onDataChange(this._movieData, newMovieData, this);
+    });
+
     [this._cardComponent, this._bigCardComponent].forEach((component) => {
       component.setWatchlistButtonCallback(() => {
         const newMovieData = MovieModel.clone(this._movieData);
