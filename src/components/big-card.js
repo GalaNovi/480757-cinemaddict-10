@@ -381,6 +381,10 @@ export default class BigCard extends AbstractSmartComponent {
     }
   }
 
+  getCommentField() {
+    return this.getElement().querySelector(`.film-details__comment-input`);
+  }
+
   highlightCommentField() {
     const commentBlock = this.getElement().querySelector(`.film-details__new-comment`);
     const commentField = this.getElement().querySelector(`.film-details__comment-input`);
