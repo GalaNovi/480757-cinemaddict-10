@@ -49,12 +49,12 @@ const createCommentMarkup = (commentData) => {
   );
 };
 
-const createUserRatingScoresMarkup = () => {
+const createUserRatingScoresMarkup = (rating) => {
   let allMarkup = ``;
 
   for (let i = 1; i <= USER_RATING_SCORES_AMOUNT; i++) {
     const itemMarkup = (
-      `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}">
+      `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}"${rating === i ? ` checked` : ``}>
       <label class="film-details__user-rating-label" for="rating-${i}">${i}</label>\n`
     );
     allMarkup += itemMarkup;
@@ -65,6 +65,8 @@ const createUserRatingScoresMarkup = () => {
 
 const createUserRatingFormMarkup = (movieData) => {
   const {poster, name} = movieData.movieInfo;
+  const personalRating = movieData.userInfo.personalRating;
+  const userRatingScoresMarkup = createUserRatingScoresMarkup(personalRating);
 
   return (
     `<div class="form-details__middle-container">
@@ -84,7 +86,7 @@ const createUserRatingFormMarkup = (movieData) => {
             <p class="film-details__user-rating-feelings">How you feel it?</p>
 
             <div class="film-details__user-rating-score">
-              ${createUserRatingScoresMarkup()}
+              ${userRatingScoresMarkup}
             </div>
           </section>
         </div>
@@ -226,7 +228,7 @@ const createBigCardMarkup = (movieData, commentsData) => {
           </section>
         </div>
 
-        ${isAlreadyWatched && !personalRating ? userRatingFormMarkup : ``}
+        ${isAlreadyWatched ? userRatingFormMarkup : ``}
 
         <div class="form-details__bottom-container">
           <section class="film-details__comments-wrap">
