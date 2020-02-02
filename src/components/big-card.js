@@ -2,6 +2,7 @@ import AbstractSmartComponent from './abstract-smart-component';
 import {capitalize, formatTime} from '../utils/common';
 import {FILM_DETAILS_TITLES} from '../const';
 import moment from 'moment';
+import he from 'he';
 
 const USER_RATING_SCORES_AMOUNT = 9;
 const UNDEFINED_COMMENTS_MESSAGE = `Sorry, comments data are missing. Please reboot the app.`;
@@ -29,8 +30,9 @@ const createCommentMarkup = (commentData) => {
     );
   }
 
-  const {id, author, comment, date, emotion} = commentData;
+  const {id, author, comment: notSanitizedComment, date, emotion} = commentData;
   const commentDate = moment(date).format(`YYYY/MM/DD HH:mm`);
+  const comment = he.encode(notSanitizedComment);
 
   return (
     `<li class="film-details__comment">
