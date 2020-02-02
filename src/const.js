@@ -40,6 +40,17 @@ const RequestType = {
   FAVORITE: `favirite`,
 };
 
+const MoviesAmount = {
+  START: 5,
+  ADD: 5,
+  EXTRA: 2,
+};
+
+const MoviesType = {
+  MAIN: `main`,
+  EXTRA: `extra`,
+};
+
 export {
   EXTRA_MOVIES_HEADINGS,
   DEFAULT_SORT_TYPE,
@@ -50,4 +61,6 @@ export {
   FilterType,
   Timestamp,
   RequestType,
+  MoviesAmount,
+  MoviesType,
 };

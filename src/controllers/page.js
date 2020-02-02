@@ -9,13 +9,7 @@ import {MenuController} from './menu';
 import {StatisticController} from '../controllers/statistic';
 import {getNextItemsIterator, getUserRank} from '../utils/common';
 import {render} from '../utils/render';
-import {EXTRA_MOVIES_HEADINGS, RequestType} from '../const';
-
-const START_MOVIES_AMOUNT = 5;
-const ADD_MOVIES_AMOUNT = 5;
-const EXTRA_MOVIES_AMOUNT = 2;
-const MAIN_MOVIES_TYPE = `main`;
-const EXTRA_MOVIES_TYPE = `extra`;
+import {EXTRA_MOVIES_HEADINGS, RequestType, MoviesAmount, MoviesType} from '../const';
 
 const extraMoviesParameters = {
   topRated: {
@@ -32,8 +26,8 @@ export class PageController {
   constructor(container, moviesModel) {
     this._container = container;
     this._moviesModel = moviesModel;
-    this._extraMoviesAmount = EXTRA_MOVIES_AMOUNT;
-    this._renderedMoviesAmount = START_MOVIES_AMOUNT;
+    this._extraMoviesAmount = MoviesAmount.EXTRA;
+    this._renderedMoviesAmount = MoviesAmount.START;
     this._moviesContainerComponent = new MoviesContainer();
     this._mainMoviesComponent = new MainMovies();
     this._shownMoviesInstances = [];
@@ -86,12 +80,12 @@ export class PageController {
     const comments = this._moviesModel.comments;
     const movieController = new MovieController(container, this._onDataChange, this._onViewChange, this._onCloseBigCard, this._getDataExchangeStatus);
     const movieInstance = {
-      type: MAIN_MOVIES_TYPE,
+      type: MoviesType.MAIN,
       controller: movieController,
     };
 
     if (container !== this._mainMoviesComponent.getMoviesList()) {
-      movieInstance.type = EXTRA_MOVIES_TYPE;
+      movieInstance.type = MoviesType.EXTRA;
     }
 
     this._shownMoviesInstances.push(movieInstance);
@@ -122,13 +116,13 @@ export class PageController {
   }
 
   _mainMoviesListInit() {
-    this._clearMovies(MAIN_MOVIES_TYPE);
+    this._clearMovies(MoviesType.MAIN);
     const moviesData = this._moviesModel.getMoviesForRender();
-    const iterator = getNextItemsIterator(moviesData, ADD_MOVIES_AMOUNT, this._renderedMoviesAmount);
+    const iterator = getNextItemsIterator(moviesData, MoviesAmount.ADD, this._renderedMoviesAmount);
     this._renderMainMovies(iterator);
     this._mainMoviesComponent.setCallback(() => {
       this._renderMainMovies(iterator);
-      this._renderedMoviesAmount += ADD_MOVIES_AMOUNT;
+      this._renderedMoviesAmount += MoviesAmount.ADD;
     });
   }
 
@@ -147,14 +141,14 @@ export class PageController {
   }
 
   _clearExtraMovies() {
-    this._clearMovies(EXTRA_MOVIES_TYPE);
+    this._clearMovies(MoviesType.EXTRA);
     this._extraMoviesComponents.forEach((component) => component.removeElement());
     this._extraMoviesComponents = [];
   }
 
   _isExtraMoviesRatingChange() {
     const currentExtraMoviesIdsString = this._shownMoviesInstances
-      .filter((item) => item.type === EXTRA_MOVIES_TYPE)
+      .filter((item) => item.type === MoviesType.EXTRA)
       .map(({controller}) => controller.id)
       .join(``);
 
