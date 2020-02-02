@@ -23,8 +23,6 @@ const formatTime = (duration) => {
   return `${time.hours()}h ${time.minutes()}m`;
 };
 
-const getRandomBetween = (min, max, decimalPlacesCount = 0) => Number(parseFloat((min + Math.random() * (max - min)) + 0.01).toFixed(decimalPlacesCount));
-
 const getUserRank = (moviesAmount) => {
   return moviesAmount ?
     userRank[Object.keys(userRank).reverse().find((key) => moviesAmount > key || moviesAmount === 0)] :

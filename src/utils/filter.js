@@ -10,6 +10,6 @@ export const filterMovies = (moviesData, filterType) => {
   if (filterType === FilterType.ALL) {
     return moviesData;
   }
-  
+
   return moviesData.filter(filterParameters[filterType]);
 };
