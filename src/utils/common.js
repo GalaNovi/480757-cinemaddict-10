@@ -31,4 +31,4 @@ const getUserRank = (moviesAmount) => {
     userRank[0];
 };
 
-export {capitalize, getNextItemsIterator, formatTime, getRandomBetween, getUserRank};
+export {capitalize, getNextItemsIterator, formatTime, getUserRank};
