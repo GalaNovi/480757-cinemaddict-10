@@ -3,8 +3,8 @@ import {filterMovies} from '../utils/filter';
 import {DEFAULT_SORT_TYPE, FilterType} from '../const';
 
 export default class Movies {
-  constructor(api) {
-    this._api = api;
+  constructor(apiWithProvider) {
+    this._apiWithProvider = apiWithProvider;
     this._movies = null;
     this._comments = [];
     this._filterType = FilterType.ALL;
@@ -33,7 +33,7 @@ export default class Movies {
   }
 
   getMovies() {
-    return this._api.getMovies()
+    return this._apiWithProvider.getMovies()
       .then((movies) => {
         this.movies = movies;
         return movies;
@@ -45,7 +45,7 @@ export default class Movies {
   }
 
   getComments(movieId) {
-    return this._api.getComments(movieId)
+    return this._apiWithProvider.getComments(movieId)
       .then((comments) => this._comments.push(...comments));
   }
 
@@ -62,14 +62,14 @@ export default class Movies {
   }
 
   updateMovie(oldMovieId, newMovie) {
-    return this._api.updateMovie(oldMovieId, newMovie.toRAW())
+    return this._apiWithProvider.updateMovie(oldMovieId, newMovie.toRAW())
       .then(() => {
         this._movies = this._movies.map((movie) => movie.id === oldMovieId ? newMovie : movie);
       });
   }
 
   deleteComment(newMovie, commentId) {
-    return this._api.deleteComment(commentId)
+    return this._apiWithProvider.deleteComment(newMovie, commentId)
       .then(() => {
         this._movies = this._movies.map((movie) => movie.id === newMovie.id ? newMovie : movie);
         this._comments = this._comments.filter((comment) => Number(comment.id) !== commentId);
@@ -77,7 +77,7 @@ export default class Movies {
   }
 
   createComment(movie, newComment) {
-    return this._api.createComment(movie.id, newComment)
+    return this._apiWithProvider.createComment(movie, newComment)
       .then(({movie: newMovie, comments}) => {
         const newCommentData = comments.find((comment) => !movie.comments.find((id) => id === comment.id));
         this._comments.push(newCommentData);

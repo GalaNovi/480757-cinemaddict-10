@@ -4,7 +4,7 @@ const Method = {
   GET: `GET`,
   POST: `POST`,
   PUT: `PUT`,
-  DELETE: `DELETE`
+  DELETE: `DELETE`,
 };
 
 const checkStatus = (response) => {
@@ -49,9 +49,9 @@ export default class Api {
     });
   }
 
-  createComment(movieId, comment) {
+  createComment(movie, comment) {
     return this._load({
-      url: `comments/${movieId}`,
+      url: `comments/${movie.id}`,
       method: Method.POST,
       body: JSON.stringify(comment),
       headers: new Headers({'Content-Type': `application/json`}),
@@ -61,6 +61,16 @@ export default class Api {
       response.movie = Movie.parseMovie(response.movie);
       return response;
     });
+  }
+
+  sync(data) {
+    return this._load({
+      url: `movies/sync`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+    .then((response) => response.json());
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

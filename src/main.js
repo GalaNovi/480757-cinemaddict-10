@@ -1,24 +1,52 @@
 import MoviesModel from './models/movies';
-import API from './api/index';
+import Api from './api/index';
+import Store from './api/store';
+import Provider from './api/provider';
 import {PageController} from './controllers/page';
 
+const StoreHeading = {
+  PREFIX: `cinemaddict-localstorage`,
+  VERSION: `v1`,
+};
+
+const storeName = `${StoreHeading.PREFIX}-${StoreHeading.VERSION}`;
 const END_POINT = `https://htmlacademy-es-10.appspot.com/cinemaddict/`;
 const randomString = Math.random().toString(36).substring(2, 10);
 // const authorizationCode = `Basic ${randomString}`;
 const authorizationCode = `Basic kjasrhgfkuGKUGiYUUfIYtfjytf`;
 
-const api = new API(END_POINT, authorizationCode);
-const moviesModel = new MoviesModel(api);
+const api = new Api(END_POINT, authorizationCode);
+const store = new Store(storeName, window.localStorage);
+const apiWithProvider = new Provider(api, store);
+const moviesModel = new MoviesModel(apiWithProvider);
 const pageController = new PageController(document.body, moviesModel);
 
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`/sw.js`)
     .then(() => {
-      console.log(`REGISTERED`);
+      console.log(`ServiceWorker REGISTERED`);
     })
     .catch(() => {
-      console.log(`NOT REGISTERED`);
+      console.log(`ServiceWorker NOT REGISTERED`);
     });
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+
+  if (!apiWithProvider.getSynchronize()) {
+    apiWithProvider.sync()
+      .then(() => {
+        console.log(`SYNCRONIZED`);
+      })
+      .catch(() => {
+        console.log(`NOT SYNCRONIZED`);
+      });
+  }
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
 });
 
 moviesModel.getMovies()
