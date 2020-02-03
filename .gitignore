@@ -15,7 +15,7 @@ node_modules/
 build/
 
 # Бандлы
-public/*.js
+public/*.js!sw.js
 public/*.map
-/*
-!sw.js
+
+
