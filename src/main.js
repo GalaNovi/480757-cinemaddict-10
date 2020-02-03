@@ -2,8 +2,8 @@ import MoviesModel from './models/movies';
 import API from './api.js';
 import {PageController} from './controllers/page';
 
-const randomString = Math.random().toString(36).substring(2, 10);
 const END_POINT = `https://htmlacademy-es-10.appspot.com/cinemaddict/`;
+const randomString = Math.random().toString(36).substring(2, 10);
 const authorizationCode = `Basic ${randomString}`;
 
 const api = new API(END_POINT, authorizationCode);
