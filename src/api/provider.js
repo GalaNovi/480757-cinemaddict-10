@@ -1,7 +1,12 @@
 import nanoid from 'nanoid';
 import Movie from '../models/movie';
 
-const COMMENTS_PREFIX = `comments:`;
+const TEMP_COMMENT_AUTHOR = `You`;
+
+const Prefix = {
+  MOVIES: `movies:`,
+  COMMENTS: `comments:`,
+};
 
 const getSyncedMovies = (movies) => movies
   .filter(({success}) => success)
@@ -18,14 +23,13 @@ export default class Provider {
     if (this._isOnLine()) {
       return this._api.getMovies()
         .then((movies) => {
-          movies.forEach((movie) => this._store.setItem(movie.id, movie.toRAW()));
+          movies.forEach((movie) => this._store.setItem(`${Prefix.MOVIES}${movie.id}`, movie.toRAW()));
           return movies;
-        }
-      );
+        });
     }
 
     const store = this._store.getAll();
-    const storeMovieIds = Object.keys(store).filter((key) => !key.match(COMMENTS_PREFIX));
+    const storeMovieIds = Object.keys(store).filter((key) => !key.match(Prefix.COMMENTS));
     const storeMovies = storeMovieIds.map((id) => store[id]);
     this._isSynchronized = false;
 
@@ -36,13 +40,12 @@ export default class Provider {
     if (this._isOnLine()) {
       return this._api.getComments(movieId)
         .then((comments) => {
-          this._store.setItem(`${COMMENTS_PREFIX}${movieId}`, comments);
+          this._store.setItem(`${Prefix.COMMENTS}${movieId}`, comments);
           return comments;
-        }
-      );
+        });
     }
 
-    const movieComments = this._store.getAll()[`${COMMENTS_PREFIX}${movieId}`];
+    const movieComments = this._store.getAll()[`${Prefix.COMMENTS}${movieId}`];
     this._isSynchronized = false;
 
     return Promise.resolve(movieComments);
@@ -52,12 +55,12 @@ export default class Provider {
     if (this._isOnLine()) {
       return this._api.updateMovie(id, newMovieData)
         .then((movie) => {
-          this._store.setItem(id, movie);
+          this._store.setItem(`${Prefix.MOVIES}${id}`, movie);
         });
     }
 
     const fakeNewMovie = Object.assign({}, newMovieData, {offline: true});
-    this._store.setItem(id, fakeNewMovie);
+    this._store.setItem(`${Prefix.MOVIES}${id}`, fakeNewMovie);
     this._isSynchronized = false;
 
     return Promise.resolve(newMovieData);
@@ -67,13 +70,14 @@ export default class Provider {
     if (this._isOnLine()) {
       return this._api.deleteComment(id)
         .then(() => {
-          this._store.removeItem(`${COMMENTS_PREFIX}${id}`);
-          this._store.setItem(movie.id, movie);
+          this._store.removeItem(`${Prefix.COMMENTS}${id}`);
+          this._store.setItem(`${Prefix.MOVIES}${movie.id}`, movie);
         });
     }
 
-    this._store.removeItem(`${COMMENTS_PREFIX}${id}`);
-    this._store.setItem(movie.id, Object.assign({}, movie, {offline: true}));
+    const updatedMovie = Object.assign({}, movie, {offline: true});
+    this._store.removeItem(`${Prefix.COMMENTS}${id}`);
+    this._store.setItem(`${Prefix.MOVIES}${movie.id}`, updatedMovie);
     this._isSynchronized = false;
 
     return Promise.resolve();
@@ -82,20 +86,24 @@ export default class Provider {
   createComment(movie, comment) {
     if (this._isOnLine()) {
       return this._api.createComment(movie, comment)
-        .then(({movie, comments}) => {
-          this._store.setItem(movie.id, movie);
-          this._store.setItem(`${COMMENTS_PREFIX}${movie.id}`, comments);
+        .then(({movie: newMovie, comments}) => {
+          this._store.setItem(`${Prefix.MOVIES}${newMovie.id}`, newMovie);
+          this._store.setItem(`${Prefix.COMMENTS}${movie.id}`, comments);
 
-          return {movie, comments};
+          return {newMovie, comments};
         });
     }
 
     const fakeNewCommentId = nanoid();
-    const fakeNewMovie = Movie.parseMovie(movie).comments.push(fakeNewCommentId);
-    const fakeNewComment = Object.assign({}, comment, {id: fakeNewCommentId});
-    const commentsWithFake = this._store.getItem(`${COMMENTS_PREFIX}${movie.id}`).push(fakeNewComment);
-    this._store.setItem(movie.id, Object.assign({}, fakeNewMovie, {offline: true}));
-    this._store.setItem(`${COMMENTS_PREFIX}${movie.id}`, commentsWithFake);
+    const fakeNewMovie = movie.comments.push(fakeNewCommentId);
+    const fakeNewComment = Object.assign({}, comment, {
+      id: fakeNewCommentId,
+      author: TEMP_COMMENT_AUTHOR,
+    });
+    console.log(fakeNewComment);
+    const commentsWithFake = this._store.getItem(`${Prefix.COMMENTS}${movie.id}`).push(fakeNewComment);
+    this._store.setItem(`${Prefix.MOVIES}${movie.id}`, Object.assign({}, fakeNewMovie, {offline: true}));
+    this._store.setItem(`${Prefix.COMMENTS}${movie.id}`, commentsWithFake);
     this._isSynchronized = false;
 
     return Promise.resolve({
@@ -107,7 +115,7 @@ export default class Provider {
   sync() {
     if (this._isOnLine()) {
       const store = this._store.getAll();
-      const storeMovieIds = Object.keys(store).filter((key) => !key.match(COMMENTS_PREFIX));
+      const storeMovieIds = Object.keys(store).filter((key) => !key.match(Prefix.COMMENTS));
       const storeMovies = storeMovieIds.map((id) => store[id]);
       console.log(storeMovies);
 
@@ -118,7 +126,6 @@ export default class Provider {
             this._store.removeItem(movie.id);
           });
 
-          const createdMovies = getSyncedMovies(response.created);
           const updatedMovies = getSyncedMovies(response.updated);
 
           [...createdMovies, ...updatedMovies].forEach((movie) => {
@@ -137,7 +144,6 @@ export default class Provider {
   getSynchronize() {
     return this._isSynchronized;
   }
-  
 
   _isOnLine() {
     return window.navigator.onLine;

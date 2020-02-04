@@ -16,8 +16,13 @@ export default class Store {
     const store = this.getAll();
 
     this._storage.setItem(
-      this._storeKey,
-      JSON.stringify(Object.assign({}, store, {[key]: value})));
+        this._storeKey,
+        JSON.stringify(Object.assign({}, store, {[key]: value})));
+  }
+
+  getItem(key) {
+    const store = this.getAll();
+    return store[key];
   }
 
   removeItem(key) {
