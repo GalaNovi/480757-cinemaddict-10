@@ -182,7 +182,10 @@ export class PageController {
 
       this._moviesModel.createComment(newMovie, newMovie.localComment)
         .then(() => this._updatePage(oldMovie, newMovie))
-        .catch(() => this._onRequestError(movieController, requestType))
+        .catch((error) => {
+          console.log(error);
+          this._onRequestError(movieController, requestType);
+        })
         .then(() => movieController.unBlockCommentField());
     } else {
       if (oldMovie.userInfo.isOnTheWatchlist !== newMovie.userInfo.isOnTheWatchlist) {

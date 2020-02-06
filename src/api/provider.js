@@ -95,20 +95,21 @@ export default class Provider {
     }
 
     const fakeNewCommentId = nanoid();
-    const fakeNewMovie = movie.comments.push(fakeNewCommentId);
-    const fakeNewComment = Object.assign({}, comment, {
+    const fakeNewMovie = movie;
+    fakeNewMovie.comments.push(fakeNewCommentId);
+    const fakeNewComment = Object.assign(comment, {
       id: fakeNewCommentId,
       author: TEMP_COMMENT_AUTHOR,
     });
-    console.log(fakeNewComment);
-    const commentsWithFake = this._store.getItem(`${Prefix.COMMENTS}${movie.id}`).push(fakeNewComment);
-    this._store.setItem(`${Prefix.MOVIES}${movie.id}`, Object.assign({}, fakeNewMovie, {offline: true}));
-    this._store.setItem(`${Prefix.COMMENTS}${movie.id}`, commentsWithFake);
+    const movieComments = this._store.getItem(`${Prefix.COMMENTS}${movie.id}`);
+    movieComments.push(fakeNewComment);
+    this._store.setItem(`${Prefix.MOVIES}${movie.id}`, Object.assign(fakeNewMovie, {offline: true}));
+    this._store.setItem(`${Prefix.COMMENTS}${movie.id}`, movieComments);
     this._isSynchronized = false;
 
     return Promise.resolve({
       movie: fakeNewMovie,
-      comments: commentsWithFake,
+      comments: movieComments,
     });
   }
 
