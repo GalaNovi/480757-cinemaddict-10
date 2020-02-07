@@ -118,18 +118,16 @@ export default class Provider {
       const store = this._store.getAll();
       const storeMovieIds = Object.keys(store).filter((key) => !key.match(Prefix.COMMENTS));
       const storeMovies = storeMovieIds.map((id) => store[id]);
-      console.log(storeMovies);
 
       return this._api.sync(storeMovies)
         .then((response) => {
-          console.log(response);
           storeMovies.filter((movie) => movie.offline).forEach((movie) => {
             this._store.removeItem(movie.id);
           });
 
           const updatedMovies = getSyncedMovies(response.updated);
 
-          [...createdMovies, ...updatedMovies].forEach((movie) => {
+          updatedMovies.forEach((movie) => {
             this._store.setItem(movie.id, movie);
           });
 
