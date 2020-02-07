@@ -79,7 +79,7 @@ export default class Movies {
   createComment(movie, newComment) {
     return this._apiWithProvider.createComment(movie, newComment)
       .then(({newMovie, comments}) => {
-        const newCommentData = comments.find((comment) => !movie.comments.find((id) => id === comment.id));
+        const newCommentData = comments[comments.length - 1];
         this._comments.push(newCommentData);
         this._movies = this._movies.map((oldMovie) => oldMovie.id === newMovie.id ? newMovie : oldMovie);
       });

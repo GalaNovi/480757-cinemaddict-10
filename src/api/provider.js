@@ -8,9 +8,48 @@ const Prefix = {
   COMMENTS: `comments:`,
 };
 
-const getSyncedMovies = (movies) => movies
-  .filter(({success}) => success)
-  .map(({payload}) => payload.task);
+const getUpdatedMovies = (store) => {
+  const storeMovieIds = Object.keys(store).filter((key) => !key.match(Prefix.COMMENTS));
+  const storeMovies = storeMovieIds.map((id) => store[id]);
+  const updatedMovies = storeMovies
+    .filter((movie) => {
+      if (movie.offline) {
+        delete movie.offline;
+        delete movie.localComment;
+        return true;
+      }
+
+      return false;
+    });
+
+  return updatedMovies;
+};
+
+const getNewComments = (store) => {
+  const storeCommentIds = Object.keys(store).filter((key) => key.match(Prefix.COMMENTS));
+  const storeComments = storeCommentIds.map((id) => {
+    const movieComments = store[id];
+    movieComments.forEach((comment) => {
+      comment.movieId = id.replace(Prefix.COMMENTS, ``);
+    });
+
+    return movieComments;
+  }).flat();
+
+  const newComments = storeComments
+    .filter((comment) => {
+      if (comment.offline) {
+        delete comment.id;
+        delete comment.author;
+        delete comment.offline;
+        return true;
+      }
+
+      return false;
+    });
+
+  return newComments;
+};
 
 export default class Provider {
   constructor(api, store) {
@@ -32,6 +71,7 @@ export default class Provider {
     const storeMovieIds = Object.keys(store).filter((key) => !key.match(Prefix.COMMENTS));
     const storeMovies = storeMovieIds.map((id) => store[id]);
     this._isSynchronized = false;
+    
 
     return Promise.resolve(Movie.parseMovies(storeMovies));
   }
@@ -85,7 +125,7 @@ export default class Provider {
 
   createComment(movie, comment) {
     if (this._isOnLine()) {
-      return this._api.createComment(movie, comment)
+      return this._api.createComment(movie.id, comment)
         .then(({movie: newMovie, comments}) => {
           this._store.setItem(`${Prefix.MOVIES}${newMovie.id}`, newMovie);
           this._store.setItem(`${Prefix.COMMENTS}${movie.id}`, comments);
@@ -95,11 +135,12 @@ export default class Provider {
     }
 
     const fakeNewCommentId = nanoid();
-    const fakeNewMovie = movie;
+    const fakeNewMovie = movie.toRAW();
     fakeNewMovie.comments.push(fakeNewCommentId);
     const fakeNewComment = Object.assign(comment, {
       id: fakeNewCommentId,
       author: TEMP_COMMENT_AUTHOR,
+      offline: true,
     });
     const movieComments = this._store.getItem(`${Prefix.COMMENTS}${movie.id}`);
     movieComments.push(fakeNewComment);
@@ -108,7 +149,7 @@ export default class Provider {
     this._isSynchronized = false;
 
     return Promise.resolve({
-      movie: fakeNewMovie,
+      newMovie: fakeNewMovie,
       comments: movieComments,
     });
   }
@@ -116,25 +157,33 @@ export default class Provider {
   sync() {
     if (this._isOnLine()) {
       const store = this._store.getAll();
-      const storeMovieIds = Object.keys(store).filter((key) => !key.match(Prefix.COMMENTS));
-      const storeMovies = storeMovieIds.map((id) => store[id]);
+      const updatedMovies = getUpdatedMovies(store);
+      const newComments = getNewComments(store);
 
-      return this._api.sync(storeMovies)
-        .then((response) => {
-          storeMovies.filter((movie) => movie.offline).forEach((movie) => {
-            this._store.removeItem(movie.id);
-          });
+      if (newComments.length) {
+        Promise.all(newComments.map((comment) => {
+          const movieId = 0;
+          delete comment.movieId;
+          this._api.createComment(movieId, comment);
+        }));
+      }
 
-          const updatedMovies = getSyncedMovies(response.updated);
+      // return this._api.sync(storeMovies)
+      //   .then((response) => {
+      //     storeMovies.filter((movie) => movie.offline).forEach((movie) => {
+      //       this._store.removeItem(movie.id);
+      //     });
 
-          updatedMovies.forEach((movie) => {
-            this._store.setItem(movie.id, movie);
-          });
+      //     const updatedMovies = getSyncedMovies(response.updated);
 
-          this._isSynchronized = true;
+      //     updatedMovies.forEach((movie) => {
+      //       this._store.setItem(movie.id, movie);
+      //     });
 
-          return Promise.resolve();
-        });
+      //     this._isSynchronized = true;
+
+      //     return Promise.resolve();
+      //   });
     }
 
     return Promise.reject(new Error(`Sync data failed`));
