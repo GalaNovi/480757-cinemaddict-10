@@ -28,15 +28,15 @@ const fetchHandler = (evt) => {
 
 const activateHandler = (evt) => {
   evt.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(
-        keys.map((key) => {
-          if (key.indexOf(CACHE_PREFIX) === 0 && key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
+      caches.keys()
+        .then((keys) => Promise.all(
+            keys.map((key) => {
+              if (key.indexOf(CACHE_PREFIX) === 0 && key !== CACHE_NAME) {
+                return caches.delete(key);
+              }
 
-          return null;
-        }).filter((key) => key !== null)))
+              return null;
+            }).filter((key) => key !== null)))
   );
 };
 

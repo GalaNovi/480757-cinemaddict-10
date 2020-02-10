@@ -9,7 +9,7 @@ import {MenuController} from './menu';
 import {StatisticController} from '../controllers/statistic';
 import {getNextItemsIterator, getUserRank} from '../utils/common';
 import {render} from '../utils/render';
-import {EXTRA_MOVIES_HEADINGS, RequestType, MoviesAmount, MoviesType} from '../const';
+import {EXTRA_MOVIES_HEADINGS, RequestType, MoviesAmount, MoviesType, SRC_IMAGES} from '../const';
 
 const extraMoviesParameters = {
   topRated: {
@@ -20,6 +20,18 @@ const extraMoviesParameters = {
     filter: ({comments}) => comments.length >= 1,
     sort: (a, b) => b.comments.length - a.comments.length,
   },
+};
+
+const renderHiddenBlockWithImages = (srcImages) => {
+  const blockElement = document.createElement(`div`);
+  blockElement.setAttribute(`style`, `display: none;`);
+  srcImages.forEach((imageSrc) => {
+    const imageElement = document.createElement(`img`);
+    imageElement.setAttribute(`src`, imageSrc);
+    blockElement.appendChild(imageElement);
+  });
+  console.log(blockElement);
+  // render(document.body, blockElement);
 };
 
 export class PageController {
@@ -73,6 +85,7 @@ export class PageController {
       render(mainElement, new NoMoviesContainer());
     }
 
+    renderHiddenBlockWithImages(SRC_IMAGES);
     this._container.querySelector(`.footer__statistics p`).textContent = `${allMovies.length} movies inside`;
   }
 
