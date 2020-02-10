@@ -37,7 +37,7 @@ export class MovieController {
 
     this._bigCardComponent.setOnDeleteCommentClickCallback((commentId) => {
       const newMovieData = MovieModel.clone(this._movieData);
-      newMovieData.comments = newMovieData.comments.filter((id) => Number(id) !== commentId);
+      newMovieData.comments = newMovieData.comments.filter((id) => id.toString() !== commentId.toString());
       this._onDataChange(this._movieData, newMovieData, this);
     });
 

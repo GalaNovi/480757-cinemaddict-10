@@ -323,7 +323,7 @@ export default class BigCard extends AbstractSmartComponent {
       .addEventListener(`click`, (evt) => {
         if (evt.target.classList.contains(`film-details__comment-delete`)) {
           evt.preventDefault();
-          this._onDeleteCommentClickCallback(Number(evt.target.getAttribute(`data-comment-id`)));
+          this._onDeleteCommentClickCallback(evt.target.getAttribute(`data-comment-id`));
         }
       });
   }

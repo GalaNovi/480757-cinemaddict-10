@@ -25,9 +25,9 @@ const getUpdatedMovies = (store) => {
   return updatedMovies;
 };
 
-const getNewComments = (store) => {
+const getStoreComments = (store) => {
   const storeCommentIds = Object.keys(store).filter((key) => key.match(Prefix.COMMENTS));
-  const storeComments = storeCommentIds.map((id) => {
+  const comments = storeCommentIds.map((id) => {
     const movieComments = store[id];
     movieComments.forEach((comment) => {
       comment.movieId = id.replace(Prefix.COMMENTS, ``);
@@ -35,6 +35,12 @@ const getNewComments = (store) => {
 
     return movieComments;
   }).flat();
+
+  return comments;
+};
+
+const getNewComments = (store) => {
+  const storeComments = getStoreComments(store);
 
   const newComments = storeComments
     .filter((comment) => {
@@ -49,6 +55,17 @@ const getNewComments = (store) => {
     });
 
   return newComments;
+};
+
+const getDeletedComments = (store) => {
+  return getStoreComments(store).filter((comment) => {
+    if (comment.isDeleted) {
+      delete comment.isDeleted;
+      return true;
+    }
+
+    return false;
+  });
 };
 
 export default class Provider {
@@ -111,12 +128,26 @@ export default class Provider {
       return this._api.deleteComment(id)
         .then(() => {
           this._store.removeItem(`${Prefix.COMMENTS}${id}`);
-          this._store.setItem(`${Prefix.MOVIES}${movie.id}`, movie);
+          this._store.setItem(`${Prefix.MOVIES}${movie.id}`, movie.toRAW());
         });
     }
 
-    const updatedMovie = Object.assign({}, movie, {offline: true});
-    this._store.removeItem(`${Prefix.COMMENTS}${id}`);
+    const updatedMovie = Object.assign({}, movie.toRAW());
+    const updatedMovieComments = this._store.getItem(`${Prefix.COMMENTS}${movie.id}`)
+      .map((comment) => {
+        if (comment.id === id) {
+          if (comment.offline) {
+            return false;
+          } else {
+            return Object.assign({}, comment, {isDeleted: true});
+          }
+        }
+
+        return comment;
+      })
+      .filter((comment) => typeof comment === `object`);
+
+    this._store.setItem(`${Prefix.COMMENTS}${movie.id}`, updatedMovieComments);
     this._store.setItem(`${Prefix.MOVIES}${movie.id}`, updatedMovie);
     this._isSynchronized = false;
 
@@ -144,7 +175,7 @@ export default class Provider {
     });
     const movieComments = this._store.getItem(`${Prefix.COMMENTS}${movie.id}`);
     movieComments.push(fakeNewComment);
-    this._store.setItem(`${Prefix.MOVIES}${movie.id}`, Object.assign(fakeNewMovie, {offline: true}));
+    this._store.setItem(`${Prefix.MOVIES}${movie.id}`, Object.assign(fakeNewMovie));
     this._store.setItem(`${Prefix.COMMENTS}${movie.id}`, movieComments);
     this._isSynchronized = false;
 
@@ -159,13 +190,19 @@ export default class Provider {
       const store = this._store.getAll();
       const updatedMovies = getUpdatedMovies(store);
       const newComments = getNewComments(store);
+      const deletedComments = getDeletedComments(store);
+      console.log(updatedMovies);
 
       if (newComments.length) {
         Promise.all(newComments.map((comment) => {
-          const movieId = 0;
+          const movieId = comment.movieId;
           delete comment.movieId;
           this._api.createComment(movieId, comment);
         }));
+      }
+
+      if (deletedComments.length) {
+        Promise.all(deletedComments.map(({id}) => this._api.deleteComment(id)));
       }
 
       // return this._api.sync(storeMovies)
