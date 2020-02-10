@@ -191,7 +191,6 @@ export default class Provider {
       const updatedMovies = getUpdatedMovies(store);
       const newComments = getNewComments(store);
       const deletedComments = getDeletedComments(store);
-      console.log(updatedMovies);
 
       if (newComments.length) {
         Promise.all(newComments.map((comment) => {
@@ -205,22 +204,19 @@ export default class Provider {
         Promise.all(deletedComments.map(({id}) => this._api.deleteComment(id)));
       }
 
-      // return this._api.sync(storeMovies)
-      //   .then((response) => {
-      //     storeMovies.filter((movie) => movie.offline).forEach((movie) => {
-      //       this._store.removeItem(movie.id);
-      //     });
+      if (updatedMovies.length) {
+        return this._api.sync(updatedMovies)
+          .then(({updated}) => {
+            const updatedMoviesFromServer = updated;
 
-      //     const updatedMovies = getSyncedMovies(response.updated);
+            updatedMoviesFromServer.forEach((movie) => {
+              this._store.setItem(`${Prefix.MOVIES}${movie.id}`, movie);
+            });
 
-      //     updatedMovies.forEach((movie) => {
-      //       this._store.setItem(movie.id, movie);
-      //     });
-
-      //     this._isSynchronized = true;
-
-      //     return Promise.resolve();
-      //   });
+            this._isSynchronized = true;
+            return Promise.resolve();
+          });
+      }
     }
 
     return Promise.reject(new Error(`Sync data failed`));
