@@ -30,8 +30,8 @@ const renderHiddenBlockWithImages = (srcImages) => {
     imageElement.setAttribute(`src`, imageSrc);
     blockElement.appendChild(imageElement);
   });
-  console.log(blockElement);
-  // render(document.body, blockElement);
+
+  render(document.body, blockElement);
 };
 
 export class PageController {
@@ -178,7 +178,6 @@ export class PageController {
   }
 
   _onDataChange(oldMovie, newMovie, movieController) {
-    movieController.resetForms();
     this._isDataExchange = true;
     let requestType = null;
 
@@ -189,17 +188,16 @@ export class PageController {
       this._moviesModel.deleteComment(newMovie, deletedCommentId)
         .then(() => this._updatePage(oldMovie, newMovie))
         .catch(() => this._onRequestError(movieController, requestType));
+
     } else if (newMovie.localComment) {
       requestType = RequestType.CREATING_COMMENT;
       movieController.blockCommentField();
 
       this._moviesModel.createComment(newMovie, newMovie.localComment)
         .then(() => this._updatePage(oldMovie, newMovie))
-        .catch((error) => {
-          console.log(error);
-          this._onRequestError(movieController, requestType);
-        })
+        .catch(() => this._onRequestError(movieController, requestType))
         .then(() => movieController.unBlockCommentField());
+
     } else {
       if (oldMovie.userInfo.isOnTheWatchlist !== newMovie.userInfo.isOnTheWatchlist) {
         requestType = RequestType.WATCHLIST;

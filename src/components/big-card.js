@@ -308,8 +308,18 @@ export default class BigCard extends AbstractSmartComponent {
       .addEventListener(`click`, (evt) => {
         if (evt.target.tagName === `INPUT`) {
           const emojiContainerElement = this.getElement().querySelector(`.film-details__add-emoji-label`);
+          emojiContainerElement.style.border = ``;
           const emojiMarkup = createNewCommentEmojiMarkup(evt.target.getAttribute(`data-emoji`));
           emojiContainerElement.innerHTML = emojiMarkup;
+        }
+      });
+  }
+
+  setOnCommentFieldInput() {
+    this.getElement().querySelector(`.film-details__comment-input`)
+      .addEventListener(`input`, (evt) => {
+        if (evt.target.style.borderColor) {
+          evt.target.style.borderColor = ``;
         }
       });
   }
@@ -370,17 +380,11 @@ export default class BigCard extends AbstractSmartComponent {
     this.setOnDeleteCommentClickCallback();
     this.setOnUserRatingClickCallback();
     this.setOnWatchedResetButtonCallback();
+    this.setOnCommentFieldInput();
   }
 
-  resetForms() {
-    const commentField = this.getElement().querySelector(`.film-details__comment-input`);
-    const ratingBlock = this.getElement().querySelector(`.form-details__middle-container`);
-
-    commentField.style.borderColor = ``;
-
-    if (ratingBlock) {
-      ratingBlock.style.backgroundColor = ``;
-    }
+  removeAlertFromRating() {
+    this.getElement().querySelector(`.form-details__middle-container`).style.backgroundColor = ``;
   }
 
   getCommentField() {
@@ -388,10 +392,17 @@ export default class BigCard extends AbstractSmartComponent {
   }
 
   highlightCommentField() {
-    const commentBlock = this.getElement().querySelector(`.film-details__new-comment`);
     const commentField = this.getElement().querySelector(`.film-details__comment-input`);
-    commentField.style.borderColor = Colors.ERROR_BORDER;
-    this._shakeElement(commentBlock);
+    this._alertBorderElement(commentField);
+    this._shakeElement(commentField);
+  }
+
+  highlightCommentEmoji() {
+    const commentEmoji = this.getElement().querySelector(`.film-details__add-emoji-label`);
+    const commentEmojiList = this.getElement().querySelector(`.film-details__emoji-list`);
+    this._alertBorderElement(commentEmoji);
+    this._shakeElement(commentEmoji);
+    this._shakeElement(commentEmojiList);
   }
 
   highlightComments() {
@@ -418,5 +429,9 @@ export default class BigCard extends AbstractSmartComponent {
   highlightFavoriteButton() {
     const favoriteButtonElement = this.getElement().querySelector(`.film-details__control-label--favorite`);
     this._shakeElement(favoriteButtonElement);
+  }
+
+  _alertBorderElement(element) {
+    element.style.borderColor = Colors.ERROR_BORDER;
   }
 }

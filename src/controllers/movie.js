@@ -34,6 +34,7 @@ export class MovieController {
     this._cardComponent.setOpenCallback(this._openBigCard);
     this._bigCardComponent.setCloseCallback(this._closeBigCard);
     this._bigCardComponent.setOnEmojiListClickHandler();
+    this._bigCardComponent.setOnCommentFieldInput();
 
     this._bigCardComponent.setOnDeleteCommentClickCallback((commentId) => {
       const newMovieData = MovieModel.clone(this._movieData);
@@ -43,6 +44,7 @@ export class MovieController {
 
     this._bigCardComponent.setOnUserRatingClickCallback((userRating) => {
       if (!this._isDataExchange()) {
+        this._bigCardComponent.removeAlertFromRating();
         const newMovieData = MovieModel.clone(this._movieData);
         newMovieData.userInfo.personalRating = Number(userRating);
         this._onDataChange(this._movieData, newMovieData, this);
@@ -100,10 +102,6 @@ export class MovieController {
     this._closeBigCard();
   }
 
-  resetForms() {
-    this._bigCardComponent.resetForms();
-  }
-
   shake(requestType) {
     switch (requestType) {
       case RequestType.CREATING_COMMENT:
@@ -144,13 +142,27 @@ export class MovieController {
       const dateValue = new Date().toISOString();
       const emotionImageElement = this._bigCardComponent.getElement().querySelector(`.film-details__add-emoji-label img`);
 
-      if (commentFieldElement.value && emotionImageElement && !this._isDataExchange()) {
+      if (!this._isDataExchange()) {
+        if (!commentFieldElement.value && !emotionImageElement) {
+          this._bigCardComponent.highlightCommentField();
+          this._bigCardComponent.highlightCommentEmoji();
+          return;
+        } else if (!commentFieldElement.value) {
+          this._bigCardComponent.highlightCommentField();
+          return;
+        } else if (!emotionImageElement) {
+          this._bigCardComponent.highlightCommentEmoji();
+          return;
+        }
+
         const newMovieData = MovieModel.clone(this._movieData);
+
         newMovieData.localComment = {
           comment: commentFieldElement.value,
           date: dateValue,
           emotion: emotionImageElement.getAttribute(`data-emoji`),
         };
+
         this._onDataChange(this._movieData, newMovieData, this);
       }
     }
