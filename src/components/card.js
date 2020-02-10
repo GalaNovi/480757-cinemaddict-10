@@ -122,17 +122,17 @@ export default class Card extends AbstractSmartComponent {
     this.setOpenCallback();
   }
 
-  highlightWatchlistButton() {
+  alertWatchlistButton() {
     const watchlistButtonElement = this.getElement().querySelector(`.film-card__controls-item--add-to-watchlist`);
     this._shakeElement(watchlistButtonElement);
   }
 
-  highlightWatchedButton() {
+  alertWatchedButton() {
     const watchedButtonElement = this.getElement().querySelector(`.film-card__controls-item--mark-as-watched`);
     this._shakeElement(watchedButtonElement);
   }
 
-  highlightFavoriteButton() {
+  alertFavoriteButton() {
     const favoriteButtonElement = this.getElement().querySelector(`.film-card__controls-item--favorite`);
     this._shakeElement(favoriteButtonElement);
   }

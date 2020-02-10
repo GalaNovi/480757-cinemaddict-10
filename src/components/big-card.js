@@ -391,13 +391,13 @@ export default class BigCard extends AbstractSmartComponent {
     return this.getElement().querySelector(`.film-details__comment-input`);
   }
 
-  highlightCommentField() {
+  alertCommentField() {
     const commentField = this.getElement().querySelector(`.film-details__comment-input`);
     this._alertBorderElement(commentField);
     this._shakeElement(commentField);
   }
 
-  highlightCommentEmoji() {
+  alertCommentEmoji() {
     const commentEmoji = this.getElement().querySelector(`.film-details__add-emoji-label`);
     const commentEmojiList = this.getElement().querySelector(`.film-details__emoji-list`);
     this._alertBorderElement(commentEmoji);
@@ -405,28 +405,28 @@ export default class BigCard extends AbstractSmartComponent {
     this._shakeElement(commentEmojiList);
   }
 
-  highlightComments() {
+  alertComments() {
     const commentBlock = this.getElement().querySelector(`.film-details__comments-list`);
     this._shakeElement(commentBlock);
   }
 
-  highlightRatingForm() {
+  alertRatingForm() {
     const ratingBlockElement = this.getElement().querySelector(`.form-details__middle-container`);
     ratingBlockElement.style.backgroundColor = Colors.ERROR_BACKGROUND;
     this._shakeElement(ratingBlockElement);
   }
 
-  highlightWatchlistButton() {
+  alertWatchlistButton() {
     const watchlistButtonElement = this.getElement().querySelector(`.film-details__control-label--watchlist`);
     this._shakeElement(watchlistButtonElement);
   }
 
-  highlightWatchedButton() {
+  alertWatchedButton() {
     const watchedButtonElement = this.getElement().querySelector(`.film-details__control-label--watched`);
     this._shakeElement(watchedButtonElement);
   }
 
-  highlightFavoriteButton() {
+  alertFavoriteButton() {
     const favoriteButtonElement = this.getElement().querySelector(`.film-details__control-label--favorite`);
     this._shakeElement(favoriteButtonElement);
   }

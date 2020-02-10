@@ -105,25 +105,25 @@ export class MovieController {
   shake(requestType) {
     switch (requestType) {
       case RequestType.CREATING_COMMENT:
-        this._bigCardComponent.highlightCommentField();
+        this._bigCardComponent.alertCommentField();
         break;
       case RequestType.DELETING_COMMENT:
-        this._bigCardComponent.highlightComments();
+        this._bigCardComponent.alertComments();
         break;
       case RequestType.SETTING_RATING:
-        this._bigCardComponent.highlightRatingForm();
+        this._bigCardComponent.alertRatingForm();
         break;
       case RequestType.WATCHLIST:
-        this._cardComponent.highlightWatchlistButton();
-        this._bigCardComponent.highlightWatchlistButton();
+        this._cardComponent.alertWatchlistButton();
+        this._bigCardComponent.alertWatchlistButton();
         break;
       case RequestType.WATCHED:
-        this._cardComponent.highlightWatchedButton();
-        this._bigCardComponent.highlightWatchedButton();
+        this._cardComponent.alertWatchedButton();
+        this._bigCardComponent.alertWatchedButton();
         break;
       case RequestType.FAVORITE:
-        this._cardComponent.highlightFavoriteButton();
-        this._bigCardComponent.highlightFavoriteButton();
+        this._cardComponent.alertFavoriteButton();
+        this._bigCardComponent.alertFavoriteButton();
         break;
     }
   }
@@ -144,14 +144,14 @@ export class MovieController {
 
       if (!this._isDataExchange()) {
         if (!commentFieldElement.value && !emotionImageElement) {
-          this._bigCardComponent.highlightCommentField();
-          this._bigCardComponent.highlightCommentEmoji();
+          this._bigCardComponent.alertCommentField();
+          this._bigCardComponent.alertCommentEmoji();
           return;
         } else if (!commentFieldElement.value) {
-          this._bigCardComponent.highlightCommentField();
+          this._bigCardComponent.alertCommentField();
           return;
         } else if (!emotionImageElement) {
-          this._bigCardComponent.highlightCommentEmoji();
+          this._bigCardComponent.alertCommentEmoji();
           return;
         }
 
