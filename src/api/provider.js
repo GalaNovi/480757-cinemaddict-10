@@ -149,7 +149,7 @@ export default class Provider {
     this._isSynchronized = false;
 
     return Promise.resolve({
-      newMovie: fakeNewMovie,
+      newMovie: Movie.parseMovie(fakeNewMovie),
       comments: movieComments,
     });
   }

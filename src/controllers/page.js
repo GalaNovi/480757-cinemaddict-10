@@ -256,7 +256,6 @@ export class PageController {
   }
 
   _updatePage(oldMovie, newMovie) {
-    console.log(this._moviesModel.movies); ////////// В хранилище записывается сырой измененный фильм
     const alreadyWatchedMovies = this._moviesModel.movies.filter((movie) => movie.userInfo.isAlreadyWatched);
 
     this._menuController.render();
