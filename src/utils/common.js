@@ -29,4 +29,17 @@ const getUserRank = (moviesAmount) => {
     userRank[0];
 };
 
-export {capitalize, getNextItemsIterator, formatTime, getUserRank};
+const removeMainPreloader = () => {
+  const preloader = document.querySelector(`.preloader-wrapper`);
+  const preloaderElement = document.querySelector(`.preloader-element`);
+  preloaderElement.style.transition = `opacity 0.5s`;
+  preloader.style.transition = `opacity 1s`;
+  preloaderElement.style.opacity = `0`;
+  preloader.style.opacity = `0`;
+
+  setTimeout(() => {
+    preloader.remove();
+  }, 1000);
+};
+
+export {capitalize, getNextItemsIterator, formatTime, getUserRank, removeMainPreloader};

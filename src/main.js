@@ -3,6 +3,7 @@ import Api from './api/index';
 import Store from './api/store';
 import Provider from './api/provider';
 import {PageController} from './controllers/page';
+import {removeMainPreloader} from './utils/common';
 
 const StoreHeading = {
   PREFIX: `cinemaddict-localstorage`,
@@ -11,11 +12,9 @@ const StoreHeading = {
 
 const storeName = `${StoreHeading.PREFIX}-${StoreHeading.VERSION}`;
 const END_POINT = `https://htmlacademy-es-10.appspot.com/cinemaddict/`;
-const randomString = Math.random().toString(36).substring(2, 10);
-// const authorizationCode = `Basic ${randomString}`;
-const authorizationCode = `Basic kjasrhgfkuGiYUUfIYtfjytf`;
+const AUTHORIZATION_CODE = `Basic kjasrhgfkuGiYUUfIYtfjytf`;
 
-const api = new Api(END_POINT, authorizationCode);
+const api = new Api(END_POINT, AUTHORIZATION_CODE);
 const store = new Store(storeName, window.localStorage);
 const apiWithProvider = new Provider(api, store);
 const moviesModel = new MoviesModel(apiWithProvider);
@@ -51,4 +50,7 @@ window.addEventListener(`offline`, () => {
 
 moviesModel.getMovies()
   .then((movies) => Promise.all(movies.map((movie) => moviesModel.getComments(movie.id))))
-  .then(() => pageController.render());
+  .then(() => {
+    pageController.render();
+    removeMainPreloader();
+  });
