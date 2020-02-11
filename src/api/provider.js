@@ -72,7 +72,7 @@ export default class Provider {
   constructor(api, store) {
     this._api = api;
     this._store = store;
-    this._isSynchronized = true;
+    this._isSynchronized = false;
   }
 
   getMovies() {
@@ -88,7 +88,6 @@ export default class Provider {
     const storeMovieIds = Object.keys(store).filter((key) => !key.match(Prefix.COMMENTS));
     const storeMovies = storeMovieIds.map((id) => store[id]);
     this._isSynchronized = false;
-    
 
     return Promise.resolve(Movie.parseMovies(storeMovies));
   }

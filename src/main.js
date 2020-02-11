@@ -22,11 +22,8 @@ const pageController = new PageController(document.body, moviesModel);
 
 window.addEventListener(`load`, () => {
   navigator.serviceWorker.register(`/sw.js`)
-    .then(() => {
-      console.log(`ServiceWorker REGISTERED`);
-    })
     .catch(() => {
-      console.log(`ServiceWorker NOT REGISTERED`);
+      throw Error(`ServiceWorker NOT REGISTERED`);
     });
 });
 
@@ -34,13 +31,7 @@ window.addEventListener(`online`, () => {
   document.title = document.title.replace(` [offline]`, ``);
 
   if (!apiWithProvider.getSynchronize()) {
-    apiWithProvider.sync()
-      .then(() => {
-        console.log(`SYNCRONIZED`);
-      })
-      .catch(() => {
-        console.log(`NOT SYNCRONIZED`);
-      });
+    apiWithProvider.sync();
   }
 });
 
