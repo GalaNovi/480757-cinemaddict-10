@@ -13,6 +13,7 @@ export class MovieController {
     this._onViewChange = onViewChange;
     this._onCloseBigCard = onCloseBigCard;
     this._isDataExchange = getDataExchangeStatus;
+    this._deletingCommentButton = null;
 
     this._onEsqKeyDown = this._onEsqKeyDown.bind(this);
     this._openBigCard = this._openBigCard.bind(this);
@@ -39,6 +40,7 @@ export class MovieController {
     this._bigCardComponent.setOnDeleteCommentClickCallback((commentId) => {
       const newMovieData = MovieModel.clone(this._movieData);
       newMovieData.comments = newMovieData.comments.filter((id) => id.toString() !== commentId.toString());
+      this._deletingCommentButton = this._bigCardComponent.getElement().querySelector(`.film-details__comment-delete[data-comment-id="${commentId}"]`);
       this._onDataChange(this._movieData, newMovieData, this);
     });
 
@@ -182,6 +184,17 @@ export class MovieController {
     document.removeEventListener(`keydown`, this._onEsqKeyDown);
     document.removeEventListener(`keydown`, this._onCtrlEnterDown);
     this._onCloseBigCard();
+  }
+
+  blockDeletedComment() {
+    this._deletingCommentButton.style.color = `#ffe800`;
+    this._deletingCommentButton.textContent = `Deleting...`;
+  }
+
+  unBlockDeletedComment() {
+    this._deletingCommentButton.style.color = ``;
+    this._deletingCommentButton.textContent = `Delete`;
+    this._deletingCommentButton = null;
   }
 
   blockCommentField() {
