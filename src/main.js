@@ -12,7 +12,7 @@ const StoreHeading = {
 
 const storeName = `${StoreHeading.PREFIX}-${StoreHeading.VERSION}`;
 const END_POINT = `https://htmlacademy-es-10.appspot.com/cinemaddict/`;
-const AUTHORIZATION_CODE = `Basic kjasrhgfkuGiYUUfIYtfjytf`;
+const AUTHORIZATION_CODE = `Basic kjasrhgfkuGierbYUUfIYtfjytf`;
 
 const api = new Api(END_POINT, AUTHORIZATION_CODE);
 const store = new Store(storeName, window.localStorage);

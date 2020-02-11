@@ -11,6 +11,33 @@ const Colors = {
   ERROR_BORDER: `#ff0000`,
 };
 
+const getCommentTimeAgoText = (dateTime) => {
+  const dateTimeStamp = new Date(dateTime).getTime();
+
+  const secondsAgo = Math.floor((Date.now() - dateTimeStamp) / 1000);
+  const minutesAgo = Math.floor((Date.now() - dateTimeStamp) / 1000 / 60);
+  const hoursAgo = Math.floor((Date.now() - dateTimeStamp) / 1000 / 60 / 60);
+  const daysAgo = Math.floor((Date.now() - dateTimeStamp) / 1000 / 60 / 60 / 24);
+
+  if (secondsAgo < 60) {
+    return `now`;
+  } else if (minutesAgo <= 3) {
+    return `a minute ago`;
+  } else if (minutesAgo < 60) {
+    return `a few minutes ago`;
+  } else if (hoursAgo < 2) {
+    return `a hour ago`;
+  } else if (hoursAgo < 24) {
+    return `a few hours ago`;
+  } else if (daysAgo === 1) {
+    return `a day ago`;
+  } else if (daysAgo === 2) {
+    return `a two days ago`;
+  } else {
+    return moment(dateTimeStamp).format(`YYYY/MM/DD HH:mm`);
+  }
+};
+
 const formatReleaseDate = (timestamp) => {
   return moment(timestamp).format(`DD MMMM YYYY`);
 };
@@ -31,7 +58,7 @@ const createCommentMarkup = (commentData) => {
   }
 
   const {id, author, comment: notSanitizedComment, date, emotion} = commentData;
-  const commentDate = moment(date).format(`YYYY/MM/DD HH:mm`);
+  const commentTimeAgoText = getCommentTimeAgoText(date);
   const comment = he.encode(notSanitizedComment);
 
   return (
@@ -43,7 +70,7 @@ const createCommentMarkup = (commentData) => {
         <p class="film-details__comment-text">${comment}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
-          <span class="film-details__comment-day">${commentDate}</span>
+          <span class="film-details__comment-day">${commentTimeAgoText}</span>
           <button class="film-details__comment-delete" data-comment-id="${id}">Delete</button>
         </p>
       </div>
@@ -177,7 +204,7 @@ const createBigCardMarkup = (movieData, commentsData) => {
   const releaseDate = formatReleaseDate(date);
   const country = release.country;
   const genresMarkup = genres.map((genre) => `<span class="film-details__genre">${capitalize(genre)}</span>`).join(`\n`);
-  const commentsMarkup = comments.map((comment) => createCommentMarkup(comment)).join(``);
+  const commentsMarkup = comments.reverse().map((comment) => createCommentMarkup(comment)).join(``);
   const userRatingFormMarkup = createUserRatingFormMarkup(movieData);
   const newCommentMarkup = createNewCommentMarkup();
   const filmDetailsMarkup = createFilmDetailsMarkup([director, writers, actors, releaseDate, formatTime(duration), country, genresMarkup]);
