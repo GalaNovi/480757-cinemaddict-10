@@ -5,6 +5,11 @@ import {render} from '../utils/render';
 import {RequestType} from '../const';
 
 const BLOCKED_FIELD_OPACITY = 0.5;
+const DELETED_BUTTON_TEXT_COLOR = `#ffe800`;
+const ButtonText = {
+  DEFAULT: `Delete`,
+  DELETING: `Deleting...`,
+};
 
 export class MovieController {
   constructor(container, onDataChange, onViewChange, onCloseBigCard, getDataExchangeStatus) {
@@ -186,14 +191,14 @@ export class MovieController {
     this._onCloseBigCard();
   }
 
-  blockDeletedComment() {
-    this._deletingCommentButton.style.color = `#ffe800`;
-    this._deletingCommentButton.textContent = `Deleting...`;
+  blockDeletedCommentButton() {
+    this._deletingCommentButton.style.color = DELETED_BUTTON_TEXT_COLOR;
+    this._deletingCommentButton.textContent = ButtonText.DELETING;
   }
 
-  unBlockDeletedComment() {
+  unBlockDeletedCommentButton() {
     this._deletingCommentButton.style.color = ``;
-    this._deletingCommentButton.textContent = `Delete`;
+    this._deletingCommentButton.textContent = ButtonText.DEFAULT;
     this._deletingCommentButton = null;
   }
 

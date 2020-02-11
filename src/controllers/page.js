@@ -184,13 +184,13 @@ export class PageController {
     if (oldMovie.comments.length > newMovie.comments.length) {
       requestType = RequestType.DELETING_COMMENT;
       const deletedCommentId = oldMovie.comments.find((commentId, index) => commentId !== newMovie.comments[index]);
-      movieController.blockDeletedComment();
+      movieController.blockDeletedCommentButton();
 
       this._moviesModel.deleteComment(newMovie, deletedCommentId)
         .then(() => this._updatePage(oldMovie, newMovie))
         .catch(() => {
           this._onRequestError(movieController, requestType);
-          movieController.unBlockDeletedComment();
+          movieController.unBlockDeletedCommentButton();
         });
 
     } else if (newMovie.localComment) {
